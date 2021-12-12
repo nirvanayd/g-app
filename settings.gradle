@@ -1,0 +1,4 @@
+rootProject.name = 'nelly-project'
+include 'application'
+include 'domain'
+
