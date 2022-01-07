@@ -1,0 +1,31 @@
+plugins {
+    id 'java'
+}
+
+group 'com.nelly'
+version '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter-web:2.6.1'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    implementation project(':client:g-app-core-web') // web 설정, security 적용
+    implementation project(':domain:g-app-domain')  // rdbms domain
+    implementation project(':domain:g-app-auth-domain') // security 사용 domain
+    implementation project(':modules:g-app-exception-handler') // exception handler
+}
+
+test {
+    useJUnitPlatform()
+}
+
+bootJar {
+    enabled = true
+}
+
+jar {
+    enabled = true
+}
