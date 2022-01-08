@@ -1,0 +1,4 @@
+spring:
+  config:
+    activate:
+      on-profile: prod # 환경이름설정

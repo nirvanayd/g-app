@@ -14,4 +14,8 @@ include 'domain:g-app-auth-domain'
 findProject(':domain:g-app-auth-domain')?.name = 'g-app-auth-domain'
 include 'modules:g-app-token-util'
 findProject(':modules:g-app-token-util')?.name = 'g-app-token-util'
+include 'application:hello'
+findProject(':application:hello')?.name = 'hello'
+include 'modules:g-app-logger'
+findProject(':modules:g-app-logger')?.name = 'g-app-logger'
 

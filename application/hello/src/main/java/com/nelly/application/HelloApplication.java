@@ -2,11 +2,10 @@ package com.nelly.application;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
 @SpringBootApplication
-public class GAppApplication {
+public class HelloApplication {
     public static void main(String[] args) {
-        SpringApplication.run(GAppApplication.class, args);
+        SpringApplication.run(HelloApplication.class, args);
     }
 }

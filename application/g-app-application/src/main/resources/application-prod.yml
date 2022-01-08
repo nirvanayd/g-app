@@ -8,7 +8,7 @@ spring:
     generate-ddl: true
     show-sql: true
     hibernate:
-      ddl-auto: update # update create-drop
+      ddl-auto: create-drop # update create-drop
     properties:
       hibernate:
         format_sql: true
@@ -16,7 +16,7 @@ spring:
   datasource:
     url: 'jdbc:mysql://localhost:3306/gproject?serverTimezone=Asia/Seoul&characterEncoding=UTF-8'
     username: root
-    password: root
+    password: Gapp123!
     driver-class-name: com.mysql.cj.jdbc.Driver
 
   redis:

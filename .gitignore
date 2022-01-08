@@ -28,4 +28,3 @@ nbdist/
 .nb-gradle/
 
 # env
-application.yml
