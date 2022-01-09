@@ -1,10 +1,10 @@
 server:
-  port: 8080
-
+  port: 8082
+  
 spring:
   config:
     activate:
-      on-profile: local # 환경이름설정
+      on-profile: local-green # 환경이름설정
   jpa:
     database: mysql
     database-platform: org.hibernate.dialect.MySQL5InnoDBDialect
