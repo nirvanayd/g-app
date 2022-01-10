@@ -53,8 +53,8 @@ jobs:
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_S3_ACCESS_SECRET }}
       run: |
           aws deploy create-deployment \
-          --application-name springboot-intro \
-          --deployment-group-name springboot-intro-deploy-group \
+          --application-name g-app \
+          --deployment-group-name g-app-deploy \
           --file-exists-behavior OVERWRITE \
           --s3-location bucket=g-app,bundleType=zip,key=g-app-build.zip \
           --region ap-northeast-2
