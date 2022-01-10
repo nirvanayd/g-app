@@ -4,7 +4,7 @@ ABSPATH=$(readlink -f $0)
 ABSDIR=$(dirname $ABSPATH)
 source ${ABSDIR}/profile.sh
 
-REPOSITORY=/home/app
+REPOSITORY=/app
 PROJECT_NAME=g-app
 
 echo "> Build file copy.."
