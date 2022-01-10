@@ -22,7 +22,7 @@ chmod +x $JAR_NAME
 
 echo "> $JAR_NAME run.."
 
-IDEL_PROFILE=$(find_idle_profile)
+IDLE_PROFILE=$(find_idle_profile)
 
 echo "> Env: $IDLE_PROFILE.."
 
