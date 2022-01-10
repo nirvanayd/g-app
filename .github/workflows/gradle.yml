@@ -38,11 +38,11 @@ jobs:
       run: cp ./application/g-app-application/build/libs/*.jar ./deploy/
     # Copy appspec.yml
     - name: Copy appspec
-      run: cp ./application/appspec.yml ./deploy/
+      run: cp ./application/g-app-application/appspec.yml ./deploy/
       
     # script file Copy
     - name: Copy shell
-      run: cp ./application/scripts/* ./deploy/
+      run: cp ./application/g-app-application/scripts/* ./deploy/
     
     # Make Zip file
     - name: Make zip file
