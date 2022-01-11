@@ -25,6 +25,7 @@ echo "> $JAR_NAME run.."
 IDLE_PROFILE=$(find_idle_profile)
 
 echo "> Env: $IDLE_PROFILE.."
+echo "> java -jar -Dspring.profiles.active=$IDLE_PROFILE $JAR_NAME > $REPOSITORY/nohup.out 2>&1 &"
 
 nohup java -jar \
     -Dspring.profiles.active=$IDLE_PROFILE \
