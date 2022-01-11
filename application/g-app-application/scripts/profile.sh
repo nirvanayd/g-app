@@ -45,18 +45,16 @@ function find_current_port()
 
         if [ ${RESPONSE_CODE} -ge 400 ] # 400 보다 크면 (즉, 40x/50x 에러 모두 포함)
         then
-            CURRENT_PROFILE="prod-green"
+            CURRENT_PROFILE="prod-blue"
         else
             CURRENT_PROFILE=$(curl -s http://localhost/prod-profile)
         fi
 
-        echo "${CURRENT_PROFILE}"
-        # IDLE_PROFILE : nginx와 연결되지 않은 profile
-#        if [ "${CURRENT_PROFILE}" == "prod-blue" ]
-#        then
-#            echo "8081"
-#        else
-#            echo "8082"
-#        fi
+        if [ "${CURRENT_PROFILE}" == "prod-blue" ]
+        then
+            echo "8081"
+        else
+            echo "8082"
+        fi
 }
 
