@@ -18,5 +18,6 @@ then
 else
   echo "> kill -15 $IDLE_PID"
   kill -15 ${IDLE_PID}
-  sleep 10
+  sleep 15
+  echo "> 15sec wait..."
 fi
