@@ -12,6 +12,6 @@ public class TestController {
 
     @GetMapping("/hello")
     public ResponseEntity<String> hello() {
-        return ResponseEntity.ok("hello this env is " + env);
+        return ResponseEntity.ok("this env is " + env);
     }
 }
