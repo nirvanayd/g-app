@@ -34,6 +34,8 @@ public class AppUserService {
         return userRepository.save(user);
     }
 
+
+
     public void addUserStyle(Users user, List<String> userStyle) {
         List<UserStyles> list = new ArrayList<>();
         Users refUser = userRepository.getById(user.getId());
@@ -41,7 +43,6 @@ public class AppUserService {
             UserStyles userStyles = UserStyles.builder().styleType(StyleType.getStyleType(code)).user(refUser).build();
             userStylesRepository.save(userStyles);
         }
-//        userStylesRepository.saveAll(list);
     }
 
     public Users getUsers(long authId) {
