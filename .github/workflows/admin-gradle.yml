@@ -32,7 +32,7 @@ jobs:
       run: ./gradlew application:g-admin-application:build
     # Make deploy directory
     - name: Make Directory for deliver
-      run: mkdir -p deploy/g-admin/app
+      run: mkdir -p deploy/g-admin
     # Copy jar file
     - name: Copy jar
       run: cp ./application/g-admin-applicaion/build/libs/*.jar ./deploy/
