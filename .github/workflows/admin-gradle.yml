@@ -29,10 +29,10 @@ jobs:
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
     - name: Build with Gradle
-      run: ./gradlew application:g-admin-application:build
+      run: ./gradlew :application:g-admin-applicaion:build
     # Make deploy directory
     - name: Make Directory for deliver
-      run: mkdir -p deploy/g-admin/app
+      run: mkdir -p deploy/g-admin
     # Copy jar file
     - name: Copy jar
       run: cp ./application/g-admin-applicaion/build/libs/*.jar ./deploy/

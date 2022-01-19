@@ -24,4 +24,6 @@ include 'application:g-admin-applicaion'
 findProject(':application:g-admin-applicaion')?.name = 'g-admin-applicaion'
 include 'modules:g-app-common'
 findProject(':modules:g-app-common')?.name = 'g-app-common'
+include 'client:g-admin-core-web'
+findProject(':client:g-admin-core-web')?.name = 'g-admin-core-web'
 
