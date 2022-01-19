@@ -10,7 +10,7 @@ function find_idle_profile()
     then
         CURRENT_PROFILE="prod-green"
     else
-        CURRENT_PROFILE=$(curl -s http://localhost:${IDLE_PORT}/prod-profile)
+        CURRENT_PROFILE=$(curl -s http://localhost:${CONF_PORT}/prod-profile)
     fi
 
     # IDLE_PROFILE : nginx와 연결되지 않은 profile
