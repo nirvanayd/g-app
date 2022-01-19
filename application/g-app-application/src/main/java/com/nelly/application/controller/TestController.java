@@ -12,7 +12,7 @@ public class TestController {
 
     @GetMapping("/hello")
     public ResponseEntity<String> hello() {
-        return ResponseEntity.ok("Hello World!!");
+        return ResponseEntity.ok("Hello World~~~");
     }
 
     @GetMapping("/env")
