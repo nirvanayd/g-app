@@ -8,3 +8,9 @@ version '1.0-SNAPSHOT'
 bootJar {
     enabled = false
 }
+
+subprojects {
+    dependencies {
+        implementation project(':modules:g-app-common') // common
+    }
+}

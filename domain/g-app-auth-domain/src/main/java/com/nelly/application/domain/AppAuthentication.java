@@ -14,25 +14,26 @@ import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
-
 @Builder
-@Table(name="users")
+@Table(name="authentication")
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
 @Setter
 @Entity
-public class Users implements UserDetails {
-
+public class AppAuthentication implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column
-    private String email;
+    private String loginId;
 
     @Column
     private String password;
+
+    @Column(nullable = true)
+    private String rt;
 
     @Column
     @ElementCollection(fetch = FetchType.EAGER)
@@ -49,7 +50,7 @@ public class Users implements UserDetails {
 
     @Override
     public String getUsername() {
-        return email;
+        return loginId;
     }
 
     @Override

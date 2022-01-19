@@ -30,9 +30,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .authorizeRequests()
-                .antMatchers("/api/auth/sign-up", "/api/auth/login").permitAll()
-//                .antMatchers("/api/login").hasRole("USER")
-//                .antMatchers("/api/adminTest").hasRole("ADMIN")
+                .antMatchers("/api/user/sign-up", "/api/user/login", "/api/user/authority").permitAll()
+                .antMatchers( "/api/user/logout", "/api/user/user-test").hasRole("USER")
+//                .antMatchers().hasRole("ADMIN")
                 .and()
                 .addFilterBefore(corsFilter, UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(

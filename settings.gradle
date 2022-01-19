@@ -18,4 +18,8 @@ include 'application:hello'
 findProject(':application:hello')?.name = 'hello'
 include 'modules:g-app-logger'
 findProject(':modules:g-app-logger')?.name = 'g-app-logger'
+include 'application:g-admin-applicaion'
+findProject(':application:g-admin-applicaion')?.name = 'g-admin-applicaion'
+include 'modules:g-app-common'
+findProject(':modules:g-app-common')?.name = 'g-app-common'
 

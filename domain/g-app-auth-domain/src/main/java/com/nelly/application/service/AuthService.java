@@ -1,10 +1,12 @@
 package com.nelly.application.service;
 
-import com.nelly.application.domain.Users;
+import com.nelly.application.domain.AppAuthentication;
+import com.nelly.application.dto.AuthTokenInfoDto;
 import com.nelly.application.dto.TokenInfoDto;
 import com.nelly.application.enums.Authority;
 import com.nelly.application.jwt.TokenProvider;
-import com.nelly.application.repository.UserRepository;
+import com.nelly.application.repository.AuthRepository;
+import com.nelly.application.util.SecurityUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -18,34 +20,33 @@ import java.util.Optional;
 @Service
 public class AuthService {
 
-    private final UserRepository userRepository;
+    private final AuthRepository authRepository;
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
     private final TokenProvider tokenProvider;
 
-    public Users signUp(String email, String password) {
-        Users user = Users.builder()
-                .email(email)
+    public Long signUp(String loginId, String password) {
+        AppAuthentication authentication = AppAuthentication.builder()
+                .loginId(loginId)
                 .password(password)
                 .roles(Collections.singletonList(Authority.ROLE_USER.name()))
                 .build();
 
-        return userRepository.save(user);
+        return authRepository.save(authentication).getId();
     }
 
-    public Users findByEmail(String email) {
-        Optional<Users> existUser = userRepository.findByEmail(email);
+    public AppAuthentication findByLoginId(String loginId) {
+        Optional<AppAuthentication> existUser = authRepository.findByLoginId(loginId);
         return existUser.orElse(null);
     }
 
-    public void login(String email, String password) {
-        if (userRepository.findByEmail(email).orElse(null) == null) {
+    public TokenInfoDto login(String loginId, String password) {
+        if (authRepository.findByLoginId(loginId).orElse(null) == null) {
             throw new RuntimeException("아이디를 찾을 수 없습니다.");
         }
-
         // 1. Login ID/PW 를 기반으로 Authentication 객체 생성
         // 이때 authentication 는 인증 여부를 확인하는 authenticated 값이 false
         UsernamePasswordAuthenticationToken authenticationToken =
-                new UsernamePasswordAuthenticationToken(email, password);
+                new UsernamePasswordAuthenticationToken(loginId, password);
 
         // 2. 실제 검증 (사용자 비밀번호 체크)이 이루어지는 부분
         // authenticate 매서드가 실행될 때 CustomUserDetailsService 에서 만든 loadUserByUsername 메서드가 실행
@@ -53,9 +54,45 @@ public class AuthService {
 
         TokenInfoDto tokenInfoDto = tokenProvider.generateToken(authentication);
 
-        System.out.println(tokenInfoDto);
-        System.out.println("***********");
-        System.out.println(authentication.getName());
+        // 3. refresh 토큰 DB 업데이트.
+        AppAuthentication auth = authRepository.findByLoginId(loginId).orElse(null);
+        if (auth == null) {
+            throw new RuntimeException("아이디를 찾을 수 없습니다.");
+        }
+        auth.setRt(tokenInfoDto.getRefreshToken());
+        authRepository.save(auth);
 
+        tokenInfoDto.setAuthId(auth.getId());
+        return tokenInfoDto;
+    }
+
+    public void authority() {
+        String userName = SecurityUtil.getCurrentUser();
+        System.out.println("#####" + userName);
+
+//        Users user = usersRepository.findByEmail(userEmail)
+//                .orElseThrow(() -> new UsernameNotFoundException("No authentication information."));
+//
+//        // add ROLE_ADMIN
+//        user.getRoles().add(Authority.ROLE_ADMIN.name());
+//        usersRepository.save(user);
+//
+//        return response.success();
+    }
+
+    public TokenInfoDto getAppAuthentication(String token) {
+        if(!tokenProvider.validateToken(token)) {
+            return null;
+        }
+        Authentication authentication = tokenProvider.getAuthentication(token);
+        AppAuthentication auth = findByLoginId(authentication.getName());
+
+        Long expire = tokenProvider.getExpiration(token);
+        return TokenInfoDto.builder().authId(auth.getId())
+                .loginId(auth.getLoginId())
+                .accessToken(token)
+                .refreshToken(auth.getRt())
+                .refreshTokenExpirationTime(expire)
+                .build();
     }
 }
