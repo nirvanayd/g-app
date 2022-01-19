@@ -3,7 +3,7 @@
 function find_idle_profile()
 {
     # curl 결과로 연결할 서비스 결정
-    CONF_PORT = $(sh /etc/nginx/conf.d/app-port.sh)
+    CONF_PORT=$(</etc/nginx/conf.d/app-port.txt)
     RESPONSE_CODE=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:${CONF_PORT}/prod-profile)
 
     if [ ${RESPONSE_CODE} -ge 400 ] # 400 보다 크면 (즉, 40x/50x 에러 모두 포함)
