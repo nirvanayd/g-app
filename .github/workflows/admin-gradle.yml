@@ -5,13 +5,13 @@
 # This workflow will build a Java project with Gradle and cache/restore any dependencies to improve the workflow execution time
 # For more information see: https://help.github.com/actions/language-and-framework-guides/building-and-testing-java-with-gradle
 
-name: g-app
+name: g-admin-app
 
 on:
   push:
-    branches: [ master ]
+    branches: [ master-admin ]
   pull_request:
-    branches: [ master ]
+    branches: [ master-admin ]
 
 jobs:
   build:
@@ -29,31 +29,31 @@ jobs:
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
     - name: Build with Gradle
-      run: ./gradlew application:g-app-application:build
+      run: ./gradlew application:g-admin-application:build
     # Make deploy directory
     - name: Make Directory for deliver
-      run: mkdir -p deploy/g-app
+      run: mkdir -p deploy/g-admin/app
     # Copy jar file
     - name: Copy jar
-      run: cp ./application/g-app-application/build/libs/*.jar ./deploy/
+      run: cp ./application/g-admin-applicaion/build/libs/*.jar ./deploy/
     # Copy appspec.yml
     - name: Copy appspec
-      run: cp ./application/g-app-application/appspec.yml ./deploy/
+      run: cp ./application/g-admin-applicaion/appspec.yml ./deploy/
       
     # script file Copy
     - name: Copy shell
-      run: cp ./application/g-app-application/scripts/* ./deploy/
+      run: cp ./application/g-admin-applicaion/scripts/* ./deploy/
     
     # Make Zip file
     - name: Make zip file
-      run: zip -r -qq -j ./g-app-build.zip ./deploy/
+      run: zip -r -qq -j ./g-admin-build.zip ./deploy/
     # Deliver
     - name: Deliver to AWS S3
       env: 
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_S3_ACCESS_KEY }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_S3_ACCESS_SECRET }}
       run: |
-          aws s3 cp --region ap-northeast-2 --acl private ./g-app-build.zip s3://g-app/
+          aws s3 cp --region ap-northeast-2 --acl private ./g-admin-build.zip s3://g-admin/
     # Deploy
     - name: Deploy
       env: 
@@ -61,8 +61,8 @@ jobs:
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_S3_ACCESS_SECRET }}
       run: |
           aws deploy create-deployment \
-          --application-name g-app-deploy \
-          --deployment-group-name g-app-deploy \
+          --application-name g-admin-deploy \
+          --deployment-group-name g-admin-deploy \
           --file-exists-behavior OVERWRITE \
-          --s3-location bucket=g-app,bundleType=zip,key=g-app-build.zip \
+          --s3-location bucket=g-admin,bundleType=zip,key=g-admin-build.zip \
           --region ap-northeast-2
