@@ -34,6 +34,18 @@ public class AuthService {
         return authRepository.save(authentication).getId();
     }
 
+    public Long signUp(String loginId, String password, Authority authority) {
+        AppAuthentication authentication = AppAuthentication.builder()
+                .loginId(loginId)
+                .password(password)
+                .roles(Collections.singletonList(authority.name()))
+                .build();
+
+        return authRepository.save(authentication).getId();
+    }
+
+
+
     public AppAuthentication findByLoginId(String loginId) {
         Optional<AppAuthentication> existUser = authRepository.findByLoginId(loginId);
         return existUser.orElse(null);
