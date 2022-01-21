@@ -5,6 +5,7 @@ import com.nelly.application.domain.Users;
 import com.nelly.application.dto.AuthTokenInfoDto;
 import com.nelly.application.dto.SignUpRequestDto;
 import com.nelly.application.dto.TokenInfoDto;
+import com.nelly.application.enums.Authority;
 import com.nelly.application.service.AppUserService;
 import com.nelly.application.service.AuthService;
 import com.nelly.application.util.CacheTemplate;
@@ -33,7 +34,8 @@ public class UserService {
         String encryptPassword = encryptUtils.encrypt(dto.getPassword());
         Long authId = authService.signUp(dto.getLoginId(), encryptPassword);
         if (authId == null) throw new RuntimeException("회원가입 중 오류가 발생하였습니다.");
-        Users user = appUserService.addUser(authId, dto.getLoginId(), dto.getEmail(), dto.getBirth(), dto.getPhone());
+        Users user = appUserService.addUser(authId, dto.getLoginId(), dto.getEmail(), dto.getBirth(), dto.getPhone(),
+                Authority.ROLE_USER);
 
         appUserService.addUserStyle(user, dto.getUserStyle());
     }

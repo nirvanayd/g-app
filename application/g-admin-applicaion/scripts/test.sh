@@ -1,21 +1,54 @@
-# curl 결과로 연결할 서비스 결정
-RESPONSE_CODE=$(curl -s -o /dev/null -w "%{http_code}" http://localhost/prod-profile)
+user nginx;
+worker_processes auto;
+error_log /var/log/nginx/error.log;
+pid /run/nginx.pid;
 
-if [ ${RESPONSE_CODE} -ge 400 ] # 400 보다 크면 (즉, 40x/50x 에러 모두 포함)
-then
-    CURRENT_PROFILE="prod-blue"
-else
-    CURRENT_PROFILE=$(curl -s http://localhost/prod-profile)
-fi
+# Load dynamic modules. See /usr/share/doc/nginx/README.dynamic.
+include /usr/share/nginx/modules/*.conf;
 
-# IDLE_PROFILE : nginx와 연결되지 않은 profile
-if [ ${CURRENT_PROFILE} == "prod-blue" ]
-then
-  IDLE_PROFILE="prod-green"
-else
-  IDLE_PROFILE="prod-blue"
-fi
+events {
+    worker_connections 1024;
+}
 
-# bash script는 값의 반환이 안된다.
-# echo로 결과 출력 후, 그 값을 잡아서 사용한다.
-echo "${IDLE_PROFILE}"
+http {
+    log_format  main  '$remote_addr - $remote_user [$time_local] "$request" '
+                      '$status $body_bytes_sent "$http_referer" '
+                      '"$http_user_agent" "$http_x_forwarded_for"';
+
+    access_log  /var/log/nginx/access.log  main;
+
+    sendfile            on;
+    tcp_nopush          on;
+    tcp_nodelay         on;
+    keepalive_timeout   65;
+    types_hash_max_size 4096;
+
+    include             /etc/nginx/mime.types;
+    default_type        application/octet-stream;
+
+    # Load modular configuration files from the /etc/nginx/conf.d directory.
+    # See http://nginx.org/en/docs/ngx_core_module.html#include
+    # for more information.
+    # include /etc/nginx/conf.d/*.conf;
+
+    include /etc/nginx/conf.d/g-app.conf
+
+  }
+
+#        ssl_session_cache shared:SSL:1m;
+#        ssl_session_timeout  10m;
+#        ssl_ciphers HIGH:!aNULL:!MD5;
+#        ssl_prefer_server_ciphers on;
+#
+#        # Load configuration files for the default server block.
+#        include /etc/nginx/default.d/*.conf;
+#
+#        error_page 404 /404.html;
+#            location = /40x.html {
+#        }
+#
+#        error_page 500 502 503 504 /50x.html;
+#            location = /50x.html {
+#        }
+#    }
+}

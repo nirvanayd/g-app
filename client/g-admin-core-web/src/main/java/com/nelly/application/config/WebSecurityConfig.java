@@ -32,6 +32,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .authorizeRequests()
                 .antMatchers("/admin/sign-up", "/admin/login", "/admin/authority").permitAll()
                 .antMatchers( "/admin/logout", "/admin/admin-test").hasRole("ADMIN")
+                .antMatchers( "/admin/users").hasRole("ADMIN")
 //                .antMatchers().hasRole("ADMIN")
                 .and()
                 .addFilterBefore(corsFilter, UsernamePasswordAuthenticationFilter.class)

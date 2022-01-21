@@ -44,8 +44,6 @@ public class AuthService {
         return authRepository.save(authentication).getId();
     }
 
-
-
     public AppAuthentication findByLoginId(String loginId) {
         Optional<AppAuthentication> existUser = authRepository.findByLoginId(loginId);
         return existUser.orElse(null);

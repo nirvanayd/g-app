@@ -29,7 +29,6 @@ public class JwtAuthenticationFilter extends GenericFilterBean {
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
 
         String token = this.resolveToken((HttpServletRequest) request);
-
         if (token != null && tokenProvider.validateToken(token)) {
             String isLogout = (String)cacheTemplate.getValue(token);
 

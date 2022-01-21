@@ -31,6 +31,8 @@ public class Users extends BaseTime{
     private Long authId;
     @Column(name = "login_id", nullable = false, length = 100)
     private String loginId;
+    @Column(name = "role", nullable = false, length = 10)
+    private String role;
     @Column(name = "email", nullable = false, length = 200)
     private String email;
     @Column(name = "birth", nullable = false, length = 10)
