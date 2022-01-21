@@ -2,7 +2,7 @@
 
 function find_idle_profile()
 {
-    IDLE_PROFILE = "prod"
+    IDLE_PROFILE="prod"
     # bash script는 값의 반환이 안된다.
     # echo로 결과 출력 후, 그 값을 잡아서 사용한다.
     echo "${IDLE_PROFILE}"
