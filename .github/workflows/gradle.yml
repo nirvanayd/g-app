@@ -9,9 +9,9 @@ name: g-app
 
 on:
   push:
-    branches: [ master-api ]
+    branches: [ master ]
   pull_request:
-    branches: [ master-api ]
+    branches: [ master ]
 
 jobs:
   build:
