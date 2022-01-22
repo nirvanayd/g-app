@@ -14,6 +14,7 @@ public enum Profiles {
     LOCAL("local"),
     LOCAL_BLUE("local-blue"),
     LOCAL_GREEN("local-green"),
+    PROD("prod"),
     PROD_BLUE("prod-blue"),
     PROD_GREEN("prod-green");
 
