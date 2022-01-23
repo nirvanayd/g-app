@@ -38,13 +38,13 @@ public class AdminService {
         appUserService.addUserStyle(user, dto.getUserStyle());
     }
 
-    public String login(String loginId, String password) {
+    public TokenInfoDto login(String loginId, String password) {
         TokenInfoDto tokenInfoDto = authService.login(loginId, password);
         // redis 저장
         cacheTemplate.putValue(String.valueOf(tokenInfoDto.getAuthId()), tokenInfoDto.getRefreshToken(), "token",
                 tokenInfoDto.getRefreshTokenExpirationTime(), TimeUnit.MILLISECONDS);
         // return
-        return tokenInfoDto.getAccessToken();
+        return tokenInfoDto;
     }
 
     public void authority() {

@@ -7,7 +7,7 @@
         <logger name="com.woowacourse.pickgit" level="DEBUG">
             <appender-ref ref="local-file-logger"/>
         </logger>
-        <logger name="org.springframework" level="DEBUG">
+        <logger name="org.springframework" level="INFO">
             <appender-ref ref="local-file-logger"/>
         </logger>
         <logger name="org.hibernate.SQL" level="DEBUG"> //SQL 로그
