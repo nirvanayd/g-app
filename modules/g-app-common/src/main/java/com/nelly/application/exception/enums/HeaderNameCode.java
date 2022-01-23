@@ -1,4 +1,4 @@
-package com.nelly.application.enums;
+package com.nelly.application.exception.enums;
 
 import lombok.AllArgsConstructor;
 

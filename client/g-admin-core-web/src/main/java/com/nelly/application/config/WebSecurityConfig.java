@@ -1,5 +1,7 @@
 package com.nelly.application.config;
 
+import com.nelly.application.handler.CustomAccessDeniedHandler;
+import com.nelly.application.handler.CustomAuthenticationEntryPoint;
 import com.nelly.application.jwt.JwtAuthenticationFilter;
 import com.nelly.application.jwt.TokenProvider;
 import com.nelly.application.util.CacheTemplate;
@@ -38,7 +40,10 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .addFilterBefore(corsFilter, UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(
                         new JwtAuthenticationFilter(tokenProvider, cacheTemplate),
-                        UsernamePasswordAuthenticationFilter.class);
+                        UsernamePasswordAuthenticationFilter.class)
+                .exceptionHandling()
+                .authenticationEntryPoint(new CustomAuthenticationEntryPoint())
+                .accessDeniedHandler(new CustomAccessDeniedHandler());
                 // JwtAuthenticationFilter를 UsernamePasswordAuthentictaionFilter 전에 적용시킨다.
     }
 

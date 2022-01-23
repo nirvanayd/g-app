@@ -4,11 +4,12 @@ import com.nelly.application.domain.Users;
 import com.nelly.application.dto.LoginRequestDto;
 import com.nelly.application.dto.Response;
 import com.nelly.application.dto.SignUpRequestDto;
+import com.nelly.application.dto.TokenInfoDto;
 import com.nelly.application.dto.response.LoginResponse;
 import com.nelly.application.dto.response.UserTestResponse;
 import com.nelly.application.service.admin.AdminService;
-import com.nelly.application.service.user.UserService;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -18,9 +19,9 @@ import javax.validation.Valid;
 
 
 @RestController
-@RequestMapping("/admin/")
 @AllArgsConstructor
 @Service
+@Slf4j
 public class AdminController {
 
     private final AdminService adminService;
@@ -35,8 +36,11 @@ public class AdminController {
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody @Valid LoginRequestDto dto) {
-        String accessToken = adminService.login(dto.getLoginId(), dto.getPassword());
-        LoginResponse data = LoginResponse.builder().accessToken(accessToken).build();
+        TokenInfoDto tokenInfoDto = adminService.login(dto.getLoginId(), dto.getPassword());
+        LoginResponse data = LoginResponse.builder()
+                .accessToken(tokenInfoDto.getAccessToken())
+                .refreshToken(tokenInfoDto.getRefreshToken())
+                .build();
         return response.success(data);
     }
 
@@ -47,8 +51,9 @@ public class AdminController {
         return response.success();
     }
 
-    @GetMapping("/admin-test")
+    @GetMapping("/admin")
     public ResponseEntity<?> userTest(@RequestHeader("Authorization") String bearerToken ) {
+        log.info(bearerToken);
         String token = adminService.getToken(bearerToken);
         Users user = adminService.userTest(token);
         UserTestResponse userTestResponse = modelMapper.map(user, UserTestResponse.class);
