@@ -1,7 +1,9 @@
-package com.nelly.application.handler;
+package com.nelly.application.exception.handler;
 
-import com.nelly.application.dto.ExceptionResponseDto;
-import com.nelly.application.enums.ExceptionCode;
+import com.nelly.application.dto.Response;
+import com.nelly.application.exception.enums.ExceptionCode;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -12,7 +14,12 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 import javax.validation.ConstraintViolation;
 
 @ControllerAdvice
+@RequiredArgsConstructor
+@Slf4j
 public class ValidExceptionHandler {
+
+    private final Response response;
+
     /**
      * DTO 검증 실패
      *
@@ -20,13 +27,13 @@ public class ValidExceptionHandler {
      * @return ErrorDto
      */
     @ExceptionHandler({MethodArgumentNotValidException.class})
-    public ResponseEntity<ExceptionResponseDto> handleDtoValidationException(
+    public ResponseEntity<?> handleDtoValidationException(
             MethodArgumentNotValidException methodArgumentNotValidException) {
 
         ExceptionCode exceptionCode = ExceptionCode.DTO_VALIDATION_EXCEPTION;
         String message = this.getMessage(methodArgumentNotValidException.getBindingResult());
-        return new ResponseEntity<>(this.getResponseDto(exceptionCode, message),
-                exceptionCode.getStatus());
+
+        return response.fail(exceptionCode.getCode(), message, exceptionCode.getStatus());
     }
 
 
@@ -37,14 +44,13 @@ public class ValidExceptionHandler {
      * @return
      */
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
-    public ResponseEntity<ExceptionResponseDto> handleMethodArgumentTypeMismatchException (
+    public ResponseEntity<?> handleMethodArgumentTypeMismatchException (
             MethodArgumentTypeMismatchException methodArgumentNotValidException) {
 
         ExceptionCode exceptionCode = ExceptionCode.DTO_VALIDATION_EXCEPTION;
         String message = methodArgumentNotValidException.getMessage();
 
-        return new ResponseEntity<>(this.getResponseDto(exceptionCode, message),
-                exceptionCode.getStatus());
+        return response.fail(exceptionCode.getCode(), message, exceptionCode.getStatus());
     }
 
     /**
@@ -69,14 +75,5 @@ public class ValidExceptionHandler {
         String field = violation.getPropertyPath().toString();
         String message = violation.getMessage();
         return "[" + field + "] " + message;
-    }
-
-    private ExceptionResponseDto getResponseDto(ExceptionCode exceptionCode, String message) {
-        return new ExceptionResponseDto(exceptionCode, message);
-    }
-
-    private ExceptionResponseDto getResponseDto(ExceptionCode exceptionCode) {
-        String message = "시스템 오류";
-        return new ExceptionResponseDto(exceptionCode, message);
     }
 }

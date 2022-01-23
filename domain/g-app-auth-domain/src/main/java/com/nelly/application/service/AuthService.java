@@ -78,8 +78,6 @@ public class AuthService {
 
     public void authority() {
         String userName = SecurityUtil.getCurrentUser();
-        System.out.println("#####" + userName);
-
 //        Users user = usersRepository.findByEmail(userEmail)
 //                .orElseThrow(() -> new UsernameNotFoundException("No authentication information."));
 //

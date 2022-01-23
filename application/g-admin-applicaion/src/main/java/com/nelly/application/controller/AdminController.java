@@ -7,8 +7,8 @@ import com.nelly.application.dto.SignUpRequestDto;
 import com.nelly.application.dto.response.LoginResponse;
 import com.nelly.application.dto.response.UserTestResponse;
 import com.nelly.application.service.admin.AdminService;
-import com.nelly.application.service.user.UserService;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -18,9 +18,9 @@ import javax.validation.Valid;
 
 
 @RestController
-@RequestMapping("/admin/")
 @AllArgsConstructor
 @Service
+@Slf4j
 public class AdminController {
 
     private final AdminService adminService;

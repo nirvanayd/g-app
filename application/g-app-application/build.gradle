@@ -16,7 +16,7 @@ dependencies {
     implementation project(':client:g-app-core-web') // web 설정, security 적용
     implementation project(':domain:g-app-domain')  // rdbms domain
     implementation project(':domain:g-app-auth-domain') // security 사용 domain
-    implementation project(':modules:g-app-exception-handler') // exception handler
+    implementation project(':modules:g-app-common') // common
     implementation project(':modules:g-app-redis')
     implementation 'com.google.code.gson:gson:2.8.9' // gson
     implementation group: 'org.modelmapper', name: 'modelmapper', version: '2.3.8'
