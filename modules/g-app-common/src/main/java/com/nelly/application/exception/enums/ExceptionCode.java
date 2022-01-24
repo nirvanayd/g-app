@@ -10,7 +10,7 @@ public enum ExceptionCode {
     AUTHENTICATION_EXCEPTION(HttpStatus.GONE, "AUTHENTICATION EXCEPTION", "토큰 정보가 올바르지 않습니다."),
     ACCESS_DENIED_EXCEPTION(HttpStatus.GONE, "ACCESS DENIED EXCEPTION", "접근 권한이 없습니다."),
     // 5xx
-    SYSTEM_EXCEPTION(HttpStatus.NOT_EXTENDED, "SYSTEM_EXCEPTION", "시스템 오류"),
+    SYSTEM_EXCEPTION(HttpStatus.NOT_EXTENDED, "SYSTEM EXCEPTION", "시스템 오류"),
     // 이하 Parameter validation exception handler
     DTO_VALIDATION_EXCEPTION(HttpStatus.NOT_EXTENDED, "VALIDATION EXCEPTION", "데이터 유효성 검사 오류"),
     CONSTRAINT_VIOLATION_EXCEPTION(HttpStatus.NOT_EXTENDED, "VARIABLE EXCEPTION", "데이터 제약 조건 유효성 오류");
