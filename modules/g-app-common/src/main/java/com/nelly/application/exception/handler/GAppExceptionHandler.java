@@ -33,9 +33,16 @@ public class GAppExceptionHandler {
     }
 
     @ExceptionHandler(SystemException.class)
-    public ResponseEntity<?> handleSystemException() {
+    public ResponseEntity<?> handleSystemException(SystemException exception) {
         log.info(">>> SystemException");
+        ExceptionCode exceptionCode = exception.getExceptionCode();
+        return response.fail(exceptionCode.getCode(), exception.getMessage(), exceptionCode.getStatus());
+    }
+
+    @ExceptionHandler(RuntimeException.class)
+    public ResponseEntity<?> handleRuntimeException(RuntimeException exception) {
+        log.info(">>> runtime exception");
         ExceptionCode exceptionCode = ExceptionCode.SYSTEM_EXCEPTION;
-        return response.fail(exceptionCode.getCode(), exceptionCode.getMessage(), exceptionCode.getStatus());
+        return response.fail(exceptionCode.getCode(), exception.getMessage(), exceptionCode.getStatus());
     }
 }
