@@ -19,7 +19,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/admin/")
 @RequiredArgsConstructor
 @Slf4j
 public class UserController {
@@ -40,6 +39,7 @@ public class UserController {
                 map(u -> modelMapper.map(u, UserResponse.class)).collect(Collectors.toList());
         UserListResponse userListResponse = new UserListResponse();
         userListResponse.setList(list);
+        userListResponse.setTotal(total);
         return response.success(userListResponse);
     }
 
@@ -50,5 +50,4 @@ public class UserController {
         UserResponse userResponse = modelMapper.map(user, UserResponse.class);
         return response.success(userResponse);
     }
-
 }
