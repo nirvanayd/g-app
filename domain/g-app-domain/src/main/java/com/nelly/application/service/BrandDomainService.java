@@ -12,6 +12,7 @@ import com.nelly.application.repository.BrandsRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -74,8 +75,12 @@ public class BrandDomainService {
         }
     }
 
-    public Page<Brands> selectBrandsList(Integer page, Integer size) {
-        PageRequest pageRequest = PageRequest.of(page, size);
+    public Page<Brands> selectBrandList(Integer page, Integer size) {
+        PageRequest pageRequest = PageRequest.of(page, size, Sort.by("id").descending());
         return brandsRepository.findAll(pageRequest);
+    }
+
+    public Brands selectBrand(long brandId) {
+        return brandsRepository.findById(brandId).orElseThrow(() -> new RuntimeException("브랜드를 조회할 수 없습니다."));
     }
 }

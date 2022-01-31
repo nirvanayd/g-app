@@ -2,7 +2,7 @@ package com.nelly.application.service.brand;
 
 import com.nelly.application.domain.Brands;
 import com.nelly.application.dto.request.AddBrandRequest;
-import com.nelly.application.dto.request.GetBrandsListRequest;
+import com.nelly.application.dto.request.GetBrandListRequest;
 import com.nelly.application.enums.BrandStatus;
 import com.nelly.application.enums.DisplayType;
 import com.nelly.application.service.BrandDomainService;
@@ -14,8 +14,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -45,7 +43,11 @@ public class BrandService {
         return s3Uploader.upload(multipartFile, "static/introduce");
     }
 
-    public Page<Brands> getBrandsList(GetBrandsListRequest requestDto) {
-        return brandDomainService.selectBrandsList(requestDto.getPage(), requestDto.getSize());
+    public Page<Brands> getBrandList(GetBrandListRequest requestDto) {
+        return brandDomainService.selectBrandList(requestDto.getPage(), requestDto.getSize());
+    }
+
+    public Brands getBrand(long brandId) {
+        return brandDomainService.selectBrand(brandId);
     }
 }
