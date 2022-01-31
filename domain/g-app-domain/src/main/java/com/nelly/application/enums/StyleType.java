@@ -1,22 +1,21 @@
 package com.nelly.application.enums;
 
-import com.nelly.application.enums.enumInterface.CommonEnums;
+import com.nelly.application.enums.enumInterface.CommonStringCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 import java.util.Arrays;
-import java.util.Optional;
 
 @RequiredArgsConstructor
 @Getter
-public enum StyleType implements CommonEnums {
+public enum StyleType implements CommonStringCode {
     CASUAL("casual", "캐주얼", true),
     SPORTY("sporty", "스포티", true),
     PROFESSIONAL("professional", "프로페셔널", true),
     LUXURY("luxury", "럭셔리", true),
     SIMPLE_BASIC("simple", "실플베이직", true),
     UNIQUE("unique", "유니크", true),
-    EMPTY("", "", false);
+    EMPTY(null, "", false);
 
     private final String code;
     private final String desc;

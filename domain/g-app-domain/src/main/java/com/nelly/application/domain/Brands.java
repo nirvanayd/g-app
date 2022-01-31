@@ -28,21 +28,27 @@ public class Brands extends BaseTime{
     private Long id;
     @Column(name = "name", nullable = false, length = 100)
     private String name;
-    @Column(name = "logo_image_url", nullable = false, length = 500)
+    @Column(name = "logo_image_url", nullable = true, length = 500)
     private String logoImageUrl;
     @Column(name = "description", nullable = true, columnDefinition = "TEXT")
     private String description;
     @Convert(converter = BrandStatusConverter.class)
     private BrandStatus status;
-    @Column(name="is_diplay", columnDefinition = "TINYINT", length=1)
+    @Column(name="is_display", columnDefinition = "TINYINT", length=1)
     private Integer isDisplay;
     @Column(name = "homepage", nullable = false, length = 500)
     private String homepage;
-    @Column(name = "introduce_image_url", nullable = false, length = 500)
+    @Column(name = "introduce_image_url", nullable = true, length = 500)
     private String introduceImageUrl;
 
     @OneToMany(mappedBy = "brand")
     private List<BrandStyles> brandStyles;
+
+    @OneToMany(mappedBy = "brand")
+    private List<BrandPlaces> brandPlaces;
+
+    @OneToMany(mappedBy = "brand")
+    private List<BrandAges> brandAges;
 
     @PrePersist
     public void prePersist() {

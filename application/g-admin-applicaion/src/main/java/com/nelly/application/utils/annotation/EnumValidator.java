@@ -1,5 +1,6 @@
 package com.nelly.application.utils.annotation;
 
+import com.nelly.application.enums.enumInterface.CommonEnums;
 import com.nelly.application.utils.annotation.aspect.EnumValidatorAspect;
 
 import javax.validation.Constraint;
@@ -16,7 +17,9 @@ public @interface EnumValidator {
     String message() default "잘못된 접근 입니다.";
     Class<?>[] groups() default {};
     Class<? extends Payload>[] payload() default {};
-    Class<? extends Enum<?>> enumClass();
+    Class<? extends CommonEnums> enumClass();
     String enumMethod();
     boolean ignoreCase() default false;
+
+
 }

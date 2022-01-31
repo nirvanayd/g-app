@@ -2,9 +2,9 @@ package com.nelly.application.controller;
 
 import com.nelly.application.config.AwsProperties;
 import com.nelly.application.dto.Response;
-import com.nelly.application.dto.request.CreateBrandRequest;
+import com.nelly.application.dto.request.AddBrandRequest;
+import com.nelly.application.dto.request.GetBrandsListRequest;
 import com.nelly.application.dto.response.FileUploadResponse;
-import com.nelly.application.service.AppUserService;
 import com.nelly.application.service.brand.BrandService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.validation.Valid;
 import java.io.IOException;
 
 @RestController
@@ -26,9 +27,8 @@ public class BrandController {
     private final BrandService brandService;
 
     @PostMapping("/brands")
-    public ResponseEntity<?> createBrand(@RequestPart("") CreateBrandRequest requestDto) {
-        System.out.println("########");
-        System.out.println(awsProperties.getS3().getDirectory());
+    public ResponseEntity<?> addBrand(@RequestBody @Valid AddBrandRequest requestDto) {
+        brandService.addBrand(requestDto);
         return response.success();
     }
 
@@ -46,5 +46,11 @@ public class BrandController {
         String imageUrl = brandService.uploadIntroduceImage(multipartFile);
         FileUploadResponse fileUploadResponse = FileUploadResponse.builder().url(imageUrl).build();
         return response.success(fileUploadResponse);
+    }
+
+    @GetMapping("/brands")
+    public ResponseEntity<?> getBrandsList(@RequestBody GetBrandsListRequest requestDto) {
+        brandService.getBrandsList(requestDto);
+        return response.success();
     }
 }

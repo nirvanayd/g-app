@@ -68,8 +68,6 @@ public class UserService {
         if (cacheTemplate.getValue(String.valueOf(tokenInfoDto.getAuthId()), "token") != null) {
             cacheTemplate.deleteCache(String.valueOf(tokenInfoDto.getAuthId()), "token");
         }
-
-        System.out.println(tokenInfoDto.getRefreshTokenExpirationTime());
         cacheTemplate.putValue(token, "logout", tokenInfoDto.getRefreshTokenExpirationTime(), TimeUnit.MILLISECONDS);
     }
 

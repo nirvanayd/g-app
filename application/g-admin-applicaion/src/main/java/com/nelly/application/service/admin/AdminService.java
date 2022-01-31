@@ -10,6 +10,7 @@ import com.nelly.application.util.CacheTemplate;
 import com.nelly.application.util.EncryptUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import java.util.concurrent.TimeUnit;
@@ -26,6 +27,7 @@ public class AdminService {
     private static final String BEARER_TYPE = "Bearer";
 
 
+    @Transactional
     public void signUp(SignUpRequestDto dto) {
         if(authService.findByLoginId(dto.getLoginId()) != null) throw new RuntimeException("사용 중인 아이디입니다.");
         // 비밀번호 암호화
@@ -66,8 +68,6 @@ public class AdminService {
         if (cacheTemplate.getValue(String.valueOf(tokenInfoDto.getAuthId()), "token") != null) {
             cacheTemplate.deleteCache(String.valueOf(tokenInfoDto.getAuthId()), "token");
         }
-
-        System.out.println(tokenInfoDto.getRefreshTokenExpirationTime());
         cacheTemplate.putValue(token, "logout", tokenInfoDto.getRefreshTokenExpirationTime(), TimeUnit.MILLISECONDS);
     }
 

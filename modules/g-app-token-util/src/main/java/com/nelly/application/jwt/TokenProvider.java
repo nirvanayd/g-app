@@ -4,6 +4,7 @@ import com.nelly.application.dto.TokenInfoDto;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -20,6 +21,7 @@ import java.util.Date;
 import java.util.stream.Collectors;
 
 @Component
+@Slf4j
 public class TokenProvider {
 
     private static final String AUTHORITIES_KEY = "auth";
@@ -72,9 +74,7 @@ public class TokenProvider {
         } catch (io.jsonwebtoken.security.SecurityException | MalformedJwtException e) {
 //            log.info("Invalid JWT Token", e);
         } catch (ExpiredJwtException e) {
-//            log.info("Expired JWT Token", e);
-            System.out.println("### expired token : " + token);
-
+            log.info("Expired JWT Token", e);
         } catch (UnsupportedJwtException e) {
 //            log.info("Unsupported JWT Token", e);
         } catch (IllegalArgumentException e) {
