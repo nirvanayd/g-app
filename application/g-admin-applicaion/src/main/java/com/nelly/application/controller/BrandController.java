@@ -10,6 +10,7 @@ import com.nelly.application.dto.response.BrandResponse;
 import com.nelly.application.dto.response.FileUploadResponse;
 import com.nelly.application.dto.response.UserResponse;
 import com.nelly.application.service.brand.BrandService;
+import dto.EnumStringCodeValue;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
@@ -79,5 +80,11 @@ public class BrandController {
         BrandResponse brandResponse = new BrandResponse();
         modelMapper.map(brands, brandResponse);
         return response.success(brandResponse);
+    }
+
+    @GetMapping("/brands/status-list")
+    public ResponseEntity<?> getBrandStatusList() {
+        List<EnumStringCodeValue> list = brandService.getBrandStatusList();
+        return response.success(list);
     }
 }

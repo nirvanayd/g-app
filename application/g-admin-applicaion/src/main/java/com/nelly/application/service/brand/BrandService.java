@@ -7,6 +7,7 @@ import com.nelly.application.enums.BrandStatus;
 import com.nelly.application.enums.DisplayType;
 import com.nelly.application.service.BrandDomainService;
 import com.nelly.application.util.S3Uploader;
+import dto.EnumStringCodeValue;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -49,5 +51,9 @@ public class BrandService {
 
     public Brands getBrand(long brandId) {
         return brandDomainService.selectBrand(brandId);
+    }
+
+    public List<EnumStringCodeValue> getBrandStatusList() {
+        return BrandStatus.getBrandStatusList();
     }
 }
