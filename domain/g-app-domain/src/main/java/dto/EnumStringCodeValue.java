@@ -6,12 +6,12 @@ import lombok.Data;
 
 @Data
 public class EnumStringCodeValue {
-    private String code;
-    private String desc;
+    private String label;
+    private String value;
 
     public EnumStringCodeValue(CommonStringCode commonStringCode) {
-        this.code = commonStringCode.getCode();
-        this.desc = commonStringCode.getDesc();
+        this.label = commonStringCode.getCode();
+        this.value = commonStringCode.getDesc();
     }
 
 }
