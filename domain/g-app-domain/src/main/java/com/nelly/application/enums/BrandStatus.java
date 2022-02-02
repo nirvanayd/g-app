@@ -24,6 +24,11 @@ public enum BrandStatus implements CommonStringCode {
         return Arrays.stream(BrandStatus.values()).anyMatch(c -> c.code.equals(code));
     }
 
+    public static boolean hasCodeValueExist(String code) {
+        if (code == null || "".equals(code)) return true;
+        return hasCode(code);
+    }
+
     public static BrandStatus getBrandStatus(String code) {
         return Arrays.stream(BrandStatus.values()).filter(c -> c.code.equals(code)).findFirst().orElse(EMPTY);
     }

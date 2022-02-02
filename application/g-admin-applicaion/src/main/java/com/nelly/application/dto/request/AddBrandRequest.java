@@ -1,7 +1,5 @@
 package com.nelly.application.dto.request;
 
-import com.nelly.application.converter.BrandStatusConverter;
-import com.nelly.application.domain.BrandStyles;
 import com.nelly.application.enums.AgeType;
 import com.nelly.application.enums.BrandStatus;
 import com.nelly.application.enums.PlaceType;

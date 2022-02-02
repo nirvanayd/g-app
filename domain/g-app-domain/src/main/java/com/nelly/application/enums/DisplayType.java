@@ -26,6 +26,11 @@ public enum DisplayType implements CommonIntegerCode {
         return Arrays.stream(DisplayType.values()).anyMatch(c -> c.code.equals(code));
     }
 
+    public static boolean hasCodeValueExist(Integer code) {
+        if (code == null) return true;
+        return hasCode(code);
+    }
+
     public static DisplayType getDisplayType(Integer code) {
         return Arrays.stream(DisplayType.values()).filter(c -> c.code.equals(code)).findFirst().orElse(EMPTY);
     }
@@ -33,4 +38,5 @@ public enum DisplayType implements CommonIntegerCode {
     public static List<EnumIntegerCodeValue> getDisplayTypeList() {
         return Arrays.stream(DisplayType.values()).filter(c -> c.code != null).map(EnumIntegerCodeValue::new).collect(Collectors.toList());
     }
+
 }

@@ -1,6 +1,7 @@
 package com.nelly.application.utils.annotation.aspect;
 
 import com.nelly.application.enums.enumInterface.CommonEnums;
+import com.nelly.application.utils.annotation.EnumIntegerValidator;
 import com.nelly.application.utils.annotation.EnumValidator;
 
 import javax.validation.ConstraintValidator;
@@ -9,18 +10,18 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 
-public class EnumValidatorAspect implements ConstraintValidator<EnumValidator, String> {
+public class EnumIntegerValidatorAspect implements ConstraintValidator<EnumIntegerValidator, Integer> {
     private Class<? extends CommonEnums> enumClass;
     private String enumMethod;
 
     @Override
-    public void initialize(EnumValidator constraintAnnotation) {
+    public void initialize(EnumIntegerValidator constraintAnnotation) {
         this.enumClass = constraintAnnotation.enumClass();
         this.enumMethod = constraintAnnotation.enumMethod();
     }
 
     @Override
-    public boolean isValid(String value, ConstraintValidatorContext constraintValidatorContext) {
+    public boolean isValid(Integer value, ConstraintValidatorContext constraintValidatorContext) {
         try {
             Method method = this.hasValidateMethod();
             if (method != null) {
@@ -35,7 +36,7 @@ public class EnumValidatorAspect implements ConstraintValidator<EnumValidator, S
 
     private Method hasValidateMethod() {
         try {
-            Method method = this.enumClass.getMethod(this.enumMethod, String.class);
+            Method method = this.enumClass.getMethod(this.enumMethod, Integer.class);
             if (!Boolean.TYPE.equals(method.getReturnType()) && !Boolean.class.equals(method.getReturnType())) {
                 throw new RuntimeException();
             }
