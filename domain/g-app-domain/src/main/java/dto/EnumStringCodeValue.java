@@ -13,5 +13,4 @@ public class EnumStringCodeValue {
         this.value = commonStringCode.getCode();
         this.label = commonStringCode.getDesc();
     }
-
 }

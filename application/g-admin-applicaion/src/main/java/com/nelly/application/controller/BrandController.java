@@ -10,6 +10,7 @@ import com.nelly.application.dto.response.BrandResponse;
 import com.nelly.application.dto.response.FileUploadResponse;
 import com.nelly.application.dto.response.UserResponse;
 import com.nelly.application.service.brand.BrandService;
+import dto.EnumIntegerCodeValue;
 import dto.EnumStringCodeValue;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -85,6 +86,12 @@ public class BrandController {
     @GetMapping("/brands/status-list")
     public ResponseEntity<?> getBrandStatusList() {
         List<EnumStringCodeValue> list = brandService.getBrandStatusList();
+        return response.success(list);
+    }
+
+    @GetMapping("/brands/display-type-list")
+    public ResponseEntity<?> getDisplayTypeList() {
+        List<EnumIntegerCodeValue> list = brandService.getDisplayTypeList();
         return response.success(list);
     }
 }

@@ -5,11 +5,11 @@ import lombok.Data;
 
 @Data
 public class EnumIntegerCodeValue {
-    private Integer code;
-    private String desc;
+    private Integer value;
+    private String label;
 
     public EnumIntegerCodeValue(CommonIntegerCode commonIntegerCode) {
-        this.code = commonIntegerCode.getCode();
-        this.desc = commonIntegerCode.getDesc();
+        this.value = commonIntegerCode.getCode();
+        this.label = commonIntegerCode.getDesc();
     }
 }

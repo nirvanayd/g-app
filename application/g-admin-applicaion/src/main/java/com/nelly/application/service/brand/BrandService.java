@@ -7,6 +7,7 @@ import com.nelly.application.enums.BrandStatus;
 import com.nelly.application.enums.DisplayType;
 import com.nelly.application.service.BrandDomainService;
 import com.nelly.application.util.S3Uploader;
+import dto.EnumIntegerCodeValue;
 import dto.EnumStringCodeValue;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -55,5 +56,9 @@ public class BrandService {
 
     public List<EnumStringCodeValue> getBrandStatusList() {
         return BrandStatus.getBrandStatusList();
+    }
+
+    public List<EnumIntegerCodeValue> getDisplayTypeList() {
+        return DisplayType.getDisplayTypeList();
     }
 }
