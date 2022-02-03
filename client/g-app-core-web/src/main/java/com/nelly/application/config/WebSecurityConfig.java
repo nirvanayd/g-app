@@ -1,9 +1,10 @@
 package com.nelly.application.config;
 
+import com.nelly.application.handler.CustomAccessDeniedHandler;
+import com.nelly.application.handler.CustomAuthenticationEntryPoint;
 import com.nelly.application.jwt.JwtAuthenticationFilter;
 import com.nelly.application.jwt.TokenProvider;
 import com.nelly.application.util.CacheTemplate;
-import com.nelly.application.util.CustomAuthenticationEntryPoint;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -41,7 +42,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                         new JwtAuthenticationFilter(tokenProvider, cacheTemplate),
                         UsernamePasswordAuthenticationFilter.class)
                 .exceptionHandling()
-                .authenticationEntryPoint(new CustomAuthenticationEntryPoint());
+                .authenticationEntryPoint(new CustomAuthenticationEntryPoint())
+                .accessDeniedHandler(new CustomAccessDeniedHandler());
                 // JwtAuthenticationFilter를 UsernamePasswordAuthentictaionFilter 전에 적용시킨다.
     }
 

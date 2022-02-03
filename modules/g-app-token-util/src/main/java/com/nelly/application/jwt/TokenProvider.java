@@ -14,6 +14,8 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
+import javax.servlet.ServletRequest;
+import java.net.http.HttpRequest;
 import java.security.Key;
 import java.util.Arrays;
 import java.util.Collection;
@@ -26,7 +28,7 @@ public class TokenProvider {
 
     private static final String AUTHORITIES_KEY = "auth";
     private static final String BEARER_TYPE = "Bearer";
-    private static final long ACCESS_TOKEN_EXPIRE_TIME = 60 * 60 * 1000L;              // 60분
+    private static final long ACCESS_TOKEN_EXPIRE_TIME = 60 * 1000L;              // 60분
     private static final long REFRESH_TOKEN_EXPIRE_TIME = 7 * 24 * 60 * 60 * 1000L;    // 7일
 
     private final Key key;
@@ -75,6 +77,24 @@ public class TokenProvider {
 //            log.info("Invalid JWT Token", e);
         } catch (ExpiredJwtException e) {
             log.info("Expired JWT Token", e);
+
+        } catch (UnsupportedJwtException e) {
+//            log.info("Unsupported JWT Token", e);
+        } catch (IllegalArgumentException e) {
+//            log.info("JWT claims string is empty.", e);
+        }
+        return false;
+    }
+
+    public boolean validateToken(ServletRequest request, String token) {
+        try {
+            Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
+            return true;
+        } catch (io.jsonwebtoken.security.SecurityException | MalformedJwtException e) {
+//            log.info("Invalid JWT Token", e);
+        } catch (ExpiredJwtException e) {
+            log.info("Expired JWT Token", e);
+            request.setAttribute("exception", "expiredToken");
         } catch (UnsupportedJwtException e) {
 //            log.info("Unsupported JWT Token", e);
         } catch (IllegalArgumentException e) {
@@ -113,7 +133,7 @@ public class TokenProvider {
         // accessToken 남은 유효시간
         Date expiration = Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(accessToken).getBody().getExpiration();
         // 현재 시간
-        Long now = new Date().getTime();
+        long now = new Date().getTime();
         return (expiration.getTime() - now);
     }
 }

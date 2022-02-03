@@ -16,6 +16,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-security'
     implementation project(':modules:g-app-redis')
     implementation project(':modules:g-app-token-util')
+    implementation project(':modules:g-app-common') // common
 }
 
 test {
