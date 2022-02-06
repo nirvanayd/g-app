@@ -27,7 +27,7 @@ public class TestController {
 
     @GetMapping("/hello")
     public ResponseEntity<String> hello() {
-        return ResponseEntity.ok("admin updated...");
+        return ResponseEntity.ok("hello admin");
     }
 
     @GetMapping("/env")
