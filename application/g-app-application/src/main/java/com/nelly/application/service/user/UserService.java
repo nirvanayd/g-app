@@ -49,11 +49,6 @@ public class UserService {
         return tokenInfoDto.getAccessToken();
     }
 
-    public void authority() {
-        // SecurityContext에 담겨 있는 authentication userEamil 정보
-        authService.authority();
-    }
-
     public String getToken(String bearerToken) {
         if (bearerToken == null) return null;
         if (StringUtils.hasText(bearerToken) && bearerToken.startsWith(BEARER_TYPE)) {
