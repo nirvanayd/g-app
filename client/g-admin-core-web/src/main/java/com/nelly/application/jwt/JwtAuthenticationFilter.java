@@ -30,7 +30,7 @@ public class JwtAuthenticationFilter extends GenericFilterBean {
 
         String token = this.resolveToken((HttpServletRequest) request);
 
-        if (token != null && tokenProvider.validateToken(token)) {
+        if (token != null && tokenProvider.validateToken(request, token)) {
             String isLogout = (String)cacheTemplate.getValue(token);
 
             if (ObjectUtils.isEmpty(isLogout)) {

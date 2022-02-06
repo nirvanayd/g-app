@@ -5,6 +5,7 @@ import com.nelly.application.exception.enums.ExceptionCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindException;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import javax.validation.ConstraintViolation;
+import java.util.Objects;
 
 @ControllerAdvice
 @RequiredArgsConstructor
@@ -49,6 +51,18 @@ public class ValidExceptionHandler {
 
         ExceptionCode exceptionCode = ExceptionCode.DTO_VALIDATION_EXCEPTION;
         String message = methodArgumentNotValidException.getMessage();
+
+        return response.fail(exceptionCode.getCode(), message, exceptionCode.getStatus());
+    }
+
+    @ExceptionHandler(BindException.class)
+    public ResponseEntity<?> handleBindException (
+            BindException bindException) {
+
+        ExceptionCode exceptionCode = ExceptionCode.DTO_VALIDATION_EXCEPTION;
+        BindingResult bindingResult = bindException.getBindingResult();
+
+        String message = Objects.requireNonNull(bindingResult.getFieldError()).getDefaultMessage();
 
         return response.fail(exceptionCode.getCode(), message, exceptionCode.getStatus());
     }

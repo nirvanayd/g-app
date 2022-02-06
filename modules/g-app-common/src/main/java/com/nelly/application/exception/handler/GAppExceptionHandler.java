@@ -5,6 +5,7 @@ import com.nelly.application.exception.AccessDeniedException;
 import com.nelly.application.exception.AuthenticationException;
 import com.nelly.application.exception.SystemException;
 import com.nelly.application.exception.enums.ExceptionCode;
+import io.jsonwebtoken.ExpiredJwtException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -42,6 +43,7 @@ public class GAppExceptionHandler {
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<?> handleRuntimeException(RuntimeException exception) {
         log.info(">>> runtime exception");
+        exception.printStackTrace();
         ExceptionCode exceptionCode = ExceptionCode.SYSTEM_EXCEPTION;
         return response.fail(exceptionCode.getCode(), exception.getMessage(), exceptionCode.getStatus());
     }

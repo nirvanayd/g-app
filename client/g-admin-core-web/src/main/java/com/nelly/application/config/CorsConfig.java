@@ -13,8 +13,8 @@ public class CorsConfig {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowCredentials(true);
-        config.setAllowCredentials(true);
-        config.addAllowedOrigin("http://localhost:8080");
+        config.addAllowedOrigin("http://localhost:8085");
+        config.addAllowedOrigin("http://admin.gapp.co.kr");
         config.addAllowedHeader("*");
         config.addAllowedMethod("*");
 

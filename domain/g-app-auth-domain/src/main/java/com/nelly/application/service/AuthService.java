@@ -1,13 +1,12 @@
 package com.nelly.application.service;
 
 import com.nelly.application.domain.AppAuthentication;
-import com.nelly.application.dto.AuthTokenInfoDto;
 import com.nelly.application.dto.TokenInfoDto;
 import com.nelly.application.enums.Authority;
 import com.nelly.application.jwt.TokenProvider;
 import com.nelly.application.repository.AuthRepository;
-import com.nelly.application.util.SecurityUtil;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
@@ -18,6 +17,7 @@ import java.util.Optional;
 
 @RequiredArgsConstructor
 @Service
+@Slf4j
 public class AuthService {
 
     private final AuthRepository authRepository;
@@ -76,18 +76,6 @@ public class AuthService {
         return tokenInfoDto;
     }
 
-    public void authority() {
-        String userName = SecurityUtil.getCurrentUser();
-//        Users user = usersRepository.findByEmail(userEmail)
-//                .orElseThrow(() -> new UsernameNotFoundException("No authentication information."));
-//
-//        // add ROLE_ADMIN
-//        user.getRoles().add(Authority.ROLE_ADMIN.name());
-//        usersRepository.save(user);
-//
-//        return response.success();
-    }
-
     public TokenInfoDto getAppAuthentication(String token) {
         if(!tokenProvider.validateToken(token)) {
             return null;
@@ -102,5 +90,26 @@ public class AuthService {
                 .refreshToken(auth.getRt())
                 .refreshTokenExpirationTime(expire)
                 .build();
+    }
+
+    public TokenInfoDto getExistTokenInfo(String accessToken, String refreshToken) {
+        if(!tokenProvider.validateToken(refreshToken)) {
+            log.info("##### validate fail");
+        }
+        Authentication authentication = tokenProvider.getAuthentication(accessToken);
+        AppAuthentication auth = findByLoginId(authentication.getName());
+
+        return TokenInfoDto.builder().authId(auth.getId())
+                .refreshToken(auth.getRt())
+                .build();
+    }
+
+    public TokenInfoDto reissue(String accessToken) {
+        Authentication authentication = tokenProvider.getAuthentication(accessToken);
+        AppAuthentication auth = findByLoginId(authentication.getName());
+        TokenInfoDto tokenInfoDto = tokenProvider.generateToken(authentication);
+        // authId 갱신
+        tokenInfoDto.setAuthId(auth.getId());
+        return tokenInfoDto;
     }
 }

@@ -42,7 +42,6 @@ public class AppUserService {
 
 
     public void addUserStyle(Users user, List<String> userStyle) {
-        List<UserStyles> list = new ArrayList<>();
         Users refUser = userRepository.getById(user.getId());
         for (String code: userStyle) {
             UserStyles userStyles = UserStyles.builder().styleType(StyleType.getStyleType(code)).user(refUser).build();

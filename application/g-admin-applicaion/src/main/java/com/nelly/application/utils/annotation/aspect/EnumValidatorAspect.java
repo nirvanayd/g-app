@@ -1,5 +1,6 @@
 package com.nelly.application.utils.annotation.aspect;
 
+import com.nelly.application.enums.enumInterface.CommonEnums;
 import com.nelly.application.utils.annotation.EnumValidator;
 
 import javax.validation.ConstraintValidator;
@@ -9,7 +10,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 
 public class EnumValidatorAspect implements ConstraintValidator<EnumValidator, String> {
-    private Class<? extends Enum<?>> enumClass;
+    private Class<? extends CommonEnums> enumClass;
     private String enumMethod;
 
     @Override

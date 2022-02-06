@@ -5,6 +5,7 @@ import com.nelly.application.dto.LoginRequestDto;
 import com.nelly.application.dto.Response;
 import com.nelly.application.dto.SignUpRequestDto;
 import com.nelly.application.dto.TokenInfoDto;
+import com.nelly.application.dto.request.ReissueRequest;
 import com.nelly.application.dto.response.LoginResponse;
 import com.nelly.application.dto.response.UserTestResponse;
 import com.nelly.application.service.admin.AdminService;
@@ -58,5 +59,15 @@ public class AdminController {
         Users user = adminService.userTest(token);
         UserTestResponse userTestResponse = modelMapper.map(user, UserTestResponse.class);
         return response.success(userTestResponse);
+    }
+
+    @PostMapping("/reissue")
+    public ResponseEntity<?> userTest(@RequestBody ReissueRequest requestDto) {
+        TokenInfoDto tokenInfoDto = adminService.reissue(requestDto);
+        LoginResponse data = LoginResponse.builder()
+                .accessToken(tokenInfoDto.getAccessToken())
+                .refreshToken(tokenInfoDto.getRefreshToken())
+                .build();
+        return response.success(data);
     }
 }

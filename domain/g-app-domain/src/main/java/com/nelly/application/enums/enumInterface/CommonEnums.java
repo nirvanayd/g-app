@@ -5,7 +5,4 @@ package com.nelly.application.enums.enumInterface;
  * annotaion을 통한 유효성 검사 시에는 해당 Interface를 상속받아야함.
  */
 public interface CommonEnums {
-    String getCode();
-    String getDesc();
-//    boolean hasCode(String code);
 }
