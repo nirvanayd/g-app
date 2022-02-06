@@ -41,12 +41,6 @@ public class UserController {
         return response.success(data);
     }
 
-    @GetMapping("/authority")
-    public ResponseEntity<?> authority() {
-        userService.authority();
-        return response.success();
-    }
-
     @GetMapping("/logout")
     public ResponseEntity<?> logout(@RequestHeader("Authorization") String bearerToken ) {
         String token = userService.getToken(bearerToken);
