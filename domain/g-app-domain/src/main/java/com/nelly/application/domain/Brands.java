@@ -3,8 +3,10 @@ package com.nelly.application.domain;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import com.nelly.application.converter.BrandStatusConverter;
+import com.nelly.application.converter.DisplayTypeConverter;
 import com.nelly.application.converter.UserStatusConverter;
 import com.nelly.application.enums.BrandStatus;
+import com.nelly.application.enums.DisplayType;
 import com.nelly.application.enums.UserStatus;
 import lombok.*;
 
@@ -34,8 +36,8 @@ public class Brands extends BaseTime{
     private String description;
     @Convert(converter = BrandStatusConverter.class)
     private BrandStatus status;
-    @Column(name="is_display", columnDefinition = "TINYINT", length=1)
-    private Integer isDisplay;
+    @Convert(converter = DisplayTypeConverter.class)
+    private DisplayType isDisplay;
     @Column(name = "homepage", nullable = false, length = 500)
     private String homepage;
     @Column(name = "introduce_image_url", nullable = true, length = 500)
@@ -52,6 +54,6 @@ public class Brands extends BaseTime{
 
     @PrePersist
     public void prePersist() {
-        this.isDisplay = this.isDisplay == null ? 0 : this.isDisplay;
+        this.isDisplay = this.isDisplay == null ? DisplayType.DISPLAY : this.isDisplay;
     }
 }

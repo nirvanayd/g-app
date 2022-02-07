@@ -1,9 +1,6 @@
 package com.nelly.application.dto.request;
 
-import com.nelly.application.enums.AgeType;
-import com.nelly.application.enums.BrandStatus;
-import com.nelly.application.enums.PlaceType;
-import com.nelly.application.enums.StyleType;
+import com.nelly.application.enums.*;
 import com.nelly.application.utils.annotation.EnumListValidator;
 import lombok.Data;
 import net.bytebuddy.implementation.bind.annotation.Empty;
@@ -21,7 +18,7 @@ public class AddBrandRequest {
     private String name;
     private String description;
     private BrandStatus status;
-    private Integer isDisplay;
+    private DisplayType isDisplay;
     @NotEmpty(message = "홈페이지URL은 필수값입니다.")
     @Pattern(regexp = "^[(http(s)?):\\/\\/(www\\.)?a-zA-Z0-9@:%._\\+~#=]{2,256}\\.[a-z]{2,6}\\b([-a-zA-Z0-9@:%_\\+.~#?&//=()]*)$",
             message = "URL형식이 올바르지 않습니다.")

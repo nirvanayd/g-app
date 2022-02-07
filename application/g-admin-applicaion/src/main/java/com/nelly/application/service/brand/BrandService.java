@@ -28,7 +28,7 @@ public class BrandService {
 
     public void addBrand(AddBrandRequest requestDto) {
         // set initial value
-        if (requestDto.getIsDisplay() == null) requestDto.setIsDisplay(DisplayType.DISPLAY.getCode());
+        if (requestDto.getIsDisplay() == null) requestDto.setIsDisplay(DisplayType.DISPLAY);
         if (requestDto.getStatus() == null) requestDto.setStatus(BrandStatus.NORMAL);
         Brands brands = brandDomainService.createBrands(requestDto.getName(), requestDto.getLogoImageUrl(), requestDto.getDescription(),
                 requestDto.getStatus(), requestDto.getIsDisplay(), requestDto.getHomepage(),

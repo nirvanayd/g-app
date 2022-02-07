@@ -1,10 +1,7 @@
 package com.nelly.application.service;
 
 import com.nelly.application.domain.*;
-import com.nelly.application.enums.AgeType;
-import com.nelly.application.enums.BrandStatus;
-import com.nelly.application.enums.PlaceType;
-import com.nelly.application.enums.StyleType;
+import com.nelly.application.enums.*;
 import com.nelly.application.repository.BrandAgesRepository;
 import com.nelly.application.repository.BrandPlacesRepository;
 import com.nelly.application.repository.BrandStylesRepository;
@@ -28,8 +25,8 @@ public class BrandDomainService {
     private final BrandPlacesRepository brandPlacesRepository;
     private final BrandAgesRepository brandAgesRepository;
 
-    public Brands createBrands(String name, String logoImageUrl, String description, BrandStatus status, Integer isDisplay,
-                                 String homepage, String introduceImageUrl) {
+    public Brands createBrands(String name, String logoImageUrl, String description, BrandStatus status,
+                               DisplayType isDisplay, String homepage, String introduceImageUrl) {
         Brands brands = Brands.builder()
                 .name(name)
                 .logoImageUrl(logoImageUrl)
