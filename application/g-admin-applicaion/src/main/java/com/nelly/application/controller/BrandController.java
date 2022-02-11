@@ -1,15 +1,14 @@
 package com.nelly.application.controller;
 
 import com.nelly.application.config.AwsProperties;
+import com.nelly.application.config.EnvProperties;
 import com.nelly.application.domain.Brands;
 import com.nelly.application.dto.Response;
 import com.nelly.application.dto.request.AddBrandRequest;
 import com.nelly.application.dto.request.GetBrandListRequest;
-import com.nelly.application.dto.response.BrandListResponse;
-import com.nelly.application.dto.response.BrandResponse;
-import com.nelly.application.dto.response.FileUploadResponse;
-import com.nelly.application.dto.response.UserResponse;
+import com.nelly.application.dto.response.*;
 import com.nelly.application.service.brand.BrandService;
+import com.nelly.application.util.S3Uploader;
 import dto.EnumIntegerCodeValue;
 import dto.EnumStringCodeValue;
 import lombok.RequiredArgsConstructor;
@@ -32,8 +31,9 @@ public class BrandController {
 
     private final Response response;
     private final ModelMapper modelMapper;
-    private final AwsProperties awsProperties;
+    private final S3Uploader s3Uploader;
     private final BrandService brandService;
+    private final EnvProperties envProperties;
 
     @PostMapping("/brands")
     public ResponseEntity<?> addBrand(@RequestBody @Valid AddBrandRequest requestDto) {
@@ -94,5 +94,20 @@ public class BrandController {
     public ResponseEntity<?> getDisplayTypeList() {
         List<EnumIntegerCodeValue> list = brandService.getDisplayTypeList();
         return response.success(list);
+    }
+
+    @PostMapping("/brands/save-images")
+    public ResponseEntity<?> saveBrandImages(@RequestParam("logo-image") MultipartFile logoImage,
+                                             @RequestParam("introduce-image") MultipartFile introduceImage) throws IOException {
+
+        String logoImageUrl = s3Uploader.upload(logoImage, "brand");
+        String introduceImageUrl = s3Uploader.upload(introduceImage, "brand");
+
+        BrandImageUploadResponse brandImageUploadResponse = BrandImageUploadResponse.builder()
+                .logoImageUrl(logoImageUrl)
+                .introduceImageUrl(introduceImageUrl)
+                .build();
+
+        return response.success(brandImageUploadResponse);
     }
 }

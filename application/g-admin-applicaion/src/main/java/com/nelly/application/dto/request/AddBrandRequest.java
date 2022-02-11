@@ -20,7 +20,7 @@ public class AddBrandRequest {
     private BrandStatus status;
     private DisplayType isDisplay;
     @NotEmpty(message = "홈페이지URL은 필수값입니다.")
-    @Pattern(regexp = "^[(http(s)?):\\/\\/(www\\.)?a-zA-Z0-9@:%._\\+~#=]{2,256}\\.[a-z]{2,6}\\b([-a-zA-Z0-9@:%_\\+.~#?&//=()]*)$",
+    @Pattern(regexp = "^(http(s)?):\\/\\/[(www\\.)?a-zA-Z0-9@:%._\\+~#=]{2,256}\\.[a-z]{2,6}\\b([-a-zA-Z0-9@:%_\\+.~#?&//=()]*)$",
             message = "URL형식이 올바르지 않습니다.")
     private String homepage;
     @Pattern(regexp = "^[(http(s)?):\\/\\/(www\\.)?a-zA-Z0-9@:%._\\+~#=]{2,256}\\.[a-z]{2,6}\\b([-a-zA-Z0-9@:%_\\+.~#?&//=()]*)$",
