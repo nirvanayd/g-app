@@ -2,12 +2,9 @@ package com.nelly.application.controller;
 
 import com.nelly.application.domain.Users;
 import com.nelly.application.dto.Response;
-import com.nelly.application.dto.request.UserListRequest;
-import com.nelly.application.dto.response.UserListResponse;
-import com.nelly.application.dto.response.UserResponse;
-import com.nelly.application.dto.response.UserTestResponse;
-import com.nelly.application.enums.Authority;
-import com.nelly.application.service.AppUserService;
+import com.nelly.application.dto.request.GetAccountListRequest;
+import com.nelly.application.dto.response.*;
+import com.nelly.application.service.user.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
@@ -25,28 +22,29 @@ public class UserController {
 
     private final Response response;
     private final ModelMapper modelMapper;
-    private final AppUserService userService;
+    private final UserService userService;
 
     @GetMapping("/users")
-    public ResponseEntity<?> getUserList(@RequestParam Integer page) {
-        log.info("request >> " + page);
-
-        Page<Users> userPage = userService.getUserList(page, Authority.ROLE_USER);
-        List<Users> userList = userPage.getContent();
-        Integer total = userPage.getTotalPages();
-
-        List<UserResponse> list = userList.stream().
+    public ResponseEntity<?> getUserList(GetAccountListRequest requestDto) {
+        Page<Users> usersPage = userService.getAccountList(requestDto);
+        long totalCount = usersPage.getTotalElements();
+        long totalPage = usersPage.getTotalPages();
+        List<Users> accountList = usersPage.getContent();
+        List<UserResponse> list = accountList.stream().
                 map(u -> modelMapper.map(u, UserResponse.class)).collect(Collectors.toList());
+
+        // response make
         UserListResponse userListResponse = new UserListResponse();
+        userListResponse.setTotalCount(totalCount);
+        userListResponse.setTotalPage(totalPage);
         userListResponse.setList(list);
-        userListResponse.setTotal(total);
         return response.success(userListResponse);
     }
 
     @GetMapping("/users/{userId}")
     public ResponseEntity<?> getUser(@PathVariable(required = false) Integer userId) {
         if (userId == null) throw new RuntimeException("사용자 정보를 조회할 수 없습니다.");
-        Users user = userService.getUserDetail(userId);
+        Users user = userService.getAccountDetail(userId);
         UserResponse userResponse = modelMapper.map(user, UserResponse.class);
         return response.success(userResponse);
     }

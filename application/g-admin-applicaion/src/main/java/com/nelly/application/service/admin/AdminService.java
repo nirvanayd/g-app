@@ -6,7 +6,7 @@ import com.nelly.application.dto.SignUpRequestDto;
 import com.nelly.application.dto.TokenInfoDto;
 import com.nelly.application.dto.request.ReissueRequest;
 import com.nelly.application.enums.Authority;
-import com.nelly.application.service.AppUserService;
+import com.nelly.application.service.UserDomainService;
 import com.nelly.application.service.AuthService;
 import com.nelly.application.util.CacheTemplate;
 import com.nelly.application.util.EncryptUtils;
@@ -25,7 +25,7 @@ import java.util.concurrent.TimeUnit;
 public class AdminService {
 
     private final AuthService authService;
-    private final AppUserService appUserService;
+    private final UserDomainService userDomainService;
     private final EncryptUtils encryptUtils;
     private final CacheTemplate cacheTemplate;
 
@@ -39,10 +39,10 @@ public class AdminService {
         String encryptPassword = encryptUtils.encrypt(dto.getPassword());
         Long authId = authService.signUp(dto.getLoginId(), encryptPassword, Authority.ROLE_ADMIN);
         if (authId == null) throw new RuntimeException("회원가입 중 오류가 발생하였습니다.");
-        Users user = appUserService.addUser(authId, dto.getLoginId(), dto.getEmail(), dto.getBirth(), dto.getPhone(),
+        Users user = userDomainService.addUser(authId, dto.getLoginId(), dto.getEmail(), dto.getBirth(), dto.getPhone(),
                 Authority.ROLE_ADMIN);
 
-        appUserService.addUserStyle(user, dto.getUserStyle());
+        userDomainService.addUserStyle(user, dto.getUserStyle());
     }
 
     public TokenInfoDto login(String loginId, String password) {
@@ -76,7 +76,7 @@ public class AdminService {
         TokenInfoDto tokenInfoDto = authService.getAppAuthentication(token);
         long authId = tokenInfoDto.getAuthId();
 
-        return appUserService.getUsers(authId);
+        return userDomainService.getUsers(authId);
     }
 
     public TokenInfoDto reissue(ReissueRequest requestDto) {

@@ -48,8 +48,10 @@ cloud:
     s3:
       bucket: g-app-resource
       directory: local
+      cloudfront-url: 'https://d3b7cshusafhca.cloudfront.net/'
+      brand-dir: 'local/brand'
+      default-image-url: 'https://d3b7cshusafhca.cloudfront.net/local/default/logo-default.png'
     region:
       static: ap-northeast-2
     stack:
       auto: false
-

@@ -11,7 +11,7 @@ import lombok.Data;
 public class GetBrandListRequest extends ListRequest {
     private String name;
     @EnumValidator(enumClass = BrandStatus.class, message = "상태값이 올바르지 않습니다.", enumMethod = "hasCodeValueExist")
-    private String status;
+    private String statusCode;
     @EnumIntegerValidator(enumClass = DisplayType.class, message = "노출여부 값이 올바르지 않습니다.", enumMethod = "hasCodeValueExist")
-    private Integer isDisplay;
+    private Integer displayCode;
 }

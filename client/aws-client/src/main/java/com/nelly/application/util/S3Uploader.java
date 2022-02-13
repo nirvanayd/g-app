@@ -39,10 +39,9 @@ public class S3Uploader {
     private static final int UNDER_BAR_INDEX = 1;
 
     public String upload(MultipartFile multipartFile, String dirName) throws IOException {
-        String directory = envDirectory + DIRECTORY_SEPARATOR + dirName;
         String fileName = buildFileName(multipartFile.getOriginalFilename());
 
-        String path = directory + DIRECTORY_SEPARATOR + fileName;
+        String path = dirName + DIRECTORY_SEPARATOR + fileName;
 
         ObjectMetadata objectMetadata = new ObjectMetadata();
         objectMetadata.setContentType(multipartFile.getContentType());
@@ -54,10 +53,6 @@ public class S3Uploader {
             throw new RuntimeException("upload failed..");
         }
         return path;
-    }
-
-    public void delete(String key) {
-        amazonS3Client.deleteObject(new DeleteObjectRequest(bucket, key));
     }
 
     public static String buildFileName(String originalFileName) {
@@ -74,5 +69,10 @@ public class S3Uploader {
         return ContentDisposition.builder("attachment")
                 .filename(fileName, StandardCharsets.UTF_8)
                 .build();
+    }
+
+    /* remove */
+    public void removeObject(String key) {
+//        amazonS3Client.deleteObject(new DeleteObjectRequest(bucket, key));
     }
 }
