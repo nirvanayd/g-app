@@ -8,7 +8,6 @@ function find_idle_profile()
     echo "${IDLE_PROFILE}"
 }
 
-# 쉬고 있는 profile의 port 찾기
 function find_idle_port()
 {
     echo "8090"

@@ -17,6 +17,11 @@ public enum UserStatus implements CommonStringCode {
     private final String code;
     private final String desc;
 
+    public static boolean hasCodeValueExist(String code) {
+        if (code == null || "".equals(code)) return true;
+        return hasCode(code);
+    }
+
     public static boolean hasCode(String code) {
         return Arrays.stream(UserStatus.values()).anyMatch(c -> c.code.equals(code));
     }

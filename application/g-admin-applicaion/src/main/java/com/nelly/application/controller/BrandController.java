@@ -1,15 +1,14 @@
 package com.nelly.application.controller;
 
 import com.nelly.application.config.AwsProperties;
+import com.nelly.application.config.EnvProperties;
 import com.nelly.application.domain.Brands;
 import com.nelly.application.dto.Response;
 import com.nelly.application.dto.request.AddBrandRequest;
 import com.nelly.application.dto.request.GetBrandListRequest;
-import com.nelly.application.dto.response.BrandListResponse;
-import com.nelly.application.dto.response.BrandResponse;
-import com.nelly.application.dto.response.FileUploadResponse;
-import com.nelly.application.dto.response.UserResponse;
+import com.nelly.application.dto.response.*;
 import com.nelly.application.service.brand.BrandService;
+import com.nelly.application.util.S3Uploader;
 import dto.EnumIntegerCodeValue;
 import dto.EnumStringCodeValue;
 import lombok.RequiredArgsConstructor;
@@ -17,12 +16,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
+import org.springframework.lang.Nullable;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
 import java.io.IOException;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @RestController
@@ -32,7 +33,7 @@ public class BrandController {
 
     private final Response response;
     private final ModelMapper modelMapper;
-    private final AwsProperties awsProperties;
+    private final S3Uploader s3Uploader;
     private final BrandService brandService;
 
     @PostMapping("/brands")
@@ -41,25 +42,18 @@ public class BrandController {
         return response.success();
     }
 
-    @PostMapping("/brands/logo-image")
-    public ResponseEntity<?> uploadLogoImage(@RequestParam("logoImage") MultipartFile multipartFile) throws IOException {
-        if (multipartFile.isEmpty()) throw new RuntimeException("파일이 첨부되지 않았습니다.");
-        String imageUrl = brandService.uploadLogoImage(multipartFile);
-        FileUploadResponse fileUploadResponse = FileUploadResponse.builder().url(imageUrl).build();
-        return response.success(fileUploadResponse);
-    }
+    @PutMapping("/brands/{brandId}")
+    public ResponseEntity<?> updateBrand(@PathVariable long brandId,
+                                         @RequestBody @Valid AddBrandRequest requestDto) {
 
-    @PostMapping("/brands/introduce-image")
-    public ResponseEntity<?> uploadIntroduceImage(@RequestParam("introduceImage") MultipartFile multipartFile) throws IOException {
-        if (multipartFile.isEmpty()) throw new RuntimeException("파일이 첨부되지 않았습니다.");
-        String imageUrl = brandService.uploadIntroduceImage(multipartFile);
-        FileUploadResponse fileUploadResponse = FileUploadResponse.builder().url(imageUrl).build();
-        return response.success(fileUploadResponse);
+        System.out.println(requestDto);
+
+        brandService.updateBrand(brandId, requestDto);
+        return response.success("test");
     }
 
     @GetMapping("/brands")
     public ResponseEntity<?> getBrandList(@Valid GetBrandListRequest requestDto) {
-        System.out.println(requestDto);
         Page<Brands> brandsPage = brandService.getBrandList(requestDto);
         long totalCount = brandsPage.getTotalElements();
         long totalPage = brandsPage.getTotalPages();
@@ -95,4 +89,23 @@ public class BrandController {
         List<EnumIntegerCodeValue> list = brandService.getDisplayTypeList();
         return response.success(list);
     }
+
+    @PostMapping("/brands/save-images")
+    public ResponseEntity<?> saveBrandImages(@Nullable @RequestParam("logo-image") MultipartFile logoImage,
+                                             @Nullable @RequestParam("introduce-image") MultipartFile introduceImage) throws IOException {
+
+        BrandImageUploadResponse brandImageUploadResponse = brandService.saveImages(logoImage, introduceImage);
+        return response.success(brandImageUploadResponse);
+    }
+
+
+    @PostMapping("/brands/update-images")
+    public ResponseEntity<?> saveBrandImages(@RequestParam("id") long id,
+                                             @Nullable @RequestParam("logo-image") MultipartFile logoImage,
+                                             @Nullable @RequestParam("introduce-image") MultipartFile introduceImage) throws IOException {
+
+        BrandImageUploadResponse brandImageUploadResponse = brandService.updateImages(id, logoImage, introduceImage);
+        return response.success(brandImageUploadResponse);
+    }
+
 }

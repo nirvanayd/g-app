@@ -20,7 +20,7 @@ import java.util.Optional;
 
 @RequiredArgsConstructor
 @Service
-public class AppUserService {
+public class UserDomainService {
 
     private final AppUserRepository userRepository;
     private final UserStylesRepository userStylesRepository;
@@ -55,17 +55,32 @@ public class AppUserService {
         return user;
     }
 
-    public Page<Users> getUserList() {
-        PageRequest pageRequest = PageRequest.of(0, 5);
-        return userRepository.findAll(pageRequest);
+    /* admin 사용 */
+    public Page<Users> selectAccountList(Integer page, Integer size, String role) {
+        PageRequest pageRequest = PageRequest.of(page, size, Sort.by("id").descending());
+        return userRepository.findAllByRole(role, pageRequest);
     }
 
-    public Page<Users> getUserList(Integer page, Authority authority) {
-        PageRequest pageRequest = PageRequest.of(page, 5, Sort.by("id").descending());
-        return userRepository.findAllByRole(authority.name(), pageRequest);
+    public Page<Users> selectAccountList(Integer page, Integer size, String email, UserStatus status, String role) {
+        PageRequest pageRequest = PageRequest.of(page, size, Sort.by("id").descending());
+        if (email == null) return userRepository.findAllByStatusAndRole(status, role, pageRequest);
+        if (status == null) return userRepository.findAllByEmailContainsAndRole(email, role, pageRequest);
+        return userRepository.findAllByEmailContainsAndStatusAndRole(email, status, role, pageRequest);
     }
 
-    public Users getUserDetail(long userId) {
+    public Page<Users> selectAccountList(Integer page, Integer size, String loginId, String email, UserStatus status, String role) {
+        PageRequest pageRequest = PageRequest.of(page, size, Sort.by("id").descending());
+        if (loginId == null && email == null && status == null) return selectAccountList(page, size, role);
+        if (loginId == null) return selectAccountList(page, size, email, status, role);
+        if (email == null && status == null) {
+            return userRepository.findAllByLoginIdContainsAndRole(loginId, role, pageRequest);
+        }
+        if (status == null) return userRepository.findAllByLoginIdContainsAndEmailContainsAndRole(loginId, email, role, pageRequest);
+        if (email == null) return userRepository.findAllByLoginIdContainsAndStatusAndRole(loginId, status, role, pageRequest);
+        return userRepository.findAllByLoginIdContainsAndEmailContainsAndStatusAndRole(loginId, email, status, role, pageRequest);
+    }
+
+    public Users selectAccount(long userId) {
         Users user = userRepository.findById(userId).orElse(null);
         if (user == null) throw new RuntimeException("사용자를 찾을 수 없습니다.");
         return user;

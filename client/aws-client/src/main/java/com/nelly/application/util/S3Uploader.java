@@ -2,6 +2,7 @@ package com.nelly.application.util;
 
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.CannedAccessControlList;
+import com.amazonaws.services.s3.model.DeleteObjectRequest;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import lombok.RequiredArgsConstructor;
@@ -29,44 +30,49 @@ public class S3Uploader {
     @Value("${cloud.aws.s3.bucket}")
     public String bucket;
 
+    @Value("${cloud.aws.s3.directory}")
+    public String envDirectory;
+
+    private static final String FILE_EXTENSION_SEPARATOR = ".";
+    private static final String DIRECTORY_SEPARATOR = "/";
+    private static final String TIME_SEPARATOR = "_";
+    private static final int UNDER_BAR_INDEX = 1;
+
     public String upload(MultipartFile multipartFile, String dirName) throws IOException {
-        log.info("upload start...." + dirName);
-        String fileName = buildFileName(dirName, multipartFile.getOriginalFilename());
+        String fileName = buildFileName(multipartFile.getOriginalFilename());
+
+        String path = dirName + DIRECTORY_SEPARATOR + fileName;
 
         ObjectMetadata objectMetadata = new ObjectMetadata();
         objectMetadata.setContentType(multipartFile.getContentType());
 
         try (InputStream inputStream = multipartFile.getInputStream()) {
-            amazonS3Client.putObject(new PutObjectRequest(bucket, fileName, inputStream, objectMetadata)
+            amazonS3Client.putObject(new PutObjectRequest(bucket, path, inputStream, objectMetadata)
                     .withCannedAcl(CannedAccessControlList.PublicRead));
         } catch (IOException e) {
             throw new RuntimeException("upload failed..");
         }
-        return amazonS3Client.getUrl(bucket, fileName).toString();
+        return path;
     }
 
-    private static final String FILE_EXTENSION_SEPARATOR = ".";
-    private static final String CATEGORY_PREFIX = "/";
-    private static final String TIME_SEPARATOR = "_";
-    private static final int UNDER_BAR_INDEX = 1;
-
-    public static String buildFileName(String category, String originalFileName) {
-        log.info("## build name ##");
-        log.info(category + " , " + originalFileName);
+    public static String buildFileName(String originalFileName) {
         int fileExtensionIndex = originalFileName.lastIndexOf(FILE_EXTENSION_SEPARATOR);
         String fileExtension = originalFileName.substring(fileExtensionIndex);
-        String fileName = originalFileName.substring(0, fileExtensionIndex);
-        String now = String.valueOf(System.currentTimeMillis());
-
-        return category + CATEGORY_PREFIX + fileName + TIME_SEPARATOR + now + fileExtension;
+        String uuid = UUID.randomUUID().toString();
+        return uuid + fileExtension;
     }
 
     /* 다운로드 시 사용 */
     public static ContentDisposition createContentDisposition(String categoryWithFileName) {
         String fileName = categoryWithFileName.substring(
-                categoryWithFileName.lastIndexOf(CATEGORY_PREFIX) + UNDER_BAR_INDEX);
+                categoryWithFileName.lastIndexOf(DIRECTORY_SEPARATOR) + UNDER_BAR_INDEX);
         return ContentDisposition.builder("attachment")
                 .filename(fileName, StandardCharsets.UTF_8)
                 .build();
+    }
+
+    /* remove */
+    public void removeObject(String key) {
+//        amazonS3Client.deleteObject(new DeleteObjectRequest(bucket, key));
     }
 }

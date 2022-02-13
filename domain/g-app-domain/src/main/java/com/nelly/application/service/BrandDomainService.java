@@ -1,10 +1,7 @@
 package com.nelly.application.service;
 
 import com.nelly.application.domain.*;
-import com.nelly.application.enums.AgeType;
-import com.nelly.application.enums.BrandStatus;
-import com.nelly.application.enums.PlaceType;
-import com.nelly.application.enums.StyleType;
+import com.nelly.application.enums.*;
 import com.nelly.application.repository.BrandAgesRepository;
 import com.nelly.application.repository.BrandPlacesRepository;
 import com.nelly.application.repository.BrandStylesRepository;
@@ -28,8 +25,8 @@ public class BrandDomainService {
     private final BrandPlacesRepository brandPlacesRepository;
     private final BrandAgesRepository brandAgesRepository;
 
-    public Brands createBrands(String name, String logoImageUrl, String description, BrandStatus status, Integer isDisplay,
-                                 String homepage, String introduceImageUrl) {
+    public Brands createBrands(String name, String logoImageUrl, String description, BrandStatus status,
+                               DisplayType isDisplay, String homepage, String introduceImageUrl) {
         Brands brands = Brands.builder()
                 .name(name)
                 .logoImageUrl(logoImageUrl)
@@ -42,7 +39,7 @@ public class BrandDomainService {
         return brandsRepository.save(brands);
     }
 
-    public void createBrandStyles(Brands brands, List<String> list) {
+    public void saveBrandStyles(Brands brands, List<String> list) {
         Brands refBrands = brandsRepository.getById(brands.getId());
         for (String code: list) {
             BrandStyles brandStyles = BrandStyles.builder()
@@ -53,7 +50,7 @@ public class BrandDomainService {
         }
     }
 
-    public void createBrandPlaces(Brands brands, List<String> list) {
+    public void saveBrandPlaces(Brands brands, List<String> list) {
         Brands refBrands = brandsRepository.getById(brands.getId());
         for (String code: list) {
             BrandPlaces brandPlaces = BrandPlaces.builder()
@@ -64,7 +61,7 @@ public class BrandDomainService {
         }
     }
 
-    public void createBrandAges(Brands brands, List<String> list) {
+    public void saveBrandAges(Brands brands, List<String> list) {
         Brands refBrands = brandsRepository.getById(brands.getId());
         for (String code: list) {
             BrandAges brandAges = BrandAges.builder()
@@ -80,7 +77,53 @@ public class BrandDomainService {
         return brandsRepository.findAll(pageRequest);
     }
 
+    public Page<Brands> selectBrandList(Integer page, Integer size, String name, BrandStatus status, DisplayType display) {
+        PageRequest pageRequest = PageRequest.of(page, size, Sort.by("id").descending());
+        if (name == null && status == null && display == null) return selectBrandList(page, size);
+        if (name == null) return selectBrandList(page, size, status, display);
+        if (status == null && display == null) return brandsRepository.findAllByNameContaining(name, pageRequest);
+        if (status == null) return brandsRepository.findAllByNameContainingAndIsDisplay(name, display, pageRequest);
+        if (display == null) return brandsRepository.findAllByNameContainingAndStatus(name, status, pageRequest);
+        return brandsRepository.findAllByNameContainingAndStatusAndIsDisplay(name, status, display, pageRequest);
+    }
+
+    public Page<Brands> selectBrandList(Integer page, Integer size, BrandStatus status, DisplayType display) {
+        PageRequest pageRequest = PageRequest.of(page, size, Sort.by("id").descending());
+        if (status == null) return brandsRepository.findAllByIsDisplay(display, pageRequest);
+        if (display == null) return brandsRepository.findAllByStatus(status, pageRequest);
+        return brandsRepository.findAllByStatusAndIsDisplay(status, display, pageRequest);
+    }
+
     public Brands selectBrand(long brandId) {
         return brandsRepository.findById(brandId).orElseThrow(() -> new RuntimeException("브랜드를 조회할 수 없습니다."));
+    }
+
+    public Brands updateBrand(long brandId, String name, String logoImageUrl, String description, BrandStatus status,
+                              DisplayType isDisplay, String homepage, String introduceImageUrl) {
+        Brands brands = brandsRepository.findById(brandId).orElseThrow(() -> new RuntimeException("브랜드를 조회할 수 없습니다."));
+
+        System.out.println("Status ****");
+        System.out.println(status);
+
+        brands.setName(name);
+        brands.setLogoImageUrl(logoImageUrl);
+        brands.setDescription(description);
+        brands.setStatus(status);
+        brands.setIsDisplay(isDisplay);
+        brands.setHomepage(homepage);
+        brands.setIntroduceImageUrl(introduceImageUrl);
+
+        return brandsRepository.save(brands);
+    }
+
+    public void updateBrandStyles(Brands brands, List<String> list) {
+        Brands refBrands = brandsRepository.getById(brands.getId());
+        for (String code: list) {
+            BrandStyles brandStyles = BrandStyles.builder()
+                    .brandStyle(StyleType.getStyleType(code))
+                    .brand(refBrands)
+                    .build();
+            brandStylesRepository.save(brandStyles);
+        }
     }
 }
