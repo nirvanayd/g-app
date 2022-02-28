@@ -8,6 +8,7 @@ import com.nelly.application.dto.request.AddBrandRequest;
 import com.nelly.application.dto.request.GetBrandListRequest;
 import com.nelly.application.dto.response.*;
 import com.nelly.application.service.brand.BrandService;
+import com.nelly.application.service.scraper.ScraperService;
 import com.nelly.application.util.S3Uploader;
 import dto.EnumIntegerCodeValue;
 import dto.EnumStringCodeValue;
@@ -33,8 +34,8 @@ public class BrandController {
 
     private final Response response;
     private final ModelMapper modelMapper;
-    private final S3Uploader s3Uploader;
     private final BrandService brandService;
+    private final ScraperService scraperService;
 
     @PostMapping("/brands")
     public ResponseEntity<?> addBrand(@RequestBody @Valid AddBrandRequest requestDto) {
@@ -108,4 +109,9 @@ public class BrandController {
         return response.success(brandImageUploadResponse);
     }
 
+    @GetMapping("/brands/scrap-all")
+    public ResponseEntity<?> scrapAll() {
+        scraperService.scrapAll();
+        return response.success();
+    }
 }

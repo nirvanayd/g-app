@@ -21,7 +21,6 @@ import javax.validation.Valid;
 
 @RestController
 @AllArgsConstructor
-@Service
 @Slf4j
 public class AdminController {
 

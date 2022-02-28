@@ -45,6 +45,7 @@ cloud:
       cloudfront-url: 'https://d3b7cshusafhca.cloudfront.net/'
       brand-dir: 'prod/brand'
       default-image-url: 'https://d3b7cshusafhca.cloudfront.net/prod/default/logo-default.png'
+      content-dir: 'prod/content'
     region:
       static: ap-northeast-2
     stack:

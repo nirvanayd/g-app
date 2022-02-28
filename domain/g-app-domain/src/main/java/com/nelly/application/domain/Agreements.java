@@ -15,7 +15,7 @@ public class Agreements extends BaseTime {
 
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)
-    private Integer id;
+    private Long id;
     @Convert(converter = AgreementTypeConverter.class)
     private String agreementTypeCode;
     @Column(name = "version", nullable = false, length = 10)

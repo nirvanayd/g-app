@@ -6,6 +6,7 @@ import com.nelly.application.converter.UserStatusConverter;
 import com.nelly.application.enums.UserStatus;
 import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.Formula;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -37,8 +38,6 @@ public class Users extends BaseTime{
     private String email;
     @Column(name = "birth", nullable = false, length = 10)
     private String birth;
-    @Column(name = "phone", nullable = false, length = 50)
-    private String phone;
     @Column(name = "profile_image_url", nullable = true, length = 500)
     private String profileImageUrl;
 
@@ -59,6 +58,9 @@ public class Users extends BaseTime{
 
     @OneToMany(mappedBy = "user")
     private List<UserStyles> userStyles;
+
+    @Formula("(select count(1) from contents c where c.user_id = id)")
+    private Integer contentCount;
 
     @PrePersist
     public void prePersist() {

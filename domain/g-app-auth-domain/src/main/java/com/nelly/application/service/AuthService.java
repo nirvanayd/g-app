@@ -3,6 +3,7 @@ package com.nelly.application.service;
 import com.nelly.application.domain.AppAuthentication;
 import com.nelly.application.dto.TokenInfoDto;
 import com.nelly.application.enums.Authority;
+import com.nelly.application.exception.AccessDeniedException;
 import com.nelly.application.jwt.TokenProvider;
 import com.nelly.application.repository.AuthRepository;
 import lombok.RequiredArgsConstructor;
@@ -10,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
@@ -49,7 +51,7 @@ public class AuthService {
         return existUser.orElse(null);
     }
 
-    public TokenInfoDto login(String loginId, String password) {
+    public TokenInfoDto login(String loginId, String password, String role) {
         if (authRepository.findByLoginId(loginId).orElse(null) == null) {
             throw new RuntimeException("아이디를 찾을 수 없습니다.");
         }
@@ -66,9 +68,13 @@ public class AuthService {
 
         // 3. refresh 토큰 DB 업데이트.
         AppAuthentication auth = authRepository.findByLoginId(loginId).orElse(null);
+
         if (auth == null) {
             throw new RuntimeException("아이디를 찾을 수 없습니다.");
         }
+
+        auth.getRoles().stream().filter(c -> c.equals(role)).findFirst().orElseThrow(()->new AccessDeniedException("접근 권한이 없습니다."));
+
         auth.setRt(tokenInfoDto.getRefreshToken());
         authRepository.save(auth);
 
@@ -111,5 +117,12 @@ public class AuthService {
         // authId 갱신
         tokenInfoDto.setAuthId(auth.getId());
         return tokenInfoDto;
+    }
+
+    public long getAuthenticationId() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        AppAuthentication auth = findByLoginId(authentication.getName());
+        if (auth == null) throw new RuntimeException("회원 정보를 조회할 수 없습니다.");
+        return auth.getId();
     }
 }
