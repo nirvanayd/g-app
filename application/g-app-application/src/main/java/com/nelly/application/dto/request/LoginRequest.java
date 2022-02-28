@@ -1,4 +1,4 @@
-package com.nelly.application.dto;
+package com.nelly.application.dto.request;
 
 import lombok.Data;
 
@@ -6,7 +6,7 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Pattern;
 
 @Data
-public class LoginRequestDto {
+public class LoginRequest {
     @NotEmpty(message = "아이디는 필수 입력값입니다.")
     private String loginId;
 

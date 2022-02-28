@@ -33,3 +33,21 @@ jwt:
   header: Authorization
   secret: c2lsdmVybmluZS10ZWNoLXNwcmluZy1ib290LWp3dC10dXRvcmlhbC1zZWNyZXQtc2lsdmVybmluZS10ZWNoLXNwcmluZy1ib290LWp3dC10dXRvcmlhbC1zZWNyZXQK
   token-validity-in-seconds: 86400
+
+cloud:
+  aws:
+    credentials:
+      accessKey: AKIARGKPZUU4ISOGS5QI
+      secretKey: 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
+    s3:
+      bucket: g-app-resource
+      directory: local
+      cloudfront-url: 'https://d3b7cshusafhca.cloudfront.net/'
+      brand-dir: 'prod/brand'
+      default-image-url: 'https://d3b7cshusafhca.cloudfront.net/local/default/logo-default.png'
+      content-dir: 'prod/content'
+    region:
+      static: ap-northeast-2
+    stack:
+      auto: false
+

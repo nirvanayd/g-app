@@ -6,6 +6,7 @@ import com.nelly.application.dto.SignUpRequestDto;
 import com.nelly.application.dto.TokenInfoDto;
 import com.nelly.application.dto.request.ReissueRequest;
 import com.nelly.application.enums.Authority;
+import com.nelly.application.enums.RoleType;
 import com.nelly.application.service.UserDomainService;
 import com.nelly.application.service.AuthService;
 import com.nelly.application.util.CacheTemplate;
@@ -39,14 +40,14 @@ public class AdminService {
         String encryptPassword = encryptUtils.encrypt(dto.getPassword());
         Long authId = authService.signUp(dto.getLoginId(), encryptPassword, Authority.ROLE_ADMIN);
         if (authId == null) throw new RuntimeException("회원가입 중 오류가 발생하였습니다.");
-        Users user = userDomainService.addUser(authId, dto.getLoginId(), dto.getEmail(), dto.getBirth(), dto.getPhone(),
+        Users user = userDomainService.addUser(authId, dto.getLoginId(), dto.getEmail(), dto.getBirth(),
                 Authority.ROLE_ADMIN);
 
         userDomainService.addUserStyle(user, dto.getUserStyle());
     }
 
     public TokenInfoDto login(String loginId, String password) {
-        TokenInfoDto tokenInfoDto = authService.login(loginId, password);
+        TokenInfoDto tokenInfoDto = authService.login(loginId, password, RoleType.ADMIN.getCode());
         // redis 저장
         cacheTemplate.putValue(String.valueOf(tokenInfoDto.getAuthId()), tokenInfoDto.getRefreshToken(), "token",
                 tokenInfoDto.getRefreshTokenExpirationTime(), TimeUnit.MILLISECONDS);
@@ -84,8 +85,6 @@ public class AdminService {
 
         // token 값 취득
         String cacheToken = cacheTemplate.getValue(String.valueOf(tokenInfoDto.getAuthId()), "token");
-        log.info("### : " + cacheToken);
-        log.info("@@@ : " + requestDto.getRefreshToken());
         if (!cacheToken.equals(requestDto.getRefreshToken())) {
             throw new RuntimeException("토큰정보가 일치하지 않습니다.");
         }

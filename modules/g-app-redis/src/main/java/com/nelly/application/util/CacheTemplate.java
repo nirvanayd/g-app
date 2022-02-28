@@ -5,6 +5,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 @Component
@@ -14,6 +17,7 @@ public class CacheTemplate {
     private final StringRedisTemplate stringRedisTemplate;
 
     private final String PREFIX = ":";
+    private final String WILDCARD = "*";
 
     public void putValue(final String key, final String value, final String cacheName) {
         putValue(concatenateCacheNameWithKey(key, cacheName), value);
@@ -94,9 +98,51 @@ public class CacheTemplate {
         return result;
     }
 
+    public void incrValue(final String key, final String cacheName) {
+        incrValue(concatenateCacheNameWithKey(key, cacheName));
+    }
+
+    public void decrValue(final String key, final String cacheName) {
+        decrValue(concatenateCacheNameWithKey(key, cacheName));
+    }
+
+    public void incrValue(final String key) {
+        try {
+            stringRedisTemplate.opsForValue().increment(key);
+        } catch (Exception ex) {
+            System.out.println("Exception::" + ex);
+        }
+    }
+
+    public void decrValue(final String key) {
+        try {
+            stringRedisTemplate.opsForValue().decrement(key);
+        } catch (Exception ex) {
+            System.out.println("Exception::" + ex);
+        }
+    }
+
     private String concatenateCacheNameWithKey(final int key, final String cacheName) {
         String stringKey = String.valueOf(key);
         return this.concatenateCacheNameWithKey(stringKey, cacheName);
+    }
+
+    public Set<String> getKeys(String cacheName) {
+        return stringRedisTemplate.keys(cacheName + PREFIX + WILDCARD);
+    }
+
+    public HashMap<String, String> parseCashNameKey(String cashNameKey) {
+        HashMap<String, String> map = new HashMap<>();
+        if (!cashNameKey.contains(PREFIX)) {
+            map.put("cacheName", "");
+            map.put("key", cashNameKey);
+            return map;
+        }
+
+        String [] array = cashNameKey.split(PREFIX);
+        map.put("cacheName", array[0]);
+        map.put("key", array[1]);
+        return map;
     }
 }
 

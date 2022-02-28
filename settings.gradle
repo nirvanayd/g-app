@@ -26,4 +26,6 @@ include 'client:g-admin-core-web'
 findProject(':client:g-admin-core-web')?.name = 'g-admin-core-web'
 include 'client:aws-client'
 findProject(':client:aws-client')?.name = 'aws-client'
+include 'client:scraper-client'
+findProject(':client:scraper-client')?.name = 'scraper-client'
 
