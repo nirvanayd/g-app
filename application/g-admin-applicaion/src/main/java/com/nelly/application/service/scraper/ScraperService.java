@@ -43,11 +43,6 @@ public class ScraperService {
                 String moduleName = detail.getScraperBrand().getModuleName();
                 ItemScrapDto itemScrapDto = scraperManager.addCurrentItem(brand.getSampleUrl(), moduleName);
 
-                log.info("name : " + itemScrapDto.getName());
-                log.info("price : " + itemScrapDto.getPrice());
-                log.info("imageList size: " + itemScrapDto.getImageList().size());
-
-
             } catch (MalformedURLException me) {
 
             }
