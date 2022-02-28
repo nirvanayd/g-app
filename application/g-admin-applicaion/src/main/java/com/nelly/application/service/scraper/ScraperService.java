@@ -8,6 +8,7 @@ import com.nelly.application.service.ScraperDomainService;
 import com.nelly.application.util.ScraperManager;
 import com.nelly.application.util.UrlUtil;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.net.MalformedURLException;
@@ -15,6 +16,7 @@ import java.util.List;
 
 @RequiredArgsConstructor
 @Service
+@Slf4j
 public class ScraperService {
 
     private final ScraperDomainService scraperDomainService;
@@ -41,6 +43,9 @@ public class ScraperService {
                 String moduleName = detail.getScraperBrand().getModuleName();
                 ItemScrapDto itemScrapDto = scraperManager.addCurrentItem(brand.getSampleUrl(), moduleName);
 
+                log.info("name : " + itemScrapDto.getName());
+                log.info("price : " + itemScrapDto.getPrice());
+                log.info("imageList size: " + itemScrapDto.getImageList().size());
 
 
             } catch (MalformedURLException me) {
