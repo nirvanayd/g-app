@@ -38,8 +38,6 @@ public class UserDomainService {
         return userRepository.save(user);
     }
 
-
-
     public void addUserStyle(Users user, List<String> userStyle) {
         Users refUser = userRepository.getById(user.getId());
         for (String code: userStyle) {
