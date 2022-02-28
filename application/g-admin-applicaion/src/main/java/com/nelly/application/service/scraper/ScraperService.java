@@ -42,7 +42,9 @@ public class ScraperService {
                 ScraperBrandDetails detail = getScraperBrand(urlInfoDto);
                 String moduleName = detail.getScraperBrand().getModuleName();
                 ItemScrapDto itemScrapDto = scraperManager.addCurrentItem(brand.getSampleUrl(), moduleName);
-
+                log.info("name : " + itemScrapDto.getName());
+                log.info("price : " + itemScrapDto.getPrice());
+                log.info("iamgeList : " + itemScrapDto.getImageList().size());
             } catch (MalformedURLException me) {
 
             }
