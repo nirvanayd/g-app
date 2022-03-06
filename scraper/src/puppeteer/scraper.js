@@ -13,7 +13,7 @@ class Scraper {
 
         const {
             goToTargetApp = true,
-            headless = true,
+            headless = false,
             devtools = false,
             slowMo = false
         } = options;
