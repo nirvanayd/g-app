@@ -19,6 +19,8 @@ public class ContentDomainService {
     private final BrandHashTagsRepository brandHashTagsRepository;
     private final ContentLikesRepository contentLikesRepository;
     private final ContentMarksRepository contentMarksRepository;
+    private final AppTagsRepository appTagsRepository;
+    private final ItemHashTagsRepository itemHashTagsRepository;
 
     public Contents createContent(Users user, String contentText) {
         Contents contents = Contents.builder()
@@ -115,4 +117,27 @@ public class ContentDomainService {
         contentsRepository.updateMarkCount(contentId, value);
     }
 
+    public AppTags createAppTag(String tag) {
+        AppTags appTag = AppTags.builder()
+                .tag(tag)
+                .build();
+        return appTagsRepository.save(appTag);
+    }
+
+    public AppTags selectAppTag(Long id) {
+        return appTagsRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("태그 정보를 조회할 수 없습니다."));
+    }
+
+    public void createItemHashTag(Contents content, AppTags appTag, String tag) {
+        ItemHashTags itemHashTags = ItemHashTags.builder()
+                .appTag(appTag)
+                .content(content)
+                .tag(tag)
+                .build();
+        itemHashTagsRepository.save(itemHashTags);
+    }
+
+    public void selectContentList() {
+    }
 }

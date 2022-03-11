@@ -3,6 +3,7 @@ package com.nelly.application.service;
 import com.nelly.application.domain.UserStyles;
 import com.nelly.application.domain.Users;
 import com.nelly.application.enums.Authority;
+import com.nelly.application.enums.RoleType;
 import com.nelly.application.enums.StyleType;
 import com.nelly.application.enums.UserStatus;
 import com.nelly.application.repository.AppUserRepository;
@@ -81,5 +82,10 @@ public class UserDomainService {
         Users user = userRepository.findById(userId).orElse(null);
         if (user == null) throw new RuntimeException("사용자를 찾을 수 없습니다.");
         return user;
+    }
+
+    public List<Users> selectAccountListByLoginId(String loginId) {
+        System.out.println("login ID : " + loginId);
+        return userRepository.findAllByLoginIdContainsAndRole(loginId, RoleType.USER.getCode());
     }
 }

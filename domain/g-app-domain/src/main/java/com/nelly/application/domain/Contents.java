@@ -58,4 +58,7 @@ public class Contents extends BaseTime {
 
     @OneToMany(mappedBy = "content")
     private List<UserHashTags> userHashTags;
+
+    @OneToMany(mappedBy = "content")
+    private List<ItemHashTags> itemHashTags;
 }

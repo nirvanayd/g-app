@@ -70,6 +70,7 @@ app.post('/add-item', async (req, res) => {
         'imageList': imageList
     }
 
+    console.log(obj);
     res.send(JSON.stringify(obj));
 });
 

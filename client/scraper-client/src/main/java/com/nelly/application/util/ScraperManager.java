@@ -7,6 +7,8 @@ import com.nelly.application.exception.ScraperException;
 import com.nelly.application.exception.enums.ExceptionCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.asynchttpclient.AsyncHttpClient;
+import org.asynchttpclient.Dsl;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
@@ -16,6 +18,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
 import java.awt.*;
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -47,5 +50,11 @@ public class ScraperManager {
                 .bodyToMono(String.class);
 
         return gson.fromJson(scraperResponse.block(), ItemScrapDto.class);
+    }
+
+    public void getScrapImage(String url) {
+        AsyncHttpClient client = Dsl.asyncHttpClient();
+
+        client.prepareGet(url).execute();
     }
 }

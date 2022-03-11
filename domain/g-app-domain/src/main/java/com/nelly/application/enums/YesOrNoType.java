@@ -24,4 +24,10 @@ public enum YesOrNoType implements CommonStringCode {
     public static YesOrNoType getYesOrNoType(String code) {
         return Arrays.stream(YesOrNoType.values()).filter(c -> c.code.equals(code)).findFirst().orElse(EMPTY);
     }
+
+    public static boolean hasCodeValueExist(String code) {
+        if (code == null || "".equals(code)) return true;
+        return hasCode(code);
+    }
+
 }

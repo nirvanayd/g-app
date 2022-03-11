@@ -2,6 +2,7 @@ package com.nelly.application.service.content;
 
 import com.nelly.application.domain.*;
 import com.nelly.application.dto.BrandTagDto;
+import com.nelly.application.dto.ItemTagDto;
 import com.nelly.application.dto.UserTagDto;
 import com.nelly.application.dto.request.AddContentRequest;
 import com.nelly.application.dto.request.RemoveContentRequest;
@@ -70,6 +71,20 @@ public class ContentService {
                 tagBrand = brandService.getBrand(brandTag.getId());
             }
             contentDomainService.createBrandTag(content, tagBrand, brandTag.getTag());
+        }
+
+        for (ItemTagDto itemTag : dto.getItemHashTags()) {
+            // 제품 태그는 그냥 텍스트임.
+            AppTags appTag = null;
+            if (itemTag.getId() == null) {
+                // item tag에 id가 없는 경우, app tag에 데이터가 없는 것이므로 app tag 생성 후 id를 세팅해줌.
+                appTag = contentDomainService.createAppTag(itemTag.getTag());
+            } else {
+                appTag = contentDomainService.selectAppTag(itemTag.getId());
+            }
+
+            contentDomainService.createItemHashTag(content, appTag, itemTag.getTag());
+
         }
     }
 

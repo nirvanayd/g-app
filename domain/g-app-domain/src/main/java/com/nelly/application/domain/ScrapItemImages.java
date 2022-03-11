@@ -8,7 +8,7 @@ import javax.persistence.*;
 
 @Entity
 @Builder
-@Table(name = "item_hash_tags")
+@Table(name = "scrap_item_images")
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
@@ -16,20 +16,19 @@ import javax.persistence.*;
 @JsonIdentityInfo(
         generator = ObjectIdGenerators.PropertyGenerator.class,
         property = "id")
-public class ItemHashTags extends BaseTime {
+public class ScrapItemImages extends BaseTime {
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)
     @Column(name = "id")
     private Long id;
 
-    @Column(name = "tag", nullable = false, length = 100)
-    private String tag;
+    @Column(name="origin_image_url", nullable = false)
+    private String originImageUrl;
+
+    @Column(name="image_url", nullable = true)
+    private String imageUrl;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "content_id")
-    private Contents content;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "tag_id")
-    private AppTags appTag;
+    @JoinColumn(name = "scrap_item_id")
+    private ScrapItems scrapItem;
 }
