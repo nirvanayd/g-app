@@ -2,6 +2,7 @@ package com.nelly.application.repository;
 
 import com.nelly.application.domain.Contents;
 import com.nelly.application.domain.Users;
+import org.springframework.data.domain.Page;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -22,4 +23,5 @@ public interface ContentsRepository extends JpaRepository<Contents, Long> {
     @Modifying
     @Query("UPDATE Contents c SET c.markCount = c.markCount + :value WHERE c.id = :contentId")
     void updateMarkCount(@Param("contentId") Long contentId, @Param("value") int value);
+
 }
