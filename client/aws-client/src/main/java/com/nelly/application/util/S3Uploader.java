@@ -49,10 +49,16 @@ public class S3Uploader {
         try (InputStream inputStream = multipartFile.getInputStream()) {
             amazonS3Client.putObject(new PutObjectRequest(bucket, path, inputStream, objectMetadata)
                     .withCannedAcl(CannedAccessControlList.PublicRead));
+
         } catch (IOException e) {
             throw new RuntimeException("upload failed..");
         }
+
         return path;
+    }
+
+    public String upload(String url, String dirName) throws IOException {
+        return "";
     }
 
     public static String buildFileName(String originalFileName) {

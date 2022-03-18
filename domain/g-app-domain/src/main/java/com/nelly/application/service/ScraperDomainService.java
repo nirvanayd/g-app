@@ -1,11 +1,7 @@
 package com.nelly.application.service;
 
-import com.nelly.application.domain.ScraperBrandDetails;
-import com.nelly.application.domain.ScraperBrands;
-import com.nelly.application.domain.ScraperSimulationLog;
-import com.nelly.application.repository.ScraperBrandDetailsRepository;
-import com.nelly.application.repository.ScraperBrandsRepository;
-import com.nelly.application.repository.ScraperSimulationLogRepository;
+import com.nelly.application.domain.*;
+import com.nelly.application.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -19,6 +15,8 @@ public class ScraperDomainService {
     private final ScraperBrandDetailsRepository scraperBrandDetailsRepository;
     private final ScraperBrandsRepository scraperBrandsRepository;
     private final ScraperSimulationLogRepository scraperSimulationLogRepository;
+    private final ScrapItemsRepository scrapItemsRepository;
+    private final ScrapItemImagesRepository scrapItemImagesRepository;
 
 
     public List<ScraperBrandDetails> selectScraperBrand(String host) {
@@ -43,4 +41,25 @@ public class ScraperDomainService {
 
         scraperSimulationLogRepository.save(log);
     }
+
+    public ScrapItems createScrapItems(String url, String name, Integer price, String currency) {
+        ScrapItems scrapItem = ScrapItems.builder()
+                .url(url)
+                .name(name)
+                .price(price)
+                .currency(currency)
+                .build();
+
+        return scrapItemsRepository.save(scrapItem);
+    }
+
+    public void createScrapItemImages(ScrapItems ScrapItem, String imageUrl) {
+        ScrapItemImages scrapItemImage = ScrapItemImages.builder()
+                .scrapItem(ScrapItem)
+                .imageUrl(imageUrl)
+                .build();
+
+        scrapItemImagesRepository.save(scrapItemImage);
+    }
+
 }

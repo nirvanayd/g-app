@@ -10,6 +10,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface AppUserRepository extends JpaRepository<Users, Long> {
@@ -26,4 +27,6 @@ public interface AppUserRepository extends JpaRepository<Users, Long> {
 
     Page<Users> findAllByLoginIdContainsAndEmailContainsAndStatusAndRole(String loginId, String email, UserStatus status,
                                                                          String role, Pageable pageable);
+
+    List<Users> findAllByLoginIdContainsAndRole(String loginId, String role);
 }

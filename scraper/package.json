@@ -12,5 +12,11 @@
     "puppeteer": "^13.4.0",
     "winston": "^3.6.0",
     "winston-daily-rotate-file": "^4.6.1"
+  },
+  "scripts": {
+    "build": "webpack"
+  },
+  "devDependencies": {
+    "webpack-cli": "^4.9.2"
   }
 }

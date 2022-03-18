@@ -24,6 +24,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @RequiredArgsConstructor
 @Service
@@ -70,6 +72,32 @@ public class ContentService {
                 tagBrand = brandService.getBrand(brandTag.getId());
             }
             contentDomainService.createBrandTag(content, tagBrand, brandTag.getTag());
+        }
+
+        Pattern hashTagPattern = Pattern.compile("#(\\S+)");
+        Matcher matcher = hashTagPattern.matcher(dto.getContentText());
+
+        List<String> tagList = new ArrayList<>();
+
+        while(matcher.find()) {
+            // matcher 를 해시태그로
+            String[] tags = matcher.group().split("#");
+
+            for (String s : tags) {
+                String str = s.replaceAll("\\s+", "");
+                if (!str.isEmpty()) {
+                    tagList.add(str);
+                }
+            }
+        }
+
+        for (String s : tagList) {
+            AppTags appTag = contentDomainService.selectAppTag(s).orElse(null);
+
+            if (appTag == null) {
+                appTag = contentDomainService.createAppTag(s);
+            }
+            contentDomainService.createContentHashTag(content, appTag, s);
         }
     }
 
