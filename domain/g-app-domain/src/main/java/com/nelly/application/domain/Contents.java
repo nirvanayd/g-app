@@ -2,7 +2,6 @@ package com.nelly.application.domain;
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
-import com.nelly.application.converter.PlaceTypeConverter;
 import com.nelly.application.converter.YesOrNoTypeConverter;
 import com.nelly.application.enums.YesOrNoType;
 import lombok.*;
@@ -60,5 +59,5 @@ public class Contents extends BaseTime {
     private List<UserHashTags> userHashTags;
 
     @OneToMany(mappedBy = "content")
-    private List<ItemHashTags> itemHashTags;
+    private List<ContentHashTags> itemHashTags;
 }

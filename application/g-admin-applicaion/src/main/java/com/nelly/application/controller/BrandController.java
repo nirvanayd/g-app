@@ -55,6 +55,7 @@ public class BrandController {
 
     @GetMapping("/brands")
     public ResponseEntity<?> getBrandList(@Valid GetBrandListRequest requestDto) {
+        System.out.println(requestDto);
         Page<Brands> brandsPage = brandService.getBrandList(requestDto);
         long totalCount = brandsPage.getTotalElements();
         long totalPage = brandsPage.getTotalPages();

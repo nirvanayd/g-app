@@ -4,10 +4,14 @@ import com.nelly.application.domain.*;
 import com.nelly.application.enums.YesOrNoType;
 import com.nelly.application.repository.*;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import javax.swing.text.html.Option;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @RequiredArgsConstructor
@@ -20,7 +24,7 @@ public class ContentDomainService {
     private final ContentLikesRepository contentLikesRepository;
     private final ContentMarksRepository contentMarksRepository;
     private final AppTagsRepository appTagsRepository;
-    private final ItemHashTagsRepository itemHashTagsRepository;
+    private final ContentHashTagsRepository contentHashTagsRepository;
 
     public Contents createContent(Users user, String contentText) {
         Contents contents = Contents.builder()
@@ -129,15 +133,27 @@ public class ContentDomainService {
                 .orElseThrow(() -> new RuntimeException("태그 정보를 조회할 수 없습니다."));
     }
 
-    public void createItemHashTag(Contents content, AppTags appTag, String tag) {
-        ItemHashTags itemHashTags = ItemHashTags.builder()
+    public Optional<AppTags> selectAppTag(String tag) {
+        return appTagsRepository.findFirstByTag(tag);
+    }
+
+    public void createContentHashTag(Contents content, AppTags appTag, String tag) {
+        ContentHashTags contentHashTags = ContentHashTags.builder()
                 .appTag(appTag)
                 .content(content)
                 .tag(tag)
                 .build();
-        itemHashTagsRepository.save(itemHashTags);
+        contentHashTagsRepository.save(contentHashTags);
     }
 
-    public void selectContentList() {
+    public Page<Contents> selectContentList(Integer page, Integer size, List<Users> userList, String isDeleted) {
+        PageRequest pageRequest = PageRequest.of(page, size, Sort.by("id").descending());
+        if (userList == null && isDeleted == null) return selectContentList(page, size);
+        return null;
+    }
+
+    public Page<Contents> selectContentList(Integer page, Integer size) {
+        PageRequest pageRequest = PageRequest.of(page, size, Sort.by("id").descending());
+        return contentsRepository.findAll(pageRequest);
     }
 }

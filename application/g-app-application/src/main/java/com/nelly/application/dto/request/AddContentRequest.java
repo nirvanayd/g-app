@@ -1,7 +1,6 @@
 package com.nelly.application.dto.request;
 
 import com.nelly.application.dto.BrandTagDto;
-import com.nelly.application.dto.ItemTagDto;
 import com.nelly.application.dto.UserTagDto;
 import lombok.Data;
 
@@ -15,5 +14,4 @@ public class AddContentRequest {
     private ArrayList<String> imageUrlList;
     private ArrayList<UserTagDto> userHashTags;
     private ArrayList<BrandTagDto> brandHashTags;
-    private ArrayList<ItemTagDto> itemHashTags;
 }

@@ -8,7 +8,7 @@ import javax.persistence.*;
 
 @Entity
 @Builder
-@Table(name = "item_hash_tags")
+@Table(name = "content_hash_tags")
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
@@ -16,7 +16,7 @@ import javax.persistence.*;
 @JsonIdentityInfo(
         generator = ObjectIdGenerators.PropertyGenerator.class,
         property = "id")
-public class ItemHashTags extends BaseTime {
+public class ContentHashTags extends BaseTime {
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)
     @Column(name = "id")

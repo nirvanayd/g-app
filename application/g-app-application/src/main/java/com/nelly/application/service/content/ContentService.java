@@ -2,7 +2,6 @@ package com.nelly.application.service.content;
 
 import com.nelly.application.domain.*;
 import com.nelly.application.dto.BrandTagDto;
-import com.nelly.application.dto.ItemTagDto;
 import com.nelly.application.dto.UserTagDto;
 import com.nelly.application.dto.request.AddContentRequest;
 import com.nelly.application.dto.request.RemoveContentRequest;
@@ -25,6 +24,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @RequiredArgsConstructor
 @Service
@@ -73,18 +74,30 @@ public class ContentService {
             contentDomainService.createBrandTag(content, tagBrand, brandTag.getTag());
         }
 
-        for (ItemTagDto itemTag : dto.getItemHashTags()) {
-            // 제품 태그는 그냥 텍스트임.
-            AppTags appTag = null;
-            if (itemTag.getId() == null) {
-                // item tag에 id가 없는 경우, app tag에 데이터가 없는 것이므로 app tag 생성 후 id를 세팅해줌.
-                appTag = contentDomainService.createAppTag(itemTag.getTag());
-            } else {
-                appTag = contentDomainService.selectAppTag(itemTag.getId());
+        Pattern hashTagPattern = Pattern.compile("#(\\S+)");
+        Matcher matcher = hashTagPattern.matcher(dto.getContentText());
+
+        List<String> tagList = new ArrayList<>();
+
+        while(matcher.find()) {
+            // matcher 를 해시태그로
+            String[] tags = matcher.group().split("#");
+
+            for (String s : tags) {
+                String str = s.replaceAll("\\s+", "");
+                if (!str.isEmpty()) {
+                    tagList.add(str);
+                }
             }
+        }
 
-            contentDomainService.createItemHashTag(content, appTag, itemTag.getTag());
+        for (String s : tagList) {
+            AppTags appTag = contentDomainService.selectAppTag(s).orElse(null);
 
+            if (appTag == null) {
+                appTag = contentDomainService.createAppTag(s);
+            }
+            contentDomainService.createContentHashTag(content, appTag, s);
         }
     }
 
