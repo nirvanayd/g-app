@@ -8,7 +8,7 @@ import javax.persistence.*;
 
 @Entity
 @Builder
-@Table(name = "scraper_simulation_log")
+@Table(name = "scraper_log")
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
@@ -16,11 +16,14 @@ import javax.persistence.*;
 @JsonIdentityInfo(
         generator = ObjectIdGenerators.PropertyGenerator.class,
         property = "id")
-public class ScraperSimulationLog extends BaseTime {
+public class ScraperLog extends BaseTime {
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)
     @Column(name = "id")
     private Long id;
+
+    @Column(name="user_id", nullable = false)
+    private Long userId;
 
     @Column(name="scraper_brand_id", nullable = false)
     private Long scraperBrandId;

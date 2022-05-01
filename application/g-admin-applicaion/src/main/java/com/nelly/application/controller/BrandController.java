@@ -3,6 +3,7 @@ package com.nelly.application.controller;
 import com.nelly.application.config.AwsProperties;
 import com.nelly.application.config.EnvProperties;
 import com.nelly.application.domain.Brands;
+import com.nelly.application.domain.ScraperBrands;
 import com.nelly.application.dto.Response;
 import com.nelly.application.dto.request.AddBrandRequest;
 import com.nelly.application.dto.request.GetBrandListRequest;
@@ -114,5 +115,26 @@ public class BrandController {
     public ResponseEntity<?> scrapAll() {
         scraperService.scrapAll();
         return response.success();
+    }
+
+    @PostMapping("/brands/scrap")
+    public ResponseEntity<?> addScrap() {
+        // 스크래핑 테스트에 추가할 브랜드 추가
+        return response.success();
+    }
+
+    @GetMapping("/brands/scrap")
+    public ResponseEntity<?> getScrapBrands() {
+        // 페이징 처리하지 않음.
+        List<ScraperBrands> scrapBrands = scraperService.getScraperBrands();
+
+        List<ScrapBrandResponse> list = scrapBrands.stream().
+                map(u -> modelMapper.map(u, ScrapBrandResponse.class)).collect(Collectors.toList());
+
+        ScrapBrandListResponse scrapBrandListResponse = new ScrapBrandListResponse();
+        scrapBrandListResponse.setTotalCount(list.size());
+        scrapBrandListResponse.setTotalPage(0);
+        scrapBrandListResponse.setList(list);
+        return response.success(scrapBrandListResponse);
     }
 }

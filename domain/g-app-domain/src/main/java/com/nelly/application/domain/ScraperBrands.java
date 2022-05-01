@@ -2,6 +2,11 @@ package com.nelly.application.domain;
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+import com.nelly.application.converter.DisplayTypeConverter;
+import com.nelly.application.converter.IsUsedTypeConverter;
+import com.nelly.application.converter.ScraperStatusConverter;
+import com.nelly.application.enums.IsUsedType;
+import com.nelly.application.enums.ScraperStatus;
 import lombok.*;
 
 import javax.persistence.*;
@@ -30,11 +35,14 @@ public class ScraperBrands extends BaseTime {
     @Column(name="module_name", nullable = true)
     private String moduleName;
 
-    @Column(name="is_used", nullable = true)
-    private boolean isUsed;
+    @Convert(converter = IsUsedTypeConverter.class)
+    private IsUsedType isUsed;
 
     @Column(name="sample_url", nullable = true)
     private String sampleUrl;
+
+    @Convert(converter = ScraperStatusConverter.class)
+    private ScraperStatus status;
 
     @Column(name="last_simulation_datetime", nullable = true)
     private LocalDateTime lastSimulationDatetime;

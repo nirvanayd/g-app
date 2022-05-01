@@ -16,7 +16,7 @@ public class ScraperService {
     private final ScraperDomainService scraperDomainService;
 
     public ScraperBrandDetails getScraperBrand(UrlInfoDto urlInfoDto) throws MalformedURLException {
-        List<ScraperBrandDetails> detailList = scraperDomainService.selectScraperBrand(urlInfoDto.getHost());
+        List<ScraperBrandDetails> detailList = scraperDomainService.selectScraperBrandDetail(urlInfoDto.getHost());
 
         if (detailList.size() == 0) throw new RuntimeException("브랜드 정보를 조회할 수 없습니다.");
 

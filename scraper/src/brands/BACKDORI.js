@@ -11,10 +11,10 @@ class BACKDORI {
     }
 
     async getPrice(page) {
-        // var price = document.querySelector('.name').innerText;
+        // document.querySelector('#span_product_price_text').innerText;
         try {
             const price = await page.evaluate(() => {
-                return document.querySelector('.name').innerText;
+                return document.querySelector('#span_product_price_text').innerText;
             })
             return strUtil.replacePrice(price);
         } catch ( Error ) {
@@ -26,7 +26,7 @@ class BACKDORI {
     async getName(page) {
         try {
             return await page.evaluate(() => {
-                return document.querySelector('.prdDesc .name1').innerText;
+                return document.querySelector('.prdDesc .name').innerText;
             })
         } catch ( Error ) {
             console.log('name error');
