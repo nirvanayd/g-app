@@ -1,10 +1,7 @@
 package com.nelly.application.enums;
 
-import com.nelly.application.enums.enumInterface.CommonEnums;
 import com.nelly.application.enums.enumInterface.CommonIntegerCode;
 import dto.EnumIntegerCodeValue;
-import dto.EnumStringCodeValue;
-import lombok.Data;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 

@@ -6,7 +6,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @RequiredArgsConstructor
 @Service
@@ -14,12 +13,12 @@ public class ScraperDomainService {
 
     private final ScraperBrandDetailsRepository scraperBrandDetailsRepository;
     private final ScraperBrandsRepository scraperBrandsRepository;
-    private final ScraperSimulationLogRepository scraperSimulationLogRepository;
+    private final ScraperLogRepository scraperSimulationLogRepository;
     private final ScrapItemsRepository scrapItemsRepository;
     private final ScrapItemImagesRepository scrapItemImagesRepository;
 
 
-    public List<ScraperBrandDetails> selectScraperBrand(String host) {
+    public List<ScraperBrandDetails> selectScraperBrandDetail(String host) {
         return scraperBrandDetailsRepository.findAllByHost(host);
     }
 
@@ -30,7 +29,7 @@ public class ScraperDomainService {
     public void createScraperSimulationLog(String name, String price, String imageList, Long scraperBrandId,
                                            String targetUrl, String resultCode) {
 
-        ScraperSimulationLog log = ScraperSimulationLog.builder()
+        ScraperLog log = ScraperLog.builder()
                 .name(name)
                 .price(price)
                 .imageList(imageList)
