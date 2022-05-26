@@ -15,6 +15,7 @@ public class CorsConfig {
         config.setAllowCredentials(true);
         config.addAllowedOrigin("http://localhost:8085");
         config.addAllowedOrigin("http://admin.gapp.co.kr");
+        config.addAllowedOrigin("http://admin.filunway.com");
         config.addAllowedHeader("*");
         config.addAllowedMethod("*");
 

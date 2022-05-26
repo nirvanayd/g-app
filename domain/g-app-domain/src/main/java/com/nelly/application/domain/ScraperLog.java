@@ -34,12 +34,12 @@ public class ScraperLog extends BaseTime {
     @Column(name="result_code", nullable = false)
     private String resultCode;
 
-    @Column(name="price", nullable = false)
+    @Column(name="price", nullable = true)
     private String price;
 
-    @Column(name="name", nullable = false)
+    @Column(name="name", nullable = true)
     private String name;
 
-    @Column(name="imageList", nullable = false)
+    @Column(name="imageList", nullable = true)
     private String imageList;
 }
