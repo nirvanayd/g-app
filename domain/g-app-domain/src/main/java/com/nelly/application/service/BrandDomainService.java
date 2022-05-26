@@ -102,9 +102,6 @@ public class BrandDomainService {
                               DisplayType isDisplay, String homepage, String introduceImageUrl) {
         Brands brands = brandsRepository.findById(brandId).orElseThrow(() -> new RuntimeException("브랜드를 조회할 수 없습니다."));
 
-        System.out.println("Status ****");
-        System.out.println(status);
-
         brands.setName(name);
         brands.setLogoImageUrl(logoImageUrl);
         brands.setDescription(description);

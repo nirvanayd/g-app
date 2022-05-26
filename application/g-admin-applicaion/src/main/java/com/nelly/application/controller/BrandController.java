@@ -48,8 +48,6 @@ public class BrandController {
     public ResponseEntity<?> updateBrand(@PathVariable long brandId,
                                          @RequestBody @Valid AddBrandRequest requestDto) {
 
-        System.out.println(requestDto);
-
         brandService.updateBrand(brandId, requestDto);
         return response.success("test");
     }
