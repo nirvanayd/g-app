@@ -28,4 +28,6 @@ include 'client:aws-client'
 findProject(':client:aws-client')?.name = 'aws-client'
 include 'client:scraper-client'
 findProject(':client:scraper-client')?.name = 'scraper-client'
+include 'modules:g-app-mail'
+findProject(':modules:g-app-mail')?.name = 'g-app-mail'
 

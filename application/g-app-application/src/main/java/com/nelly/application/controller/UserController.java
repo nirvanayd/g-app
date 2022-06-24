@@ -1,12 +1,12 @@
 package com.nelly.application.controller;
 
 import com.nelly.application.domain.Users;
-import com.nelly.application.dto.request.LoginRequest;
+import com.nelly.application.dto.request.*;
 import com.nelly.application.dto.Response;
-import com.nelly.application.dto.request.SignUpRequest;
-import com.nelly.application.dto.request.UpdateUserRequest;
 import com.nelly.application.dto.response.LoginResponse;
 import com.nelly.application.dto.response.UserResponse;
+import com.nelly.application.enums.StyleType;
+import com.nelly.application.mail.MailSender;
 import com.nelly.application.service.user.UserService;
 import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -14,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.Optional;
 
 
 @RestController
@@ -23,6 +24,7 @@ public class UserController {
     private final UserService userService;
     private final Response response;
     private final ModelMapper modelMapper;
+    private final MailSender mailSender;
 
     @PostMapping("/sign-up")
     public ResponseEntity<?> signUp(@RequestBody @Valid SignUpRequest dto) {
@@ -76,5 +78,46 @@ public class UserController {
     public ResponseEntity<?> updateUser(@RequestBody @Valid UpdateUserRequest dto) {
 
         return response.success("debug...");
+    }
+
+    /**
+     * 사용자 아이디 중복확인
+     */
+    @PostMapping("/duplicate-id")
+    public ResponseEntity<?> duplicateId(@RequestBody @Valid DuplicateIdRequest dto) {
+        Optional<Users> user = userService.existId(dto.getLoginId());
+        if (user.isPresent()) {
+            throw new RuntimeException("이미 사용중인 아이디입니다.");
+        }
+        return response.success();
+    }
+
+    /**
+     * 사용자 이메일 중복확인
+     */
+    @PostMapping("/duplicate-email")
+    public ResponseEntity<?> duplicateEmail(@RequestBody @Valid DuplicateEmailRequest dto) {
+        Optional<Users> user = userService.existEmail(dto.getEmail());
+        if (user.isPresent()) {
+            throw new RuntimeException("이미 사용중인 이메일입니다.");
+        }
+        return response.success();
+    }
+
+    @GetMapping("/style-list")
+    public ResponseEntity<?> getStyle() {
+        return response.success(StyleType.getStyleList());
+    }
+
+    @PostMapping("/find-id")
+    public ResponseEntity<?> findId(@RequestBody @Valid FindIdRequest dto) {
+        userService.findId(dto.getEmail());
+        return response.success();
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<?> resetPassword(@RequestBody @Valid ResetPasswordRequest dto) {
+        userService.resetPassword(dto.getEmail());
+        return response.success();
     }
 }

@@ -51,3 +51,17 @@ cloud:
       static: ap-northeast-2
     stack:
       auto: false
+
+mail:
+  host: smtp.gmail.com
+  port: 587
+  username: filunway@gmail.com
+  password: bbeylfxhlpxhwxbs
+  smtp:
+    auth: true
+    starttls: true
+    sslenable: true
+    ssltrust: smtp.gmail.com
+  protocol: smtp
+  debug: true
+  encoding: UTF-8

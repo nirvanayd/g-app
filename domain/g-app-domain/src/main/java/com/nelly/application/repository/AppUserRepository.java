@@ -1,10 +1,7 @@
 package com.nelly.application.repository;
 
 
-import com.nelly.application.domain.Brands;
 import com.nelly.application.domain.Users;
-import com.nelly.application.enums.BrandStatus;
-import com.nelly.application.enums.DisplayType;
 import com.nelly.application.enums.UserStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -29,4 +26,6 @@ public interface AppUserRepository extends JpaRepository<Users, Long> {
                                                                          String role, Pageable pageable);
 
     List<Users> findAllByLoginIdContainsAndRole(String loginId, String role);
+    Optional<Users> findByLoginIdAndRole(String loginId, String role);
+    Optional<Users> findByEmailAndRole(String email, String role);
 }
