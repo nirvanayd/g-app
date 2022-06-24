@@ -85,7 +85,15 @@ public class UserDomainService {
     }
 
     public List<Users> selectAccountListByLoginId(String loginId) {
-        System.out.println("login ID : " + loginId);
         return userRepository.findAllByLoginIdContainsAndRole(loginId, RoleType.USER.getCode());
     }
+
+    public Optional<Users> selectAccountByLoginId(String loginId) {
+        return userRepository.findByLoginIdAndRole(loginId, RoleType.USER.getCode());
+    }
+
+    public Optional<Users> selectAccountByEmail(String email) {
+        return userRepository.findByEmailAndRole(email, RoleType.USER.getCode());
+    }
+
 }

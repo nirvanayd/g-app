@@ -125,4 +125,16 @@ public class AuthService {
         if (auth == null) throw new RuntimeException("회원 정보를 조회할 수 없습니다.");
         return auth.getId();
     }
+
+    public void resetPassword(String loginId, String password) {
+        AppAuthentication auth = authRepository.findByLoginId(loginId).orElse(null);
+        if (auth == null) {
+            throw new RuntimeException("아이디를 찾을 수 없습니다.");
+        }
+        auth.setPassword(password);
+        authRepository.save(auth);
+        SecurityContextHolder.clearContext();
+    }
+
+
 }

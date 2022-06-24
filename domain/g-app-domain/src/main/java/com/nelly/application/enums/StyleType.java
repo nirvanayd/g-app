@@ -1,10 +1,13 @@
 package com.nelly.application.enums;
 
 import com.nelly.application.enums.enumInterface.CommonStringCode;
+import dto.EnumStringCodeValue;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Getter
@@ -27,5 +30,9 @@ public enum StyleType implements CommonStringCode {
 
     public static StyleType getStyleType(String code) {
         return Arrays.stream(StyleType.values()).filter(c -> c.code.equals(code)).findFirst().orElse(EMPTY);
+    }
+
+    public static List<EnumStringCodeValue> getStyleList() {
+        return Arrays.stream(StyleType.values()).filter(c -> c.code != null & c.used).map(EnumStringCodeValue::new).collect(Collectors.toList());
     }
 }
