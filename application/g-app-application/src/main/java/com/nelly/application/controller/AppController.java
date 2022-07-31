@@ -2,6 +2,7 @@ package com.nelly.application.controller;
 
 import com.nelly.application.dto.Response;
 import com.nelly.application.dto.request.AddCurrentItemRequest;
+import com.nelly.application.dto.request.SignupDataRequest;
 import com.nelly.application.dto.response.AppVersionResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -23,5 +24,11 @@ public class AppController {
         appVersionResponse.setMinVersion("1.0.0");
         appVersionResponse.setLatestVersion("1.0.0");
         return response.success(appVersionResponse);
+    }
+
+    @GetMapping("/signup-data")
+    public ResponseEntity<?> getSignUpData(SignupDataRequest signupDataRequest) {
+        System.out.println(signupDataRequest.getVersion());
+        return response.success();
     }
 }
