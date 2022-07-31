@@ -20,7 +20,7 @@ public class AppController {
     @GetMapping("/version")
     public ResponseEntity<?> getAppVersionConf() {
         AppVersionResponse appVersionResponse = new AppVersionResponse();
-        appVersionResponse.setAppVersion("1.0.1");
+        appVersionResponse.setAppVersion("1.0.0");
         appVersionResponse.setMinVersion("1.0.0");
         appVersionResponse.setLatestVersion("1.0.0");
         return response.success(appVersionResponse);
