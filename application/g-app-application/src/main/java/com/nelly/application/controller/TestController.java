@@ -21,6 +21,6 @@ public class TestController {
     public ResponseEntity<String> env() {
 
         log.info("env test..");
-        return ResponseEntity.ok("this env is " + env);
+        return ResponseEntity.ok("this env is -> " + env);
     }
 }
