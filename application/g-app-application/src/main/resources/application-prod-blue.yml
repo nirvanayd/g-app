@@ -10,7 +10,7 @@ spring:
     generate-ddl: true
     show-sql: true
     hibernate:
-      ddl-auto: create # update create-drop create
+      ddl-auto: update # update create-drop create
     properties:
       hibernate:
         format_sql: true
