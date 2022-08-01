@@ -10,8 +10,10 @@ import java.util.Arrays;
 @RequiredArgsConstructor
 @Getter
 public enum AgreementType implements CommonStringCode {
-    MARKETING_POLICY("marketing", "마케팅 동의"),
-    PRIVACY_POLICY("privacy", "개인정보 처리방침"),
+    MARKETING_POLICY("marketing", "마케팅약관"),
+    PRIVACY_POLICY("privacy", "개인정보 수집이용 약관"),
+    SERVICE_POLICY("service", "서비스 이용약관"),
+    CHILDREN_POLICY("children", "14세 이상약관"),
     EMPTY(null, "");
 
     private final String code;

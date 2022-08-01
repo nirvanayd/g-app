@@ -1,6 +1,5 @@
 package com.nelly.application.converter;
 
-import com.nelly.application.enums.UserStatus;
 import com.nelly.application.enums.YesOrNoType;
 
 import javax.persistence.AttributeConverter;
