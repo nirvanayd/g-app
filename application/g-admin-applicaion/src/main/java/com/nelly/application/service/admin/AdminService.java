@@ -41,7 +41,7 @@ public class AdminService {
         Long authId = authService.signUp(dto.getLoginId(), encryptPassword, Authority.ROLE_ADMIN);
         if (authId == null) throw new RuntimeException("회원가입 중 오류가 발생하였습니다.");
         Users user = userDomainService.addUser(authId, dto.getLoginId(), dto.getEmail(), dto.getBirth(),
-                Authority.ROLE_ADMIN);
+                null, Authority.ROLE_ADMIN);
 
         userDomainService.addUserStyle(user, dto.getUserStyle());
     }

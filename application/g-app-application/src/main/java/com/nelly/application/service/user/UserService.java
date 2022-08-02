@@ -1,6 +1,7 @@
 package com.nelly.application.service.user;
 
 import com.nelly.application.domain.Users;
+import com.nelly.application.dto.request.ReissueRequest;
 import com.nelly.application.dto.request.SignUpRequest;
 import com.nelly.application.dto.TokenInfoDto;
 import com.nelly.application.enums.Authority;
@@ -12,6 +13,8 @@ import com.nelly.application.util.CacheTemplate;
 import com.nelly.application.util.EncryptUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
 import java.util.List;
@@ -32,6 +35,7 @@ public class UserService {
     private static final String BEARER_TYPE = "Bearer";
 
 
+    @Transactional
     public void signUp(SignUpRequest dto) {
         if(authService.findByLoginId(dto.getLoginId()) != null) throw new RuntimeException("사용 중인 아이디입니다.");
         // 비밀번호 암호화
@@ -39,13 +43,16 @@ public class UserService {
         Long authId = authService.signUp(dto.getLoginId(), encryptPassword);
         if (authId == null) throw new RuntimeException("회원가입 중 오류가 발생하였습니다.");
         Users user = userDomainService.addUser(authId, dto.getLoginId(), dto.getEmail(), dto.getBirth(),
-                Authority.ROLE_USER);
+                dto.getMarketingAgreement(), Authority.ROLE_USER);
 
         userDomainService.addUserStyle(user, dto.getUserStyle());
     }
 
     public String login(String loginId, String password) {
         TokenInfoDto tokenInfoDto = authService.login(loginId, password, RoleType.USER.getCode());
+        // 해당 authId의 토큰은 삭제함.
+
+
         // redis 저장
         cacheTemplate.putValue(String.valueOf(tokenInfoDto.getAuthId()), tokenInfoDto.getRefreshToken(), "token",
                 tokenInfoDto.getRefreshTokenExpirationTime(), TimeUnit.MILLISECONDS);
@@ -140,5 +147,23 @@ public class UserService {
         String content = "회원님의 비밀번호는 <strong>" + generatedString + "</strong> 입니다.";
         String subject = "Filunaway 비밀번호 초기화 결과 =";
         mailSender.sendMail(subject, content, email);
+    }
+
+    public TokenInfoDto reissue(ReissueRequest requestDto) {
+        TokenInfoDto tokenInfoDto = authService.getExistTokenInfo(requestDto.getAccessToken(), requestDto.getRefreshToken());
+
+        // token 값 취득
+        String cacheToken = cacheTemplate.getValue(String.valueOf(tokenInfoDto.getAuthId()), "token");
+        if (!cacheToken.equals(requestDto.getRefreshToken())) {
+            throw new RuntimeException("토큰정보가 일치하지 않습니다.");
+        }
+        if (ObjectUtils.isEmpty(cacheToken)) {
+            throw new RuntimeException("잘못된 요청입니다.");
+        }
+
+        TokenInfoDto newTokenInfoDto = authService.reissue(requestDto.getAccessToken());
+        cacheTemplate.putValue(String.valueOf(newTokenInfoDto.getAuthId()), newTokenInfoDto.getRefreshToken(), "token",
+                newTokenInfoDto.getRefreshTokenExpirationTime(), TimeUnit.MILLISECONDS);
+        return newTokenInfoDto;
     }
 }

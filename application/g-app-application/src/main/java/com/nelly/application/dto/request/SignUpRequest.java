@@ -26,4 +26,6 @@ public class SignUpRequest {
 
     @EnumListValidator(enumClass = StyleType.class, message = "스타일 유형이 올바르지 않습니다.", enumMethod = "hasCode")
     private List<String> userStyle;
+    
+    private String marketingAgreement;
 }

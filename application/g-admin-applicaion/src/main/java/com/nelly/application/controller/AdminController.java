@@ -53,7 +53,6 @@ public class AdminController {
 
     @GetMapping("/admin")
     public ResponseEntity<?> userTest(@RequestHeader("Authorization") String bearerToken ) {
-        log.info(bearerToken);
         String token = adminService.getToken(bearerToken);
         Users user = adminService.userTest(token);
         UserTestResponse userTestResponse = modelMapper.map(user, UserTestResponse.class);

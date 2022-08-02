@@ -26,12 +26,14 @@ public class UserDomainService {
     private final AppUserRepository userRepository;
     private final UserStylesRepository userStylesRepository;
 
-    public Users addUser(Long authId, String loginId, String email, String birth, Authority authority) {
+    public Users addUser(Long authId, String loginId, String email, String birth,
+                         String marketingAgreement, Authority authority) {
         Users user = Users.builder().authId(authId)
                 .loginId(loginId)
                 .role(authority.name())
                 .email(email)
                 .birth(birth)
+                .marketingAgreement(marketingAgreement)
                 .status(UserStatus.NORMAL)
                 .joinedDate(LocalDateTime.now())
                 .build();

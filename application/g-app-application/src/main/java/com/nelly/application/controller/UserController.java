@@ -1,6 +1,7 @@
 package com.nelly.application.controller;
 
 import com.nelly.application.domain.Users;
+import com.nelly.application.dto.TokenInfoDto;
 import com.nelly.application.dto.request.*;
 import com.nelly.application.dto.Response;
 import com.nelly.application.dto.response.LoginResponse;
@@ -36,6 +37,16 @@ public class UserController {
     public ResponseEntity<?> login(@RequestBody @Valid LoginRequest dto) {
         String accessToken = userService.login(dto.getLoginId(), dto.getPassword());
         LoginResponse data = LoginResponse.builder().accessToken(accessToken).build();
+        return response.success(data);
+    }
+
+    @PostMapping("/reissue")
+    public ResponseEntity<?> userTest(@RequestBody ReissueRequest requestDto) {
+        TokenInfoDto tokenInfoDto = userService.reissue(requestDto);
+        LoginResponse data = LoginResponse.builder()
+                .accessToken(tokenInfoDto.getAccessToken())
+                .refreshToken(tokenInfoDto.getRefreshToken())
+                .build();
         return response.success(data);
     }
 
