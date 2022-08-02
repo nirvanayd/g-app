@@ -37,7 +37,8 @@ public class UserService {
 
     @Transactional
     public void signUp(SignUpRequest dto) {
-        if(authService.findByLoginId(dto.getLoginId()) != null) throw new RuntimeException("사용 중인 아이디입니다.");
+        if (authService.findByLoginId(dto.getLoginId()) != null) throw new RuntimeException("사용 중인 아이디입니다.");
+        if (userDomainService.existEmail(dto.getEmail())) throw new RuntimeException("사용 중인 이메일입니다.");
         // 비밀번호 암호화
         String encryptPassword = encryptUtils.encrypt(dto.getPassword());
         Long authId = authService.signUp(dto.getLoginId(), encryptPassword);

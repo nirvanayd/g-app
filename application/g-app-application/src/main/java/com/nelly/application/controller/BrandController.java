@@ -23,4 +23,9 @@ public class BrandController {
     public void downloadImage() {
         brandService.downloadImage();
     }
+
+    @GetMapping("/brands/rank")
+    public void getBrandRank() {
+
+    }
 }

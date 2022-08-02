@@ -86,6 +86,11 @@ public class UserDomainService {
         return user;
     }
 
+    public boolean existEmail(String email) {
+        Optional<Users> user = userRepository.findByEmailAndRole(email, RoleType.USER.getCode());
+        return user.isPresent();
+    }
+
     public List<Users> selectAccountListByLoginId(String loginId) {
         return userRepository.findAllByLoginIdContainsAndRole(loginId, RoleType.USER.getCode());
     }
@@ -97,5 +102,6 @@ public class UserDomainService {
     public Optional<Users> selectAccountByEmail(String email) {
         return userRepository.findByEmailAndRole(email, RoleType.USER.getCode());
     }
+
 
 }
