@@ -50,7 +50,7 @@ public class UserController {
         return response.success(data);
     }
 
-    @GetMapping("/logout")
+    @GetMapping("/users/logout")
     public ResponseEntity<?> logout(@RequestHeader("Authorization") String bearerToken ) {
         String token = userService.getToken(bearerToken);
         userService.logout(token);
