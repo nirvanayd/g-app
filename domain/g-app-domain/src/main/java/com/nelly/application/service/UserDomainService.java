@@ -1,12 +1,11 @@
 package com.nelly.application.service;
 
+import com.nelly.application.domain.UserMarketing;
 import com.nelly.application.domain.UserStyles;
 import com.nelly.application.domain.Users;
-import com.nelly.application.enums.Authority;
-import com.nelly.application.enums.RoleType;
-import com.nelly.application.enums.StyleType;
-import com.nelly.application.enums.UserStatus;
+import com.nelly.application.enums.*;
 import com.nelly.application.repository.AppUserRepository;
+import com.nelly.application.repository.UserMarketingTypeRepository;
 import com.nelly.application.repository.UserStylesRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -25,15 +24,14 @@ public class UserDomainService {
 
     private final AppUserRepository userRepository;
     private final UserStylesRepository userStylesRepository;
+    private final UserMarketingTypeRepository userMarketingTypeRepository;
 
-    public Users addUser(Long authId, String loginId, String email, String birth,
-                         String marketingAgreement, Authority authority) {
+    public Users addUser(Long authId, String loginId, String email, String birth, Authority authority) {
         Users user = Users.builder().authId(authId)
                 .loginId(loginId)
                 .role(authority.name())
                 .email(email)
                 .birth(birth)
-                .marketingAgreement(marketingAgreement)
                 .status(UserStatus.NORMAL)
                 .joinedDate(LocalDateTime.now())
                 .build();
@@ -48,6 +46,15 @@ public class UserDomainService {
             userStylesRepository.save(userStyles);
         }
     }
+
+    public void addUserMarketingType(Users user, List<String> userMarketingType) {
+        Users refUser = userRepository.getById(user.getId());
+        for (String code: userMarketingType) {
+            UserMarketing userMarketing = UserMarketing.builder().marketingType(MarketingType.getMarketingType(code)).user(refUser).build();
+            userMarketingTypeRepository.save(userMarketing);
+        }
+    }
+
 
     public Users getUsers(long authId) {
         Users user = userRepository.findByAuthId(authId).orElse(null);

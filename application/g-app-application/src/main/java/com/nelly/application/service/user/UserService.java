@@ -41,12 +41,13 @@ public class UserService {
         if (userDomainService.existEmail(dto.getEmail())) throw new RuntimeException("사용 중인 이메일입니다.");
         // 비밀번호 암호화
         String encryptPassword = encryptUtils.encrypt(dto.getPassword());
+        // 마케팅 수신동의
         Long authId = authService.signUp(dto.getLoginId(), encryptPassword);
         if (authId == null) throw new RuntimeException("회원가입 중 오류가 발생하였습니다.");
-        Users user = userDomainService.addUser(authId, dto.getLoginId(), dto.getEmail(), dto.getBirth(),
-                dto.getMarketingAgreement(), Authority.ROLE_USER);
+        Users user = userDomainService.addUser(authId, dto.getLoginId(), dto.getEmail(), dto.getBirth(), Authority.ROLE_USER);
 
         userDomainService.addUserStyle(user, dto.getUserStyle());
+        userDomainService.addUserMarketingType(user, dto.getUserMarketingType());
     }
 
     public String login(String loginId, String password) {

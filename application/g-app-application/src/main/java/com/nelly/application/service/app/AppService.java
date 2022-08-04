@@ -3,6 +3,7 @@ package com.nelly.application.service.app;
 import com.nelly.application.domain.Agreements;
 import com.nelly.application.dto.response.AgreementResponse;
 import com.nelly.application.dto.response.AppInitDataResponse;
+import com.nelly.application.enums.MarketingType;
 import com.nelly.application.enums.StyleType;
 import com.nelly.application.service.AppDomainService;
 import dto.EnumStringCodeValue;
@@ -25,7 +26,7 @@ public class AppService {
     public AppInitDataResponse getAppInitData(String version) {
         List<Agreements> agreementsList = appDomainService.selectAgreements(version);
         List<EnumStringCodeValue> styleTypeList = StyleType.getStyleList();
-
+        List<EnumStringCodeValue> marketingTypeList = MarketingType.getMarketingTypeList();
 
         List<AgreementResponse> agreementResponses = agreementsList.stream().
                 map(u -> modelMapper.map(u, AgreementResponse.class)).collect(Collectors.toList());
@@ -34,6 +35,7 @@ public class AppService {
 
         response.setAgreementsList(agreementResponses);
         response.setStyleList(styleTypeList);
+        response.setMarketingTypeList(marketingTypeList);
         return response;
     }
 }

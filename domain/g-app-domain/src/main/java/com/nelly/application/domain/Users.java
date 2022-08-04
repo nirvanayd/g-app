@@ -55,8 +55,6 @@ public class Users extends BaseTime{
     private LocalDateTime joinedDate;
     @Column(name="leave_date", nullable = true)
     private LocalDateTime leaveDate;
-    @Column(name="marketing_agreement", nullable = true, length = 20)
-    private String marketingAgreement;
 
     @OneToMany(mappedBy = "user")
     private List<UserStyles> userStyles;
