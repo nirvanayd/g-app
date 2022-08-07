@@ -13,6 +13,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
@@ -31,11 +32,16 @@ public class AppService {
         List<AgreementResponse> agreementResponses = agreementsList.stream().
                 map(u -> modelMapper.map(u, AgreementResponse.class)).collect(Collectors.toList());
 
+        Optional<AgreementResponse> marketingOptional =
+                agreementResponses.stream().filter(a -> a.getAgreementTypeCode().equals("marketing")).findFirst();
+
+        marketingOptional.ifPresent(agreementResponse -> agreementResponse.setItemList(marketingTypeList));
+
         AppInitDataResponse response = new AppInitDataResponse();
 
         response.setAgreementsList(agreementResponses);
         response.setStyleList(styleTypeList);
-        response.setMarketingTypeList(marketingTypeList);
+//        response.setMarketingTypeList(marketingTypeList);
         return response;
     }
 }

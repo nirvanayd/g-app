@@ -3,9 +3,7 @@ package com.nelly.application.domain;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import com.nelly.application.converter.MarketingTypeConverter;
-import com.nelly.application.converter.StyleTypeConverter;
 import com.nelly.application.enums.MarketingType;
-import com.nelly.application.enums.StyleType;
 import lombok.*;
 
 import javax.persistence.*;

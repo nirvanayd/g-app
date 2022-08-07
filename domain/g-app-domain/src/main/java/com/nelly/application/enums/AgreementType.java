@@ -14,6 +14,7 @@ public enum AgreementType implements CommonStringCode {
     PRIVACY_POLICY("privacy", "개인정보 수집이용 약관"),
     SERVICE_POLICY("service", "서비스 이용약관"),
     CHILDREN_POLICY("children", "14세 이상약관"),
+    PROVISION_POLICY("provision", "제3자 정보제공 동의"),
     EMPTY(null, "");
 
     private final String code;

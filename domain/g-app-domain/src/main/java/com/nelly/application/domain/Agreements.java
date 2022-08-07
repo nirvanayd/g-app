@@ -39,4 +39,7 @@ public class Agreements extends BaseTime {
 
     @Column(name = "content", nullable = true, columnDefinition = "TEXT")
     private String content;
+
+    @Column(name = "seq", nullable = false)
+    private Integer seq;
 }

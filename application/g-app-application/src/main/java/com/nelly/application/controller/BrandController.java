@@ -26,6 +26,7 @@ public class BrandController {
 
     @GetMapping("/brands/rank")
     public void getBrandRank() {
-
     }
+
+
 }
