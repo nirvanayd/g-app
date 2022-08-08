@@ -6,6 +6,10 @@ import com.nelly.application.enums.DisplayType;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+import org.springframework.transaction.annotation.Transactional;
 
 public interface BrandsRepository extends JpaRepository<Brands, Long> {
     // findAll(Pageable)
@@ -18,4 +22,14 @@ public interface BrandsRepository extends JpaRepository<Brands, Long> {
     Page<Brands> findAllByStatusAndIsDisplay(BrandStatus status, DisplayType displayType, Pageable pageable);
 
     Page<Brands> findAllByNameContainingAndStatusAndIsDisplay(String name, BrandStatus status, DisplayType isDisplay, Pageable pageable);
+
+    @Transactional
+    @Modifying
+    @Query("UPDATE Brands b SET b.favoriteCount = b.favoriteCount + :value WHERE b.id = :brandId")
+    void updateBrandFavoriteCount(@Param("brandId") Long contentId, @Param("value") int value);
+
+    // app search
+    // default : page, size, status
+    // filter : name, style, place, age
+
 }

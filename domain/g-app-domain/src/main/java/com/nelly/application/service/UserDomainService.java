@@ -62,6 +62,10 @@ public class UserDomainService {
         return user;
     }
 
+    public Optional<Users> selectAppUsers(long authId) {
+        return userRepository.findByAuthId(authId);
+    }
+
     /* admin 사용 */
     public Page<Users> selectAccountList(Integer page, Integer size, String role) {
         PageRequest pageRequest = PageRequest.of(page, size, Sort.by("id").descending());

@@ -2,10 +2,8 @@ package com.nelly.application.service;
 
 import com.nelly.application.domain.*;
 import com.nelly.application.enums.*;
-import com.nelly.application.repository.BrandAgesRepository;
-import com.nelly.application.repository.BrandPlacesRepository;
-import com.nelly.application.repository.BrandStylesRepository;
-import com.nelly.application.repository.BrandsRepository;
+import com.nelly.application.exception.SystemException;
+import com.nelly.application.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -24,6 +22,8 @@ public class BrandDomainService {
     private final BrandStylesRepository brandStylesRepository;
     private final BrandPlacesRepository brandPlacesRepository;
     private final BrandAgesRepository brandAgesRepository;
+    private final BrandRankRepository brandRankRepository;
+    private final UserBrandsRepository userBrandsRepository;
 
     public Brands createBrands(String name, String logoImageUrl, String description, BrandStatus status,
                                DisplayType isDisplay, String homepage, String introduceImageUrl) {
@@ -122,5 +122,32 @@ public class BrandDomainService {
                     .build();
             brandStylesRepository.save(brandStyles);
         }
+    }
+
+    // app brand search
+    public Page<BrandRank> selectAppBrandRankList(Integer page, Integer size) {
+        PageRequest pageRequest = PageRequest.of(page, size, Sort.by("ranking").ascending());
+        return brandRankRepository.findAll(pageRequest);
+    }
+
+    public List<UserBrands> selectAppUserBrandList(Long userId, List<Long> brandIdList) {
+        return userBrandsRepository.findAllByUserIdAndBrandIdIn(userId, brandIdList);
+    }
+
+    public Optional<UserBrands> selectUserBrand(Long brandId, Long userId) {
+        return  userBrandsRepository.findByBrandIdAndUserId(brandId, userId);
+    }
+
+    public void createUserBrand(Long brandId, Long userId) {
+        UserBrands userBrands = UserBrands.builder().userId(userId).brandId(brandId).build();
+        userBrandsRepository.save(userBrands);
+    }
+
+    public void deleteUserBrand(UserBrands userBrand) {
+        userBrandsRepository.delete(userBrand);
+    }
+
+    public void updateBrandFavoriteCount(Long brandId, int value) {
+        brandsRepository.updateBrandFavoriteCount(brandId, value);
     }
 }

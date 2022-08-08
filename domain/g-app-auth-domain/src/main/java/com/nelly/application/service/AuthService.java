@@ -126,6 +126,13 @@ public class AuthService {
         return auth.getId();
     }
 
+    public Long getAppAuthenticationId() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        AppAuthentication auth = findByLoginId(authentication.getName());
+        if (auth == null) return null;
+        return auth.getId();
+    }
+
     public void resetPassword(String loginId, String password) {
         AppAuthentication auth = authRepository.findByLoginId(loginId).orElse(null);
         if (auth == null) {

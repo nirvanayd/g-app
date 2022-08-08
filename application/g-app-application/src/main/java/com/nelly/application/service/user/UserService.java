@@ -94,6 +94,12 @@ public class UserService {
         return userDomainService.getUsers(authId);
     }
 
+    public Optional<Users> getAppUser() {
+        Long authId = authService.getAppAuthenticationId();
+        if (authId == null) return Optional.empty();
+        return userDomainService.selectAppUsers(authId);
+    }
+
     public Users getUser(long userId) {
         return userDomainService.selectAccount(userId);
     }
