@@ -60,6 +60,10 @@ public class Brands extends BaseTime{
     @OneToOne(mappedBy = "brand")
     private BrandRank ranking;
 
+    @JsonIgnore
+    @OneToMany(mappedBy = "brand")
+    private List<UserBrands> userBrandList;
+
     @PrePersist
     public void prePersist() {
         this.isDisplay = this.isDisplay == null ? DisplayType.DISPLAY : this.isDisplay;

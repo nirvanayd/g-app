@@ -59,7 +59,9 @@ public class BrandController {
 
     @GetMapping("/brands/favorite")
     public ResponseEntity<?> getUserBrands(GetUserBrandsRequest getUserBrandsRequest) {
-        return response.success();
+        Users user = userService.getAppUser().orElseThrow(() -> new SystemException("사용자 정보를 조회할 수 없습니다."));
+        GetRankResponse getRankResponse = brandService.getUserBrandList(user.getId(), getUserBrandsRequest);
+        return response.success(getRankResponse);
     }
 
     @PostMapping("/brands/favorite")

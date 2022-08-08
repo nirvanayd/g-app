@@ -5,6 +5,7 @@ import com.nelly.application.dto.ItemScrapDto;
 import com.nelly.application.dto.UrlInfoDto;
 import com.nelly.application.dto.request.AddCurrentItemRequest;
 import com.nelly.application.dto.request.GetRankRequest;
+import com.nelly.application.dto.request.GetUserBrandsRequest;
 import com.nelly.application.dto.request.SaveUserBrandsRequest;
 import com.nelly.application.dto.response.BrandRankResponse;
 import com.nelly.application.dto.response.GetRankResponse;
@@ -92,7 +93,7 @@ public class BrandService {
 
             for (BrandRankResponse brandRankResponse : list) {
 
-                boolean isFavorite = userBrandList.stream().anyMatch(u -> u.getBrandId().equals(brandRankResponse.getId()));
+                boolean isFavorite = userBrandList.stream().anyMatch(u -> u.getBrand().getId().equals(brandRankResponse.getId()));
 
                 brandRankResponse.setIsFavorite(isFavorite);
                 //
@@ -115,13 +116,34 @@ public class BrandService {
 
         if (YesOrNoType.YES.getCode().equals(saveUserBrandsRequest.getFavoriteYn())) {
             if (userBrand.isPresent()) return;
-            brandDomainService.createUserBrand(saveUserBrandsRequest.getBrandId(), userId);
+            brandDomainService.createUserBrand(brand, userId);
             cacheTemplate.incrValue(String.valueOf(saveUserBrandsRequest.getBrandId()), "favorite");
         } else if (YesOrNoType.NO.getCode().equals(saveUserBrandsRequest.getFavoriteYn())) {
             if (userBrand.isEmpty()) throw new SystemException("즐겨찾기 정보를 조회할 수 없습니다.");
             brandDomainService.deleteUserBrand(userBrand.get());
             cacheTemplate.decrValue(String.valueOf(saveUserBrandsRequest.getBrandId()), "favorite");
         }
+    }
+
+    public GetRankResponse getUserBrandList(Long userId, GetUserBrandsRequest getUserBrandsRequest) {
+
+        Page<UserBrands> userBrandsPage = brandDomainService.selectUserBrandList(userId,
+                getUserBrandsRequest.getPage(), getUserBrandsRequest.getSize());
+
+        long totalCount = userBrandsPage.getTotalElements();
+        long totalPage = userBrandsPage.getTotalPages();
+        List<UserBrands> userBrandList = userBrandsPage.getContent();
+        List<BrandRankResponse> list = userBrandList.stream().
+                map(u -> modelMapper.map(u.getBrand(), BrandRankResponse.class)).collect(Collectors.toList());
+
+        list.forEach(l -> l.setIsFavorite(true));
+
+        GetRankResponse getRankResponse = new GetRankResponse();
+        getRankResponse.setTotalCount(totalCount);
+        getRankResponse.setTotalPage(totalPage);
+        getRankResponse.setBrandList(list);
+
+        return getRankResponse;
     }
 
     @Transactional

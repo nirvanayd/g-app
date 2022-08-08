@@ -139,8 +139,14 @@ public class BrandDomainService {
         return  userBrandsRepository.findByBrandIdAndUserId(brandId, userId);
     }
 
-    public void createUserBrand(Long brandId, Long userId) {
-        UserBrands userBrands = UserBrands.builder().userId(userId).brandId(brandId).build();
+    public Page<UserBrands> selectUserBrandList(Long userId, Integer page, Integer size) {
+        PageRequest pageRequest = PageRequest.of(page, size, Sort.by("brandName").ascending());
+        return userBrandsRepository.findAllByUserId(userId, pageRequest);
+    }
+
+
+    public void createUserBrand(Brands brand, Long userId) {
+        UserBrands userBrands = UserBrands.builder().userId(userId).brand(brand).build();
         userBrandsRepository.save(userBrands);
     }
 

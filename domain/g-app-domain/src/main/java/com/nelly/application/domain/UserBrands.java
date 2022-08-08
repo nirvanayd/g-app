@@ -26,8 +26,9 @@ public class UserBrands extends BaseTime {
     @Column(name = "id")
     private Long id;
 
-    @Column(name = "brand_id")
-    private Long brandId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "brand_id")
+    private Brands brand;
 
     @Column(name = "user_id")
     private Long userId;
