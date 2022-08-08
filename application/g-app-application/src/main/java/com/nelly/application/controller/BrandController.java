@@ -6,6 +6,7 @@ import com.nelly.application.domain.Users;
 import com.nelly.application.dto.Response;
 import com.nelly.application.dto.request.AddCurrentItemRequest;
 import com.nelly.application.dto.request.GetRankRequest;
+import com.nelly.application.dto.request.GetUserBrandsRequest;
 import com.nelly.application.dto.request.SaveUserBrandsRequest;
 import com.nelly.application.dto.response.BrandRankResponse;
 import com.nelly.application.dto.response.BrandResponse;
@@ -53,6 +54,11 @@ public class BrandController {
 
     @GetMapping("/brands")
     public ResponseEntity<?> getAppUserBrandList(GetRankRequest getRankRequest) {
+        return response.success();
+    }
+
+    @GetMapping("/brands/favorite")
+    public ResponseEntity<?> getUserBrands(GetUserBrandsRequest getUserBrandsRequest) {
         return response.success();
     }
 

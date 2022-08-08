@@ -35,6 +35,7 @@ public class BrandDomainService {
                 .isDisplay(isDisplay)
                 .homepage(homepage)
                 .introduceImageUrl(introduceImageUrl)
+                .favoriteCount(0)
                 .build();
         return brandsRepository.save(brands);
     }
