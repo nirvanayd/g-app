@@ -8,7 +8,9 @@ import com.nelly.application.dto.request.GetRankRequest;
 import com.nelly.application.dto.request.GetUserBrandsRequest;
 import com.nelly.application.dto.request.SaveUserBrandsRequest;
 import com.nelly.application.dto.response.BrandRankResponse;
+import com.nelly.application.dto.response.BrandResponse;
 import com.nelly.application.dto.response.GetRankResponse;
+import com.nelly.application.dto.response.GetUserBrandsResponse;
 import com.nelly.application.enums.YesOrNoType;
 import com.nelly.application.exception.SystemException;
 import com.nelly.application.service.BrandDomainService;
@@ -74,11 +76,8 @@ public class BrandService {
     }
 
     public GetRankResponse getBrandRankList(GetRankRequest getRankRequest) {
-
         Page<BrandRank> brandsPage = brandDomainService.selectAppBrandRankList(getRankRequest.getPage(), getRankRequest.getSize());
-
         Optional<Users> user = userService.getAppUser();
-
         long totalCount = brandsPage.getTotalElements();
         long totalPage = brandsPage.getTotalPages();
         List<BrandRank> rankList = brandsPage.getContent();
@@ -109,6 +108,8 @@ public class BrandService {
     }
 
 
+
+
     public void saveUserBrands(Long userId, SaveUserBrandsRequest saveUserBrandsRequest) {
 
         Brands brand = brandDomainService.selectBrand(saveUserBrandsRequest.getBrandId());
@@ -125,7 +126,7 @@ public class BrandService {
         }
     }
 
-    public GetRankResponse getUserBrandList(Long userId, GetUserBrandsRequest getUserBrandsRequest) {
+    public GetUserBrandsResponse getUserBrandList(Long userId, GetUserBrandsRequest getUserBrandsRequest) {
 
         Page<UserBrands> userBrandsPage = brandDomainService.selectUserBrandList(userId,
                 getUserBrandsRequest.getPage(), getUserBrandsRequest.getSize());
@@ -133,17 +134,17 @@ public class BrandService {
         long totalCount = userBrandsPage.getTotalElements();
         long totalPage = userBrandsPage.getTotalPages();
         List<UserBrands> userBrandList = userBrandsPage.getContent();
-        List<BrandRankResponse> list = userBrandList.stream().
-                map(u -> modelMapper.map(u.getBrand(), BrandRankResponse.class)).collect(Collectors.toList());
+        List<BrandResponse> list = userBrandList.stream().
+                map(u -> modelMapper.map(u.getBrand(), BrandResponse.class)).collect(Collectors.toList());
 
-        list.forEach(l -> l.setIsFavorite(true));
+        list.forEach(l -> l.setFavorite(true));
 
-        GetRankResponse getRankResponse = new GetRankResponse();
-        getRankResponse.setTotalCount(totalCount);
-        getRankResponse.setTotalPage(totalPage);
-        getRankResponse.setBrandList(list);
+        GetUserBrandsResponse getUserBrandsResponse = new GetUserBrandsResponse();
+        getUserBrandsResponse.setTotalCount(totalCount);
+        getUserBrandsResponse.setTotalPage(totalPage);
+        getUserBrandsResponse.setBrandList(list);
 
-        return getRankResponse;
+        return getUserBrandsResponse;
     }
 
     @Transactional

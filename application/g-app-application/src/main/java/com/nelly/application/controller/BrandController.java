@@ -8,9 +8,7 @@ import com.nelly.application.dto.request.AddCurrentItemRequest;
 import com.nelly.application.dto.request.GetRankRequest;
 import com.nelly.application.dto.request.GetUserBrandsRequest;
 import com.nelly.application.dto.request.SaveUserBrandsRequest;
-import com.nelly.application.dto.response.BrandRankResponse;
-import com.nelly.application.dto.response.BrandResponse;
-import com.nelly.application.dto.response.GetRankResponse;
+import com.nelly.application.dto.response.*;
 import com.nelly.application.exception.SystemException;
 import com.nelly.application.service.brand.BrandService;
 import com.nelly.application.service.user.UserService;
@@ -24,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RestController
@@ -52,6 +51,25 @@ public class BrandController {
         return response.success(rankResponse);
     }
 
+    @GetMapping("/brands/main")
+    public ResponseEntity<?> getAppBrandMain() {
+        // rank
+        GetRankRequest getRankRequest = new GetRankRequest();
+        GetRankResponse rankResponse = brandService.getBrandRankList(getRankRequest);
+
+
+        // favorite
+        GetUserBrandsRequest getUserBrandsRequest = new GetUserBrandsRequest();
+        Optional<Users> user = userService.getAppUser();
+        GetUserBrandsResponse getUserBrandsResponse = brandService.getUserBrandList(user.isEmpty() ? null : user.get().getId(), getUserBrandsRequest);
+
+        BrandMainResponse brandMainResponse = new BrandMainResponse();
+        brandMainResponse.setBrandRank(rankResponse);
+        brandMainResponse.setGetUserBrandsResponse(getUserBrandsResponse);
+
+        return response.success(brandMainResponse);
+    }
+
     @GetMapping("/brands")
     public ResponseEntity<?> getAppUserBrandList(GetRankRequest getRankRequest) {
         return response.success();
@@ -59,9 +77,9 @@ public class BrandController {
 
     @GetMapping("/brands/favorite")
     public ResponseEntity<?> getUserBrands(GetUserBrandsRequest getUserBrandsRequest) {
-        Users user = userService.getAppUser().orElseThrow(() -> new SystemException("사용자 정보를 조회할 수 없습니다."));
-        GetRankResponse getRankResponse = brandService.getUserBrandList(user.getId(), getUserBrandsRequest);
-        return response.success(getRankResponse);
+        Optional<Users> user = userService.getAppUser();
+        GetUserBrandsResponse getUserBrandsResponse = brandService.getUserBrandList(user.isEmpty() ? null : user.get().getId(), getUserBrandsRequest);
+        return response.success(getUserBrandsResponse);
     }
 
     @PostMapping("/brands/favorite")

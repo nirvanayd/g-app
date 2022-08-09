@@ -87,7 +87,6 @@ public class UserController {
 
     @PutMapping("/users")
     public ResponseEntity<?> updateUser(@RequestBody @Valid UpdateUserRequest dto) {
-
         return response.success("debug...");
     }
 
@@ -129,6 +128,25 @@ public class UserController {
     @PostMapping("/reset-password")
     public ResponseEntity<?> resetPassword(@RequestBody @Valid ResetPasswordRequest dto) {
         userService.resetPassword(dto.getEmail());
+        return response.success();
+    }
+
+    @PostMapping("/users/password")
+    public ResponseEntity<?> updatePassword(@RequestBody @Valid UpdatePasswordRequest dto) {
+        Optional<Users> user = userService.getAppUser();
+        if (user.isEmpty()) throw new RuntimeException("사용자 정보를 조회할 수 없습니다.");
+        userService.updatePassword(user.get(), dto);
+
+        return response.success();
+    }
+
+    @PostMapping("/users/email")
+    public ResponseEntity<?> updateEmail(@RequestBody @Valid UpdateEmailRequest dto) {
+        Optional<Users> user = userService.getAppUser();
+        if (user.isEmpty()) throw new RuntimeException("사용자 정보를 조회할 수 없습니다.");
+
+        userService.updateEmail(user.get(), dto);
+
         return response.success();
     }
 }

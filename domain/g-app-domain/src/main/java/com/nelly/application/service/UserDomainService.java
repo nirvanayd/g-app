@@ -114,5 +114,10 @@ public class UserDomainService {
         return userRepository.findByEmailAndRole(email, RoleType.USER.getCode());
     }
 
+    public Users saveAccountEmail(Users user, String email) {
+        user.setEmail(email);
+        return userRepository.save(user);
+    }
+
 
 }

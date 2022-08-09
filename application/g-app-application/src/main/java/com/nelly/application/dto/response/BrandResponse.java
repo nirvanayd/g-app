@@ -24,10 +24,13 @@ public class BrandResponse {
     private String homepage;
     private String introduceImageUrl;
 
+    private boolean isFavorite;
+
     List<BrandStyleResponse> brandStyles;
     List<BrandAgeResponse> brandAges;
 
     List<BrandPlaceResponse> brandPlaces;
+
 
     public void setStatus(BrandStatus status) {
         this.status = status;

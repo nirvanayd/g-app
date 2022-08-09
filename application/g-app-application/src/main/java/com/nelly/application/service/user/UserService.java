@@ -4,6 +4,8 @@ import com.nelly.application.domain.Users;
 import com.nelly.application.dto.request.ReissueRequest;
 import com.nelly.application.dto.request.SignUpRequest;
 import com.nelly.application.dto.TokenInfoDto;
+import com.nelly.application.dto.request.UpdateEmailRequest;
+import com.nelly.application.dto.request.UpdatePasswordRequest;
 import com.nelly.application.enums.Authority;
 import com.nelly.application.enums.RoleType;
 import com.nelly.application.mail.MailSender;
@@ -52,8 +54,9 @@ public class UserService {
 
     public String login(String loginId, String password) {
         TokenInfoDto tokenInfoDto = authService.login(loginId, password, RoleType.USER.getCode());
-        // 해당 authId의 토큰은 삭제함.
 
+
+        // 해당 authId의 토큰은 삭제함.
 
         // redis 저장
         cacheTemplate.putValue(String.valueOf(tokenInfoDto.getAuthId()), tokenInfoDto.getRefreshToken(), "token",
@@ -173,5 +176,21 @@ public class UserService {
         cacheTemplate.putValue(String.valueOf(newTokenInfoDto.getAuthId()), newTokenInfoDto.getRefreshToken(), "token",
                 newTokenInfoDto.getRefreshTokenExpirationTime(), TimeUnit.MILLISECONDS);
         return newTokenInfoDto;
+    }
+
+    public void updatePassword(Users user, UpdatePasswordRequest dto) {
+        authService.checkAppUserPassword(user.getLoginId(), dto.getOldPassword(), RoleType.USER.getCode());
+
+        String encryptPassword = encryptUtils.encrypt(dto.getNewPassword());
+        authService.resetPassword(user.getLoginId(), encryptPassword);
+    }
+
+    public void updateEmail(Users user, UpdateEmailRequest dto) {
+        // 기존 이메일 일치여부
+        if (!user.getEmail().equals(dto.getOldEmail())) {
+            throw new RuntimeException("기존 이메일 정보가 일치하지 않습니다.");
+        }
+        if (userDomainService.existEmail(dto.getNewEmail())) throw new RuntimeException("사용 중인 이메일입니다.");
+        userDomainService.saveAccountEmail(user, dto.getNewEmail());
     }
 }
