@@ -14,6 +14,6 @@ public class AppDomainService {
     private final AgreementsRepository agreementsRepository;
 
     public List<Agreements> selectAgreements(String version) {
-        return agreementsRepository.findAllByVersion(version);
+        return agreementsRepository.findAllByVersionOrderBySeqAsc(version);
     }
 }

@@ -6,5 +6,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface AgreementsRepository extends JpaRepository<Agreements, Long> {
-    List<Agreements> findAllByVersion(String version);
+    List<Agreements> findAllByVersionOrderBySeqAsc(String version);
 }

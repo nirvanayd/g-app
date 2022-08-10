@@ -16,7 +16,7 @@ public enum StyleType implements CommonStringCode {
     SPORTY("sporty", "스포티", true),
     PROFESSIONAL("professional", "프로페셔널", true),
     LUXURY("luxury", "럭셔리", true),
-    SIMPLE_BASIC("simple", "실플베이직", true),
+    SIMPLE_BASIC("simple", "심플베이직", true),
     UNIQUE("unique", "유니크", true),
     EMPTY(null, "", false);
 
