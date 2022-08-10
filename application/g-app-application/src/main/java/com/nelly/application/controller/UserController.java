@@ -1,10 +1,12 @@
 package com.nelly.application.controller;
 
+import com.nelly.application.domain.UserAgreements;
 import com.nelly.application.domain.Users;
 import com.nelly.application.dto.TokenInfoDto;
 import com.nelly.application.dto.request.*;
 import com.nelly.application.dto.Response;
 import com.nelly.application.dto.response.LoginResponse;
+import com.nelly.application.dto.response.UserAgreementsResponse;
 import com.nelly.application.dto.response.UserResponse;
 import com.nelly.application.enums.StyleType;
 import com.nelly.application.mail.MailSender;
@@ -15,7 +17,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 
 @RestController
@@ -65,7 +69,14 @@ public class UserController {
     @GetMapping("/users")
     public ResponseEntity<?> getUser() {
         Users users = userService.getUser();
+        List<UserAgreements> list = userService.getAppUserAgreements(users);
         UserResponse userResponse = modelMapper.map(users, UserResponse.class);
+
+        List<UserAgreementsResponse> userAgreementList =
+                list.stream().map(l -> modelMapper.map(l, UserAgreementsResponse.class)).collect(Collectors.toList());
+
+        userResponse.setUserAgreements(userAgreementList);
+
         return response.success(userResponse);
     }
 
@@ -144,8 +155,16 @@ public class UserController {
     public ResponseEntity<?> updateEmail(@RequestBody @Valid UpdateEmailRequest dto) {
         Optional<Users> user = userService.getAppUser();
         if (user.isEmpty()) throw new RuntimeException("사용자 정보를 조회할 수 없습니다.");
-
         userService.updateEmail(user.get(), dto);
+        return response.success();
+    }
+
+    @PostMapping("/users/agreement")
+    public ResponseEntity<?> updateAgreement(@RequestBody @Valid UpdateAgreementRequest dto) {
+        Optional<Users> user = userService.getAppUser();
+        if (user.isEmpty()) throw new RuntimeException("사용자 정보를 조회할 수 없습니다.");
+
+        userService.updateAgreement(user.get(), dto);
 
         return response.success();
     }

@@ -1,11 +1,9 @@
 package com.nelly.application.service.user;
 
+import com.nelly.application.domain.UserAgreements;
 import com.nelly.application.domain.Users;
-import com.nelly.application.dto.request.ReissueRequest;
-import com.nelly.application.dto.request.SignUpRequest;
+import com.nelly.application.dto.request.*;
 import com.nelly.application.dto.TokenInfoDto;
-import com.nelly.application.dto.request.UpdateEmailRequest;
-import com.nelly.application.dto.request.UpdatePasswordRequest;
 import com.nelly.application.enums.Authority;
 import com.nelly.application.enums.RoleType;
 import com.nelly.application.mail.MailSender;
@@ -47,6 +45,8 @@ public class UserService {
         Long authId = authService.signUp(dto.getLoginId(), encryptPassword);
         if (authId == null) throw new RuntimeException("회원가입 중 오류가 발생하였습니다.");
         Users user = userDomainService.addUser(authId, dto.getLoginId(), dto.getEmail(), dto.getBirth(), Authority.ROLE_USER);
+
+        addUserAgreement(user, dto.getAgreementList());
 
         userDomainService.addUserStyle(user, dto.getUserStyle());
         userDomainService.addUserMarketingType(user, dto.getUserMarketingType());
@@ -192,5 +192,17 @@ public class UserService {
         }
         if (userDomainService.existEmail(dto.getNewEmail())) throw new RuntimeException("사용 중인 이메일입니다.");
         userDomainService.saveAccountEmail(user, dto.getNewEmail());
+    }
+
+    public void updateAgreement(Users user, UpdateAgreementRequest dto) {
+
+    }
+
+    public List<UserAgreements> getAppUserAgreements(Users user) {
+        return userDomainService.getUserAgreements(user);
+    }
+
+    public void addUserAgreement(Users user, List<UserAgreementRequest> list) {
+        list.forEach(l -> userDomainService.addUserAgreement(user, l.getAgreementType(), l.getValue()));
     }
 }

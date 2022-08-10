@@ -1,10 +1,12 @@
 package com.nelly.application.service;
 
+import com.nelly.application.domain.UserAgreements;
 import com.nelly.application.domain.UserMarketing;
 import com.nelly.application.domain.UserStyles;
 import com.nelly.application.domain.Users;
 import com.nelly.application.enums.*;
 import com.nelly.application.repository.AppUserRepository;
+import com.nelly.application.repository.UserAgreementsRepository;
 import com.nelly.application.repository.UserMarketingTypeRepository;
 import com.nelly.application.repository.UserStylesRepository;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +27,7 @@ public class UserDomainService {
     private final AppUserRepository userRepository;
     private final UserStylesRepository userStylesRepository;
     private final UserMarketingTypeRepository userMarketingTypeRepository;
+    private final UserAgreementsRepository userAgreementsRepository;
 
     public Users addUser(Long authId, String loginId, String email, String birth, Authority authority) {
         Users user = Users.builder().authId(authId)
@@ -119,5 +122,17 @@ public class UserDomainService {
         return userRepository.save(user);
     }
 
+    public List<UserAgreements> getUserAgreements(Users user) {
+        return userAgreementsRepository.findAllByUserId(user.getId());
+    }
 
+    public void addUserAgreement(Users user, String agreementType, String value) {
+        Users refUser = userRepository.getById(user.getId());
+        UserAgreements userAgreement = UserAgreements.builder()
+                .userId(refUser.getId())
+                .useYn(value)
+                .agreementType(agreementType)
+                .build();
+        userAgreementsRepository.save(userAgreement);
+    }
 }
