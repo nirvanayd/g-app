@@ -135,4 +135,14 @@ public class UserDomainService {
                 .build();
         userAgreementsRepository.save(userAgreement);
     }
+
+    public void saveUserAgreement(Long userId, String agreementType, String value) {
+        Optional<UserAgreements> userAgreements = userAgreementsRepository.findByUserIdAndAgreementType(userId, agreementType);
+        if (userAgreements.isEmpty()) return;
+        UserAgreements refUserAgreement = userAgreementsRepository.findById(userAgreements.get().getId()).orElse(null);
+        if (refUserAgreement == null) return;
+        if (value == null) return;
+        refUserAgreement.setUseYn(value);
+        userAgreementsRepository.save(refUserAgreement);
+    }
 }

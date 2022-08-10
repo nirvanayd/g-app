@@ -195,7 +195,7 @@ public class UserService {
     }
 
     public void updateAgreement(Users user, UpdateAgreementRequest dto) {
-
+        userDomainService.saveUserAgreement(user.getId(), dto.getAgreementType(), dto.getUseYn());
     }
 
     public List<UserAgreements> getAppUserAgreements(Users user) {

@@ -163,9 +163,7 @@ public class UserController {
     public ResponseEntity<?> updateAgreement(@RequestBody @Valid UpdateAgreementRequest dto) {
         Optional<Users> user = userService.getAppUser();
         if (user.isEmpty()) throw new RuntimeException("사용자 정보를 조회할 수 없습니다.");
-
         userService.updateAgreement(user.get(), dto);
-
         return response.success();
     }
 }

@@ -5,5 +5,5 @@ import lombok.Data;
 @Data
 public class UpdateAgreementRequest {
     private String agreementType;
-    private String value;
+    private String useYn;
 }
