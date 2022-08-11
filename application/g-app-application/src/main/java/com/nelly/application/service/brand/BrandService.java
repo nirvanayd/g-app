@@ -209,4 +209,20 @@ public class BrandService {
         }
     }
 
+    public List<String> getBrandSearchKeyword() {
+        List<String> list = new ArrayList<>();
+        list.add("volvik");
+        list.add("brnad1");
+        list.add("brnad2");
+        list.add("brnad3");
+        list.add("brnad4");
+        list.add("brnad5");
+        list.add("brnad6");
+        list.add("brnad7");
+        list.add("brnad8");
+        list.add("brnad9");
+
+        return list;
+    }
+
 }

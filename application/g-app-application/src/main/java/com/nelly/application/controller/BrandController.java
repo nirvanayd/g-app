@@ -18,6 +18,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -91,6 +92,15 @@ public class BrandController {
         Users user = userService.getAppUser().orElseThrow(() -> new SystemException("사용자 정보를 조회할 수 없습니다."));
         brandService.saveUserBrands(user.getId(), saveUserBrandsRequest);
         return response.success();
+    }
+
+    @GetMapping("/brands/keyword")
+    public ResponseEntity<?> getBrandSearchKeyword() {
+
+        // 임시 처리함.
+        // 로직에 따라 문자열 배열 생성필요.
+        List<String> keywordList = brandService.getBrandSearchKeyword();
+        return response.success(keywordList);
     }
 
 }
