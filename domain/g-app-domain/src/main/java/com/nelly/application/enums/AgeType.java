@@ -15,9 +15,9 @@ import java.util.stream.Collectors;
 @Getter
 public enum AgeType implements CommonStringCode {
     AGE_20("20", "20대"),
-    AGE_30("30", "30대 후반"),
-    AGE_40("40", "40대 후반"),
-    AGE_50("50", "40대 후반"),
+    AGE_30("30", "30대"),
+    AGE_40("40", "40대"),
+    AGE_50("50", "50대"),
     ETC("etc", "기타"),
     EMPTY(null, "");
 
