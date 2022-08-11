@@ -7,10 +7,10 @@ import com.nelly.application.dto.request.AddCurrentItemRequest;
 import com.nelly.application.dto.request.GetRankRequest;
 import com.nelly.application.dto.request.GetUserBrandsRequest;
 import com.nelly.application.dto.request.SaveUserBrandsRequest;
-import com.nelly.application.dto.response.BrandRankResponse;
-import com.nelly.application.dto.response.BrandResponse;
-import com.nelly.application.dto.response.GetRankResponse;
-import com.nelly.application.dto.response.GetUserBrandsResponse;
+import com.nelly.application.dto.response.*;
+import com.nelly.application.enums.AgeType;
+import com.nelly.application.enums.PlaceType;
+import com.nelly.application.enums.StyleType;
 import com.nelly.application.enums.YesOrNoType;
 import com.nelly.application.exception.SystemException;
 import com.nelly.application.service.BrandDomainService;
@@ -20,10 +20,13 @@ import com.nelly.application.service.user.UserService;
 import com.nelly.application.util.CacheTemplate;
 import com.nelly.application.util.ScraperManager;
 import com.nelly.application.util.UrlUtil;
+import dto.EnumStringCodeValue;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -76,11 +79,43 @@ public class BrandService {
     }
 
     public GetRankResponse getBrandRankList(GetRankRequest getRankRequest) {
-        Page<BrandRank> brandsPage = brandDomainService.selectAppBrandRankList(getRankRequest.getPage(), getRankRequest.getSize());
+        PageRequest pageRequest = PageRequest.of(getRankRequest.getPage(), getRankRequest.getSize());
+
+        // parameter 분기
+        boolean adjustStyle = getRankRequest.getStyle() != null && getRankRequest.getStyle().size() > 0;
+        boolean adjustPlace = getRankRequest.getPlace() != null && getRankRequest.getPlace().size() > 0;
+        boolean adjustAge = getRankRequest.getAge() != null && getRankRequest.getAge().size() > 0;
+
+        Page<BrandRank> rankPage = null;
+        List<Brands> brandsList = null;
+        List<BrandStyles> brandStyleList = null;
+        List<BrandPlaces> brandPlaceList = null;
+        List<BrandAges> brandAgeList = null;
+
+        List<StyleType> styleTypeList = StyleType.getStyleList(getRankRequest.getStyle());
+        List<AgeType> ageTypeList = AgeType.getAgeList(getRankRequest.getAge());
+        List<PlaceType> placeTypeList = PlaceType.getPlaceList(getRankRequest.getPlace());
+
+        brandStyleList = brandDomainService.selectBrandStyles(styleTypeList);
+        brandAgeList = brandDomainService.selectBrandAges(ageTypeList);
+        brandPlaceList = brandDomainService.selectBrandPlaces(placeTypeList);
+
+        if (adjustStyle) {
+            if (adjustAge && adjustPlace) {
+            } else if (!adjustPlace && !adjustAge) {
+//                brandsList = brandDomainService.selectBrandList(brandStyleList);
+            } else if (adjustAge) {
+//                brandsList = brandDomainService.selectBrandList(brandStyleList, brandAgeList);
+            } else if (adjustPlace) {
+            }
+        }
+
+        rankPage = brandDomainService.selectAppBrandRankList(pageRequest);
+
         Optional<Users> user = userService.getAppUser();
-        long totalCount = brandsPage.getTotalElements();
-        long totalPage = brandsPage.getTotalPages();
-        List<BrandRank> rankList = brandsPage.getContent();
+        long totalCount = rankPage.getTotalElements();
+        long totalPage = rankPage.getTotalPages();
+        List<BrandRank> rankList = rankPage.getContent();
 
         List<BrandRankResponse> list = rankList.stream().
                 map(u -> modelMapper.map(u.getBrand(), BrandRankResponse.class)).collect(Collectors.toList());
@@ -134,10 +169,10 @@ public class BrandService {
         long totalCount = userBrandsPage.getTotalElements();
         long totalPage = userBrandsPage.getTotalPages();
         List<UserBrands> userBrandList = userBrandsPage.getContent();
-        List<BrandResponse> list = userBrandList.stream().
-                map(u -> modelMapper.map(u.getBrand(), BrandResponse.class)).collect(Collectors.toList());
+        List<BrandFavoriteResponse> list = userBrandList.stream().
+                map(u -> modelMapper.map(u.getBrand(), BrandFavoriteResponse.class)).collect(Collectors.toList());
 
-        list.forEach(l -> l.setFavorite(true));
+        list.forEach(l -> l.setIsFavorite(true));
 
         GetUserBrandsResponse getUserBrandsResponse = new GetUserBrandsResponse();
         getUserBrandsResponse.setTotalCount(totalCount);
@@ -157,4 +192,5 @@ public class BrandService {
             cacheTemplate.deleteCache(key);
         }
     }
+
 }

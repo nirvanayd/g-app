@@ -8,5 +8,5 @@ import java.util.List;
 public class GetUserBrandsResponse {
     private long totalPage;
     private long totalCount;
-    private List<BrandResponse> brandList;
+    private List<BrandFavoriteResponse> brandList;
 }

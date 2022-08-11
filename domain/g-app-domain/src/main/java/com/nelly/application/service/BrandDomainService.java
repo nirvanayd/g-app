@@ -126,10 +126,14 @@ public class BrandDomainService {
     }
 
     // app brand search
-    public Page<BrandRank> selectAppBrandRankList(Integer page, Integer size) {
-        PageRequest pageRequest = PageRequest.of(page, size, Sort.by("ranking").ascending());
+    public Page<BrandRank> selectAppBrandRankList(PageRequest pageRequest) {
         return brandRankRepository.findAll(pageRequest);
     }
+
+    public Page<BrandRank> selectAppBrandRankList(List<Brands> brandList, PageRequest pageRequest) {
+        return brandRankRepository.findAllByBrandIn(brandList, pageRequest);
+    }
+
 
     public List<UserBrands> selectAppUserBrandList(Long userId, List<Long> brandIdList) {
         return userBrandsRepository.findAllByUserIdAndBrandIdIn(userId, brandIdList);
@@ -157,4 +161,24 @@ public class BrandDomainService {
     public void updateBrandFavoriteCount(Long brandId, int value) {
         brandsRepository.updateBrandFavoriteCount(brandId, value);
     }
+
+    public List<BrandStyles> selectBrandStyles(List<StyleType> styleTypeList) {
+        return brandStylesRepository.findAllByBrandStyleIn(styleTypeList);
+    }
+
+    public List<BrandAges> selectBrandAges(List<AgeType> ageTypeList) {
+        return brandAgesRepository.findAllByAgeTypeIn(ageTypeList);
+    }
+
+    public List<BrandPlaces> selectBrandPlaces(List<PlaceType> placeTypeList) {
+        return brandPlacesRepository.findAllByPlaceTypeIn(placeTypeList);
+    }
+
+    public List<Brands> selectBrandList(List<Brands> brandStyleList) {
+        return brandsRepository.findAllByIdIn(brandStyleList);
+    }
+
+//    public List<Brands> selectBrandList(List<BrandStyles> brandStyleList, List<BrandAges> brandAgeList) {
+//        return brandsRepository.findAllByBrandStylesIn(brandStyleList);
+//    }
 }

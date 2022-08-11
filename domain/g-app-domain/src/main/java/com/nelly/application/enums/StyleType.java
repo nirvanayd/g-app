@@ -5,7 +5,9 @@ import dto.EnumStringCodeValue;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -34,5 +36,10 @@ public enum StyleType implements CommonStringCode {
 
     public static List<EnumStringCodeValue> getStyleList() {
         return Arrays.stream(StyleType.values()).filter(c -> c.code != null & c.used).map(EnumStringCodeValue::new).collect(Collectors.toList());
+    }
+
+    public static List<StyleType> getStyleList(List<String> codeList) {
+        if (codeList == null || codeList.isEmpty()) return Collections.emptyList();
+        return Arrays.stream(StyleType.values()).filter(c -> c.code != null & c.used & codeList.contains(c.code)).collect(Collectors.toList());
     }
 }

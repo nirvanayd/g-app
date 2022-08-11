@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -33,5 +34,10 @@ public enum AgeType implements CommonStringCode {
 
     public static List<EnumStringCodeValue> getAgeList() {
         return Arrays.stream(AgeType.values()).filter(c -> c.code != null).map(EnumStringCodeValue::new).collect(Collectors.toList());
+    }
+
+    public static List<AgeType> getAgeList(List<String> codeList) {
+        if (codeList == null || codeList.isEmpty()) return Collections.emptyList();
+        return Arrays.stream(AgeType.values()).filter(c -> c.code != null & codeList.contains(c.code)).collect(Collectors.toList());
     }
 }

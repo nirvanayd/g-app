@@ -79,6 +79,7 @@ public class BrandController {
     public ResponseEntity<?> getUserBrands(GetUserBrandsRequest getUserBrandsRequest) {
         Optional<Users> user = userService.getAppUser();
         GetUserBrandsResponse getUserBrandsResponse = brandService.getUserBrandList(user.isEmpty() ? null : user.get().getId(), getUserBrandsRequest);
+
         return response.success(getUserBrandsResponse);
     }
 
