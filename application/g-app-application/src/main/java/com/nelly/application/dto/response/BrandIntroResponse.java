@@ -5,24 +5,31 @@ import com.nelly.application.enums.BrandStatus;
 import com.nelly.application.enums.DisplayType;
 import lombok.Data;
 
+import java.util.Arrays;
 import java.util.List;
 
 @Data
-public class BrandFavoriteResponse {
+public class BrandIntroResponse {
     private long id;
     private String name;
     private String description;
+    private String introduceImageUrl;
     @JsonIgnore
     private String logoImageUrl;
     @JsonIgnore
     private Integer favoriteCount;
     @JsonIgnore
     private Boolean isFavorite;
+    @JsonIgnore
+    private String homepage;
 
     // flutter model 적용파라미터
     private String photoURL;
+    @JsonIgnore
     private Integer likeCount;
     private Boolean liked;
+    private List<String> tagList;
+    private String storeUrl;
 
     @JsonIgnore
     private BrandStatus status;
@@ -36,10 +43,7 @@ public class BrandFavoriteResponse {
     private Integer displayCode;
     @JsonIgnore
     private String displayDesc;
-    @JsonIgnore
-    private String homepage;
-    @JsonIgnore
-    private String introduceImageUrl;
+
     @JsonIgnore
     private Integer ranking;
     @JsonIgnore
@@ -98,4 +102,18 @@ public class BrandFavoriteResponse {
         if (isFavorite == null) return false;
         return isFavorite;
     }
+
+    public String getStoreUrl() {
+        return homepage;
+    }
+
+    /*
+     final int id;
+     final String photoURL;
+     final String name;
+     final String description;
+     final String storeURL;
+     final List<String> tagList;
+     bool liked;
+    * */
 }

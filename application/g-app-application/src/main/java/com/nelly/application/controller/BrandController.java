@@ -16,10 +16,7 @@ import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
@@ -75,11 +72,17 @@ public class BrandController {
         return response.success();
     }
 
+    @GetMapping("/brands/intro/{id}")
+    public ResponseEntity<?> getBrandDetail(@PathVariable Long id) {
+        Users user = userService.getAppUser().orElse(null);
+        BrandIntroResponse introDto = brandService.getBrandIntro(id, user);
+        return response.success(introDto);
+    }
+
     @GetMapping("/brands/favorite")
     public ResponseEntity<?> getUserBrands(GetUserBrandsRequest getUserBrandsRequest) {
         Optional<Users> user = userService.getAppUser();
         GetUserBrandsResponse getUserBrandsResponse = brandService.getUserBrandList(user.isEmpty() ? null : user.get().getId(), getUserBrandsRequest);
-
         return response.success(getUserBrandsResponse);
     }
 

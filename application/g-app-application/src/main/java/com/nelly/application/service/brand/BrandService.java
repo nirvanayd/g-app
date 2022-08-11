@@ -20,18 +20,16 @@ import com.nelly.application.service.user.UserService;
 import com.nelly.application.util.CacheTemplate;
 import com.nelly.application.util.ScraperManager;
 import com.nelly.application.util.UrlUtil;
-import dto.EnumStringCodeValue;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.swing.text.html.Option;
 import java.net.MalformedURLException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -52,6 +50,24 @@ public class BrandService {
 
     public Brands getBrand(Long brandId) {
         return brandDomainService.selectBrand(brandId);
+    }
+
+    public BrandIntroResponse getBrandIntro(Long id, Users user) {
+        Brands brand = getBrand(id);
+        BrandIntroResponse brandIntroResponse = modelMapper.map(brand, BrandIntroResponse.class);
+
+        List<String> list = new ArrayList<>();
+        list.addAll(brand.getBrandStyles().stream().map(l -> l.getBrandStyle().getDesc()).collect(Collectors.toList()));
+        list.addAll(brand.getBrandAges().stream().map(l -> l.getAgeType().getDesc()).collect(Collectors.toList()));
+        list.addAll(brand.getBrandPlaces().stream().map(l -> l.getPlaceType().getDesc()).collect(Collectors.toList()));
+
+        brandIntroResponse.setTagList(list);
+
+        if (user != null) {
+            Optional<UserBrands> userBrands = brandDomainService.selectAppUserBrand(user.getId(), brand);
+            if (userBrands.isPresent()) brandIntroResponse.setIsFavorite(true);
+        }
+        return brandIntroResponse;
     }
 
     public void addCurrentItem(AddCurrentItemRequest dto) {

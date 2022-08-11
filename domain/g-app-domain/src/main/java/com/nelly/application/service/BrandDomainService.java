@@ -139,6 +139,10 @@ public class BrandDomainService {
         return userBrandsRepository.findAllByUserIdAndBrandIdIn(userId, brandIdList);
     }
 
+    public Optional<UserBrands> selectAppUserBrand(Long userId, Brands brand) {
+        return userBrandsRepository.findByUserIdAndBrand(userId, brand);
+    }
+
     public Optional<UserBrands> selectUserBrand(Long brandId, Long userId) {
         return  userBrandsRepository.findByBrandIdAndUserId(brandId, userId);
     }
