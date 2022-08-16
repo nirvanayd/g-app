@@ -3,6 +3,7 @@ package com.nelly.application.exception.handler;
 import com.nelly.application.dto.Response;
 import com.nelly.application.exception.AccessDeniedException;
 import com.nelly.application.exception.AuthenticationException;
+import com.nelly.application.exception.ExpireTokenException;
 import com.nelly.application.exception.SystemException;
 import com.nelly.application.exception.enums.ExceptionCode;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -19,6 +20,13 @@ public class GAppExceptionHandler {
 
     private final Response response;
 
+    @ExceptionHandler(ExpireTokenException.class)
+    public ResponseEntity<?> handleExpireTokenException() {
+        log.info(">>> AuthenticationException");
+        ExceptionCode exceptionCode = ExceptionCode.EXPIRED_TOKEN_EXCEPTION;
+        return response.fail(exceptionCode.getCode(), exceptionCode.getMessage(), exceptionCode.getStatus());
+    }
+
     @ExceptionHandler(AccessDeniedException.class)
     public ResponseEntity<?> handleAccessDeniedException() {
         log.info(">>> AccessDeniedException");
@@ -32,6 +40,8 @@ public class GAppExceptionHandler {
         ExceptionCode exceptionCode = ExceptionCode.ACCESS_DENIED_EXCEPTION;
         return response.fail(exceptionCode.getCode(), exceptionCode.getMessage(), exceptionCode.getStatus());
     }
+
+
 
     @ExceptionHandler(SystemException.class)
     public ResponseEntity<?> handleSystemException(SystemException exception) {

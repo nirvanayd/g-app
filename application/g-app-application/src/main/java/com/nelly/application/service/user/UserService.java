@@ -52,17 +52,24 @@ public class UserService {
         userDomainService.addUserMarketingType(user, dto.getUserMarketingType());
     }
 
-    public String login(String loginId, String password) {
+    public TokenInfoDto login(String loginId, String password) {
         TokenInfoDto tokenInfoDto = authService.login(loginId, password, RoleType.USER.getCode());
-
-
-        // 해당 authId의 토큰은 삭제함.
+        // 해당 authId의 토큰은 로그아웃처리.
+        String existToken = cacheTemplate.getValue(String.valueOf(tokenInfoDto.getAuthId()), "accessToken");
+        if (existToken != null) {
+            Long expireTime = authService.getExpiration(existToken);
+            cacheTemplate.putValue(existToken, "logout", expireTime, TimeUnit.MILLISECONDS);
+        }
 
         // redis 저장
         cacheTemplate.putValue(String.valueOf(tokenInfoDto.getAuthId()), tokenInfoDto.getRefreshToken(), "token",
                 tokenInfoDto.getRefreshTokenExpirationTime(), TimeUnit.MILLISECONDS);
+
+        cacheTemplate.putValue(String.valueOf(tokenInfoDto.getAuthId()), tokenInfoDto.getAccessToken(), "accessToken",
+                tokenInfoDto.getRefreshTokenExpirationTime(), TimeUnit.MILLISECONDS);
+
         // return
-        return tokenInfoDto.getAccessToken();
+        return tokenInfoDto;
     }
 
     public String getToken(String bearerToken) {

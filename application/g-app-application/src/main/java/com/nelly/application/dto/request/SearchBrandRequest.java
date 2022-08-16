@@ -1,5 +1,6 @@
 package com.nelly.application.dto.request;
 
+import com.nelly.application.domain.BrandStyles;
 import com.nelly.application.enums.AgeType;
 import com.nelly.application.enums.PlaceType;
 import com.nelly.application.enums.StyleType;
@@ -9,7 +10,7 @@ import lombok.Data;
 import java.util.List;
 
 @Data
-public class GetRankRequest extends PageRequest {
+public class SearchBrandRequest extends PageRequest {
     private String brandName;
 
     @EnumListValidator(enumClass = StyleType.class, message = "스타일 유형이 올바르지 않습니다.", enumMethod = "hasCode")

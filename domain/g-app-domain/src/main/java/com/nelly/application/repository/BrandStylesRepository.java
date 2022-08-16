@@ -1,7 +1,6 @@
 package com.nelly.application.repository;
 
 import com.nelly.application.domain.BrandStyles;
-import com.nelly.application.domain.Brands;
 import com.nelly.application.enums.StyleType;
 import org.springframework.data.jpa.repository.JpaRepository;
 

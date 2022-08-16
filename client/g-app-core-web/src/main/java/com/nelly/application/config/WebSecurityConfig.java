@@ -2,6 +2,7 @@ package com.nelly.application.config;
 
 import com.nelly.application.handler.CustomAccessDeniedHandler;
 import com.nelly.application.handler.CustomAuthenticationEntryPoint;
+import com.nelly.application.jwt.ExceptionHandlerFilter;
 import com.nelly.application.jwt.JwtAuthenticationFilter;
 import com.nelly.application.jwt.TokenProvider;
 import com.nelly.application.util.CacheTemplate;
@@ -23,6 +24,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     private final TokenProvider tokenProvider;
     private final CacheTemplate cacheTemplate;
     private final CorsFilter corsFilter;
+    private final ExceptionHandlerFilter exceptionHandlerFilter;
 
     @Override
     protected void configure(HttpSecurity httpSecurity) throws Exception {
@@ -44,6 +46,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .addFilterBefore(
                         new JwtAuthenticationFilter(tokenProvider, cacheTemplate),
                         UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(exceptionHandlerFilter, JwtAuthenticationFilter.class)
                 .exceptionHandling()
                 .authenticationEntryPoint(new CustomAuthenticationEntryPoint())
                 .accessDeniedHandler(new CustomAccessDeniedHandler());

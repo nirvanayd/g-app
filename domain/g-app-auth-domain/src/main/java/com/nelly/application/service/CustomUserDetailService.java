@@ -27,7 +27,6 @@ public class CustomUserDetailService implements UserDetailsService {
     }
 
     private UserDetails createUserDetails(AppAuthentication authentication) {
-
         return new User(authentication.getUsername(), authentication.getPassword(), authentication.getAuthorities());
     }
 }

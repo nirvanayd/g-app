@@ -3,10 +3,7 @@ package com.nelly.application.service.brand;
 import com.nelly.application.domain.*;
 import com.nelly.application.dto.ItemScrapDto;
 import com.nelly.application.dto.UrlInfoDto;
-import com.nelly.application.dto.request.AddCurrentItemRequest;
-import com.nelly.application.dto.request.GetRankRequest;
-import com.nelly.application.dto.request.GetUserBrandsRequest;
-import com.nelly.application.dto.request.SaveUserBrandsRequest;
+import com.nelly.application.dto.request.*;
 import com.nelly.application.dto.response.*;
 import com.nelly.application.enums.AgeType;
 import com.nelly.application.enums.PlaceType;
@@ -223,6 +220,11 @@ public class BrandService {
         list.add("brnad9");
 
         return list;
+    }
+
+
+    public void brandBrandList(SearchBrandRequest dto) {
+
     }
 
 }

@@ -108,6 +108,8 @@ public class AuthService {
         if(!tokenProvider.validateToken(refreshToken)) {
             log.info("##### validate fail");
         }
+
+
         Authentication authentication = tokenProvider.getAuthentication(accessToken);
         AppAuthentication auth = findByLoginId(authentication.getName());
 
@@ -157,5 +159,9 @@ public class AuthService {
         } catch (BadCredentialsException be) {
             throw new SystemException("사용자 정보를 조회할 수 없습니다.");
         }
+    }
+
+    public Long getExpiration(String accessToken) {
+        return tokenProvider.getExpiration(accessToken);
     }
 }

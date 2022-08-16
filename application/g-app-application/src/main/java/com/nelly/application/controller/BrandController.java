@@ -1,27 +1,19 @@
 package com.nelly.application.controller;
 
-import com.nelly.application.domain.BrandRank;
-import com.nelly.application.domain.Brands;
 import com.nelly.application.domain.Users;
 import com.nelly.application.dto.Response;
-import com.nelly.application.dto.request.AddCurrentItemRequest;
-import com.nelly.application.dto.request.GetRankRequest;
-import com.nelly.application.dto.request.GetUserBrandsRequest;
-import com.nelly.application.dto.request.SaveUserBrandsRequest;
+import com.nelly.application.dto.request.*;
 import com.nelly.application.dto.response.*;
 import com.nelly.application.exception.SystemException;
 import com.nelly.application.service.brand.BrandService;
 import com.nelly.application.service.user.UserService;
 import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
-import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @RestController
 @AllArgsConstructor
@@ -49,27 +41,8 @@ public class BrandController {
         return response.success(rankResponse);
     }
 
-    @GetMapping("/brands/main")
-    public ResponseEntity<?> getAppBrandMain() {
-        // rank
-        GetRankRequest getRankRequest = new GetRankRequest();
-        GetRankResponse rankResponse = brandService.getBrandRankList(getRankRequest);
-
-
-        // favorite
-        GetUserBrandsRequest getUserBrandsRequest = new GetUserBrandsRequest();
-        Optional<Users> user = userService.getAppUser();
-        GetUserBrandsResponse getUserBrandsResponse = brandService.getUserBrandList(user.isEmpty() ? null : user.get().getId(), getUserBrandsRequest);
-
-        BrandMainResponse brandMainResponse = new BrandMainResponse();
-        brandMainResponse.setBrandRank(rankResponse);
-        brandMainResponse.setGetUserBrandsResponse(getUserBrandsResponse);
-
-        return response.success(brandMainResponse);
-    }
-
     @GetMapping("/brands")
-    public ResponseEntity<?> getAppUserBrandList(GetRankRequest getRankRequest) {
+    public ResponseEntity<?> getAppUserBrandList(SearchBrandRequest searchBrandRequest) {
         return response.success();
     }
 
@@ -96,11 +69,17 @@ public class BrandController {
 
     @GetMapping("/brands/keyword")
     public ResponseEntity<?> getBrandSearchKeyword() {
-
         // 임시 처리함.
         // 로직에 따라 문자열 배열 생성필요.
         List<String> keywordList = brandService.getBrandSearchKeyword();
         return response.success(keywordList);
     }
+
+    @PostMapping("/brands/search")
+    public ResponseEntity<?> searchBrand(SearchBrandRequest searchRequest) {
+        brandService.brandBrandList(searchRequest);
+        return response.success();
+    }
+
 
 }

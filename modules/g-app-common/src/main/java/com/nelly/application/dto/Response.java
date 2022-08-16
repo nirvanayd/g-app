@@ -1,5 +1,7 @@
 package com.nelly.application.dto;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.gson.Gson;
 import lombok.Builder;
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
@@ -77,5 +79,13 @@ public class Response {
         return fail(Collections.emptyList(), "fail", null, HttpStatus.NOT_EXTENDED);
     }
 
-
+    public String convertToJson(Object data, String code, String msg) {
+        Body body = Body.builder()
+                .data(data)
+                .code(code)
+                .message(msg)
+                .build();
+        Gson gson = new Gson();
+        return gson.toJson(body);
+    }
 }
