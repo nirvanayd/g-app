@@ -57,8 +57,10 @@ public class UserService {
         // 해당 authId의 토큰은 로그아웃처리.
         String existToken = cacheTemplate.getValue(String.valueOf(tokenInfoDto.getAuthId()), "accessToken");
         if (existToken != null) {
-            Long expireTime = authService.getExpiration(existToken);
-            cacheTemplate.putValue(existToken, "logout", expireTime, TimeUnit.MILLISECONDS);
+            try {
+                Long expireTime = authService.getExpiration(existToken);
+                cacheTemplate.putValue(existToken, "logout", expireTime, TimeUnit.MILLISECONDS);
+            } catch (Exception e) {}
         }
 
         // redis 저장

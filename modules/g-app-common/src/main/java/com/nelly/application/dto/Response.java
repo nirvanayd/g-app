@@ -15,7 +15,6 @@ public class Response {
     @Getter
     @Builder
     private static class Body {
-
         private String code;
         private String message;
         private Object data;
@@ -44,8 +43,31 @@ public class Response {
     }
 
     public ResponseEntity<?> success() {
-        return success(Collections.emptyList(), null, HttpStatus.OK);
+        return success(null, null, HttpStatus.OK);
     }
+
+    /**
+     * List Response 대응
+     */
+    public ResponseEntity<?> success(ResponseData data, String msg, HttpStatus status) {
+        Body body = Body.builder()
+                .data(data)
+                .code("success")
+                .message(msg)
+                .error(Collections.emptyList())
+                .build();
+        if (data instanceof CommonListResponse) {
+            if (data.isEnded()) {
+                return ResponseEntity.status(HttpStatus.NON_AUTHORITATIVE_INFORMATION).body(data);
+            }
+        }
+        return ResponseEntity.status(status).body(body);
+    }
+
+    public ResponseEntity<?> success(ResponseData data) {
+        return success(data, null, HttpStatus.OK);
+    }
+
 
     /**
      * fail

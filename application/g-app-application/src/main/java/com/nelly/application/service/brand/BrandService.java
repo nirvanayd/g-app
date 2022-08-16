@@ -93,7 +93,8 @@ public class BrandService {
 
     public GetRankResponse getBrandRankList(GetRankRequest getRankRequest) {
         PageRequest pageRequest = PageRequest.of(getRankRequest.getPage(), getRankRequest.getSize());
-
+        // list end 분기
+        boolean isEnded = false;
         // parameter 분기
         boolean adjustStyle = getRankRequest.getStyle() != null && getRankRequest.getStyle().size() > 0;
         boolean adjustPlace = getRankRequest.getPlace() != null && getRankRequest.getPlace().size() > 0;
@@ -130,6 +131,10 @@ public class BrandService {
         long totalPage = rankPage.getTotalPages();
         List<BrandRank> rankList = rankPage.getContent();
 
+        if ((totalPage-1) <= getRankRequest.getPage()) {
+            isEnded = true;
+        }
+
         List<BrandRankResponse> list = rankList.stream().
                 map(u -> modelMapper.map(u.getBrand(), BrandRankResponse.class)).collect(Collectors.toList());
 
@@ -151,11 +156,9 @@ public class BrandService {
         getRankResponse.setTotalCount(totalCount);
         getRankResponse.setTotalPage(totalPage);
         getRankResponse.setBrandList(list);
-
+        getRankResponse.setEnded(isEnded);
         return getRankResponse;
     }
-
-
 
 
     public void saveUserBrands(Long userId, SaveUserBrandsRequest saveUserBrandsRequest) {
@@ -175,12 +178,18 @@ public class BrandService {
     }
 
     public GetUserBrandsResponse getUserBrandList(Long userId, GetUserBrandsRequest getUserBrandsRequest) {
-
+        // list ended
+        boolean isEnded = false;
         Page<UserBrands> userBrandsPage = brandDomainService.selectUserBrandList(userId,
                 getUserBrandsRequest.getPage(), getUserBrandsRequest.getSize());
 
         long totalCount = userBrandsPage.getTotalElements();
         long totalPage = userBrandsPage.getTotalPages();
+
+        if ((totalPage -1) <= getUserBrandsRequest.getPage()) {
+            isEnded = true;
+        }
+
         List<UserBrands> userBrandList = userBrandsPage.getContent();
         List<BrandFavoriteResponse> list = userBrandList.stream().
                 map(u -> modelMapper.map(u.getBrand(), BrandFavoriteResponse.class)).collect(Collectors.toList());
@@ -191,6 +200,7 @@ public class BrandService {
         getUserBrandsResponse.setTotalCount(totalCount);
         getUserBrandsResponse.setTotalPage(totalPage);
         getUserBrandsResponse.setBrandList(list);
+        getUserBrandsResponse.setEnded(isEnded);
 
         return getUserBrandsResponse;
     }
