@@ -133,7 +133,7 @@ public class BrandService {
 
         if (totalPage == 0) {
             isEnded = true;
-        } else if (totalPage < getRankRequest.getPage()) {
+        } else if (totalPage < getRankRequest.getPage() + 1) {
             isEnded = true;
         }
 
@@ -190,7 +190,7 @@ public class BrandService {
 
         if (totalPage == 0) {
             isEnded = true;
-        } else if (totalPage < getUserBrandsRequest.getPage()) {
+        } else if (totalPage < getUserBrandsRequest.getPage() + 1) {
             isEnded = true;
         }
 
