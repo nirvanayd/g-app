@@ -131,7 +131,7 @@ public class BrandService {
         long totalPage = rankPage.getTotalPages();
         List<BrandRank> rankList = rankPage.getContent();
 
-        if ((totalPage-1) <= getRankRequest.getPage()) {
+        if ((totalPage-1) < getRankRequest.getPage()) {
             isEnded = true;
         }
 
@@ -186,7 +186,7 @@ public class BrandService {
         long totalCount = userBrandsPage.getTotalElements();
         long totalPage = userBrandsPage.getTotalPages();
 
-        if ((totalPage -1) <= getUserBrandsRequest.getPage()) {
+        if ((totalPage -1) < getUserBrandsRequest.getPage()) {
             isEnded = true;
         }
 
