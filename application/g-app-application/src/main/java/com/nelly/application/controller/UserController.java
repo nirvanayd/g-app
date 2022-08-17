@@ -39,7 +39,8 @@ public class UserController {
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody @Valid LoginRequest dto) {
-        TokenInfoDto tokenInfoDto = userService.login(dto.getLoginId(), dto.getPassword());
+        TokenInfoDto tokenInfoDto = userService.login(dto);
+
         LoginResponse data = LoginResponse.builder().accessToken(tokenInfoDto.getAccessToken())
                 .refreshToken(tokenInfoDto.getRefreshToken()).build();
         return response.success(data);

@@ -25,8 +25,11 @@ public class UserNotificationTokens extends BaseTime{
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "user_id", unique = true)
     private Users user;
+
+    @Column(name = "fcm_token", nullable = true, length = 255)
+    private String fcmToken;
 }
 
 

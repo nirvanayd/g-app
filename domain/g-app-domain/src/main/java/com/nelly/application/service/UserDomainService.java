@@ -1,14 +1,8 @@
 package com.nelly.application.service;
 
-import com.nelly.application.domain.UserAgreements;
-import com.nelly.application.domain.UserMarketing;
-import com.nelly.application.domain.UserStyles;
-import com.nelly.application.domain.Users;
+import com.nelly.application.domain.*;
 import com.nelly.application.enums.*;
-import com.nelly.application.repository.AppUserRepository;
-import com.nelly.application.repository.UserAgreementsRepository;
-import com.nelly.application.repository.UserMarketingTypeRepository;
-import com.nelly.application.repository.UserStylesRepository;
+import com.nelly.application.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -28,6 +22,7 @@ public class UserDomainService {
     private final UserStylesRepository userStylesRepository;
     private final UserMarketingTypeRepository userMarketingTypeRepository;
     private final UserAgreementsRepository userAgreementsRepository;
+    private final UserNotificationTokensRepository userNotificationTokensRepository;
 
     public Users addUser(Long authId, String loginId, String email, String birth, Authority authority) {
         Users user = Users.builder().authId(authId)
@@ -69,6 +64,12 @@ public class UserDomainService {
         return userRepository.findByAuthId(authId);
     }
 
+    public Users selectAccount(long userId) {
+        Users user = userRepository.findById(userId).orElse(null);
+        if (user == null) throw new RuntimeException("사용자를 찾을 수 없습니다.");
+        return user;
+    }
+
     /* admin 사용 */
     public Page<Users> selectAccountList(Integer page, Integer size, String role) {
         PageRequest pageRequest = PageRequest.of(page, size, Sort.by("id").descending());
@@ -94,11 +95,6 @@ public class UserDomainService {
         return userRepository.findAllByLoginIdContainsAndEmailContainsAndStatusAndRole(loginId, email, status, role, pageRequest);
     }
 
-    public Users selectAccount(long userId) {
-        Users user = userRepository.findById(userId).orElse(null);
-        if (user == null) throw new RuntimeException("사용자를 찾을 수 없습니다.");
-        return user;
-    }
 
     public boolean existEmail(String email) {
         Optional<Users> user = userRepository.findByEmailAndRole(email, RoleType.USER.getCode());
@@ -144,5 +140,23 @@ public class UserDomainService {
         if (value == null) return;
         refUserAgreement.setUseYn(value);
         userAgreementsRepository.save(refUserAgreement);
+    }
+
+    public Optional<UserNotificationTokens> existFcmToken(Users user) {
+        return userNotificationTokensRepository.findByUser(user);
+    }
+
+    public UserNotificationTokens saveUserToken(UserNotificationTokens userNotificationToken, String token) {
+        UserNotificationTokens existNotificationToken = userNotificationTokensRepository.getById(userNotificationToken.getId());
+        existNotificationToken.setFcmToken(token);
+        return userNotificationTokensRepository.save(existNotificationToken);
+    }
+
+    public UserNotificationTokens saveUserToken(Users user, String token) {
+        UserNotificationTokens userNotificationToken = UserNotificationTokens.builder()
+                .user(user)
+                .fcmToken(token)
+                .build();
+        return userNotificationTokensRepository.save(userNotificationToken);
     }
 }

@@ -1,6 +1,7 @@
 package com.nelly.application.service.user;
 
 import com.nelly.application.domain.UserAgreements;
+import com.nelly.application.domain.UserNotificationTokens;
 import com.nelly.application.domain.Users;
 import com.nelly.application.dto.request.*;
 import com.nelly.application.dto.TokenInfoDto;
@@ -52,8 +53,19 @@ public class UserService {
         userDomainService.addUserMarketingType(user, dto.getUserMarketingType());
     }
 
-    public TokenInfoDto login(String loginId, String password) {
+    @Transactional
+    public TokenInfoDto login(LoginRequest request) {
+
+        String loginId = request.getLoginId();
+        String password = request.getPassword();
+
         TokenInfoDto tokenInfoDto = authService.login(loginId, password, RoleType.USER.getCode());
+
+        if (request.getFcmToken() != null) {
+            Optional<Users> users = userDomainService.selectAppUsers(tokenInfoDto.getAuthId());
+            users.ifPresent(value -> createUserFcmToken(value, request.getFcmToken()));
+        }
+
         // 해당 authId의 토큰은 로그아웃처리.
         String existToken = cacheTemplate.getValue(String.valueOf(tokenInfoDto.getAuthId()), "accessToken");
         if (existToken != null) {
@@ -105,6 +117,7 @@ public class UserService {
         // 추후 캐시로 전환
         return userDomainService.getUsers(authId);
     }
+
 
     public Optional<Users> getAppUser() {
         Long authId = authService.getAppAuthenticationId();
@@ -213,5 +226,17 @@ public class UserService {
 
     public void addUserAgreement(Users user, List<UserAgreementRequest> list) {
         list.forEach(l -> userDomainService.addUserAgreement(user, l.getAgreementType(), l.getValue()));
+    }
+
+    public UserNotificationTokens createUserFcmToken(Users user, String fcmToken) {
+        if (fcmToken == null || fcmToken.isEmpty()) return null;
+        // exist check
+        Optional<UserNotificationTokens> userTokens = userDomainService.existFcmToken(user);
+
+        // insert or update
+        if (userTokens.isPresent()) {
+            return userDomainService.saveUserToken(userTokens.get(), fcmToken);
+        }
+        return userDomainService.saveUserToken(user, fcmToken);
     }
 }
