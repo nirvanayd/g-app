@@ -4,10 +4,7 @@ import com.nelly.application.config.AwsProperties;
 import com.nelly.application.domain.*;
 import com.nelly.application.dto.BrandTagDto;
 import com.nelly.application.dto.UserTagDto;
-import com.nelly.application.dto.request.AddContentRequest;
-import com.nelly.application.dto.request.RemoveContentRequest;
-import com.nelly.application.dto.request.SaveLikeRequest;
-import com.nelly.application.dto.request.SaveMarkRequest;
+import com.nelly.application.dto.request.*;
 import com.nelly.application.dto.response.AddContentImageResponse;
 import com.nelly.application.enums.YesOrNoType;
 import com.nelly.application.service.ContentDomainService;
@@ -50,11 +47,13 @@ public class ContentService {
         Users user = userService.getUser();
 
         Contents content = contentDomainService.createContent(user, dto.getContentText());
-
         int imageSequence = 0;
-        for (String imageUrl : dto.getImageUrlList()) {
+        for (AddImageRequest imageRequest : dto.getImageList()) {
+            contentDomainService.createContentImage(content, imageRequest.getImageUrl(), imageSequence);
 
-            contentDomainService.createContentImage(content, imageUrl, imageSequence);
+            for (AddTagRequest tagRequest : imageRequest.getTagList()) {
+
+            }
             imageSequence++;
         }
 
