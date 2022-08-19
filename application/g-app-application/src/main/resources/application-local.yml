@@ -43,7 +43,9 @@ cloud:
     s3:
       bucket: g-app-resource
       directory: local
-      cloudfront-url: 'https://d3b7cshusafhca.cloudfront.net/'
+    cloudFront:
+      default-dir: 'local'
+      url: 'https://d3b7cshusafhca.cloudfront.net/'
       brand-dir: 'local/brand'
       default-image-url: 'https://d3b7cshusafhca.cloudfront.net/local/default/logo-default.png'
       content-dir: 'local/content'

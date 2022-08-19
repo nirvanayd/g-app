@@ -1,5 +1,6 @@
 package com.nelly.application.service.content;
 
+import com.nelly.application.config.AwsProperties;
 import com.nelly.application.domain.*;
 import com.nelly.application.dto.BrandTagDto;
 import com.nelly.application.dto.UserTagDto;
@@ -22,6 +23,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.*;
 import java.util.regex.Matcher;
@@ -32,12 +34,7 @@ import java.util.regex.Pattern;
 @Slf4j
 public class ContentService {
 
-    @Value("${cloud.aws.s3.content-dir}")
-    public String contentDirectory;
-
-    @Value("${cloud.aws.s3.cloudfront-url}")
-    public String cloudFrontUrl;
-
+    private final AwsProperties awsProperties;
     private final CacheTemplate cacheTemplate;
     private final S3Uploader s3Uploader;
     private final UserService userService;
@@ -118,7 +115,13 @@ public class ContentService {
         // get user id
         Users user = userService.getUser();
         for (MultipartFile file: images) {
-            imageUrlList.add(s3Uploader.upload(file, getS3ContentPath() + DIRECTORY_SEPARATOR + user.getId()));
+            String a = awsProperties.getS3().getBucket();
+
+            imageUrlList.add(awsProperties.getCloudFront().getUrl() +
+                    s3Uploader.upload(
+                            awsProperties.getS3().getBucket(),
+                            file,
+                            getS3ContentPath() + DIRECTORY_SEPARATOR + user.getId()));
         }
         return AddContentImageResponse.builder()
                 .imageUrlList(imageUrlList)
@@ -172,7 +175,7 @@ public class ContentService {
     }
 
     public String getS3ContentPath() {
-        return contentDirectory;
+        return awsProperties.getCloudFront().getContentDir();
     }
 
     @Transactional

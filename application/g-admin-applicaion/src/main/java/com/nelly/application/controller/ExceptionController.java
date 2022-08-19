@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @Slf4j
 public class ExceptionController {
-
     @GetMapping("/exception/accessDenied")
     public void accessDeniedController() {
         throw new AccessDeniedException();
