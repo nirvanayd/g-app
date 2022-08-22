@@ -18,7 +18,7 @@ spring:
   datasource:
     url: 'jdbc:mysql://localhost:3306/gproject?serverTimezone=Asia/Seoul&characterEncoding=UTF-8'
     username: root
-    password: Gapp123!
+    password: root
     driver-class-name: com.mysql.cj.jdbc.Driver
 
   redis:
@@ -46,7 +46,7 @@ cloud:
       secretKey: ++AnjnmYXBYmPtNZa15g40/nGFbKiTNZBlz4L/2I
     s3:
       bucket: g-app-resource
-      directory: local
+      directory: prod
     cloudFront:
       default-dir: 'prod'
       url: 'https://d3b7cshusafhca.cloudfront.net/'
@@ -71,4 +71,3 @@ mail:
   protocol: smtp
   debug: true
   encoding: UTF-8
-

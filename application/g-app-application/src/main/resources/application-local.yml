@@ -30,6 +30,11 @@ spring:
   cache:
     type: redis
 
+  servlet:
+    multipart:
+      max-file-size: 1024MB
+      max-request-size: 1024MB
+
 jwt:
   header: Authorization
   secret: c2lsdmVybmluZS10ZWNoLXNwcmluZy1ib290LWp3dC10dXRvcmlhbC1zZWNyZXQtc2lsdmVybmluZS10ZWNoLXNwcmluZy1ib290LWp3dC10dXRvcmlhbC1zZWNyZXQK
@@ -67,3 +72,4 @@ mail:
   protocol: smtp
   debug: true
   encoding: UTF-8
+
