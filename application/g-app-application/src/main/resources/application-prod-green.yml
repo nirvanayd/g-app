@@ -46,8 +46,10 @@ cloud:
       secretKey: ++AnjnmYXBYmPtNZa15g40/nGFbKiTNZBlz4L/2I
     s3:
       bucket: g-app-resource
-      directory: 'prod'
-      cloudfront-url: 'https://d3b7cshusafhca.cloudfront.net/'
+      directory: local
+    cloudFront:
+      default-dir: 'prod'
+      url: 'https://d3b7cshusafhca.cloudfront.net/'
       brand-dir: 'prod/brand'
       default-image-url: 'https://d3b7cshusafhca.cloudfront.net/prod/default/logo-default.png'
       content-dir: 'prod/content'
