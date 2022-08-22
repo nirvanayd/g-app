@@ -134,6 +134,11 @@ public class BrandDomainService {
         return brandRankRepository.findAllByBrandIn(brandList, pageRequest);
     }
 
+    public List<Brands> selectAppBrandRankList() {
+        // paging 없음.
+        return brandsRepository.findAll();
+    }
+
 
     public List<UserBrands> selectAppUserBrandList(Long userId, List<Long> brandIdList) {
         return userBrandsRepository.findAllByUserIdAndBrandIdIn(userId, brandIdList);
@@ -178,8 +183,9 @@ public class BrandDomainService {
         return brandPlacesRepository.findAllByPlaceTypeIn(placeTypeList);
     }
 
-    public List<Brands> selectBrandList(List<Brands> brandStyleList) {
-        return brandsRepository.findAllByIdIn(brandStyleList);
+    public List<Brands> selectAppBrandList() {
+        List<BrandStatus> statusList = BrandStatus.getAppBrandStatusList();
+        return brandsRepository.findAllByStatusInAndIsDisplayOrderByName(statusList, DisplayType.DISPLAY);
     }
 
 //    public List<Brands> selectBrandList(List<BrandStyles> brandStyleList, List<BrandAges> brandAgeList) {

@@ -8,19 +8,16 @@ import com.nelly.application.dto.request.*;
 import com.nelly.application.dto.response.AddContentImageResponse;
 import com.nelly.application.enums.YesOrNoType;
 import com.nelly.application.service.ContentDomainService;
-import com.nelly.application.service.UserDomainService;
 import com.nelly.application.service.brand.BrandService;
 import com.nelly.application.service.user.UserService;
 import com.nelly.application.util.CacheTemplate;
 import com.nelly.application.util.S3Uploader;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.*;
 import java.util.regex.Matcher;
@@ -38,7 +35,6 @@ public class ContentService {
     private final BrandService brandService;
 
     private final ContentDomainService contentDomainService;
-    private final UserDomainService userDomainService;
 
     private static final String DIRECTORY_SEPARATOR = "/";
 
@@ -48,12 +44,8 @@ public class ContentService {
 
         Contents content = contentDomainService.createContent(user, dto.getContentText());
         int imageSequence = 0;
-        for (AddImageRequest imageRequest : dto.getImageList()) {
-            contentDomainService.createContentImage(content, imageRequest.getImageUrl(), imageSequence);
-
-            for (AddTagRequest tagRequest : imageRequest.getTagList()) {
-
-            }
+        for (AddImageRequest imageRequest : dto.getPhotoList()) {
+            ContentImages contentImages = contentDomainService.createContentImage(content, imageRequest.getPhotoURL(), imageSequence);
             imageSequence++;
         }
 
@@ -70,15 +62,18 @@ public class ContentService {
             contentDomainService.createBrandTag(content, tagBrand, brandTag.getTag());
         }
 
+        // user mention
+        Pattern userTagPattern = Pattern.compile("@(\\S+)");
+        Matcher userTagMatcher = userTagPattern.matcher(dto.getContentText());
+
+
+        // hash tag
         Pattern hashTagPattern = Pattern.compile("#(\\S+)");
-        Matcher matcher = hashTagPattern.matcher(dto.getContentText());
-
+        Matcher hashTagMatcher = hashTagPattern.matcher(dto.getContentText());
         List<String> tagList = new ArrayList<>();
-
-        while(matcher.find()) {
+        while(hashTagMatcher.find()) {
             // matcher 를 해시태그로
-            String[] tags = matcher.group().split("#");
-
+            String[] tags = hashTagMatcher.group().split("#");
             for (String s : tags) {
                 String str = s.replaceAll("\\s+", "");
                 if (!str.isEmpty()) {
@@ -86,16 +81,22 @@ public class ContentService {
                 }
             }
         }
-
         for (String s : tagList) {
             AppTags appTag = contentDomainService.selectAppTag(s).orElse(null);
-
             if (appTag == null) {
                 appTag = contentDomainService.createAppTag(s);
             }
             contentDomainService.createContentHashTag(content, appTag, s);
         }
     }
+
+    /**
+     * content text 태그 파싱
+     */
+    private void parseTag(String contentText) {
+
+    }
+
 
     public void removeContent(RemoveContentRequest dto) {
         Users user = userService.getUser();

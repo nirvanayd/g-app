@@ -5,6 +5,6 @@ import java.util.List;
 
 @Data
 public class AddImageRequest {
-    private String imageUrl;
+    private String photoURL;
     private List<AddTagRequest> tagList;
 }

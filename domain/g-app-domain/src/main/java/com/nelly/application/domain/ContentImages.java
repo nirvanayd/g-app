@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import lombok.*;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Entity
 @Builder
@@ -31,4 +32,7 @@ public class ContentImages extends BaseTime {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "content_id")
     private Contents content;
+
+    @OneToMany(mappedBy = "contentImage")
+    private List<AppTags> tagsList;
 }

@@ -38,5 +38,8 @@ public interface BrandsRepository extends JpaRepository<Brands, Long> {
     // filter : name, style, place, age
 
     List<Brands> findAllByIdIn(List<Brands> brandStyleList);
+
+    // app brand list
+    List<Brands> findAllByStatusInAndIsDisplayOrderByName(List<BrandStatus> statusList, DisplayType displayType);
 //    List<Brands> findAllByBrandStylesInAndBrandAgesIn(List<BrandStyles> brandStyleList, List<BrandAges> brandAgeList);
 }

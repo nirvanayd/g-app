@@ -10,4 +10,5 @@ import java.util.List;
 public class AppInitDataResponse {
     private List<AgreementResponse> agreementsList;
     private List<EnumStringCodeValue> styleList;
+    private List<BrandInitResponse> brandList;
 }

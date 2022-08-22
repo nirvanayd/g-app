@@ -11,7 +11,7 @@ import java.util.ArrayList;
 public class AddContentRequest {
     @NotNull
     private String contentText;
-    private ArrayList<AddImageRequest> imageList;
+    private ArrayList<AddImageRequest> photoList;
     private ArrayList<UserTagDto> userHashTags;
     private ArrayList<BrandTagDto> brandHashTags;
 }

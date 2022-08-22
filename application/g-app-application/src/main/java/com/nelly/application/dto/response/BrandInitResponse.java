@@ -9,9 +9,8 @@ import lombok.EqualsAndHashCode;
 
 import java.util.List;
 
-@EqualsAndHashCode(callSuper = true)
 @Data
-public class BrandResponse extends CommonListResponse {
+public class BrandInitResponse {
     private long id;
     private String name;
     private String description;
@@ -24,7 +23,9 @@ public class BrandResponse extends CommonListResponse {
 
     // flutter model 적용파라미터
     private String photoURL;
+    @JsonIgnore
     private Integer likeCount;
+    @JsonIgnore
     private Boolean liked;
 
     @JsonIgnore
