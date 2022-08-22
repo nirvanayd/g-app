@@ -85,4 +85,8 @@ public class ScraperDomainService {
 
         scraperLogRepository.save(log);
     }
+
+    public void saveWebviewRequest(String url) {
+
+    }
 }
