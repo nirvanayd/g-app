@@ -2,6 +2,7 @@ package com.nelly.application.service.user;
 
 import com.nelly.application.domain.UserAgreements;
 import com.nelly.application.domain.UserNotificationTokens;
+import com.nelly.application.domain.UserStyles;
 import com.nelly.application.domain.Users;
 import com.nelly.application.dto.request.*;
 import com.nelly.application.dto.TokenInfoDto;
@@ -238,5 +239,10 @@ public class UserService {
             return userDomainService.saveUserToken(userTokens.get(), fcmToken);
         }
         return userDomainService.saveUserToken(user, fcmToken);
+    }
+
+    public void updateUserStyle(Users user, UpdateUserStyleRequest dto) {
+        List<String> userStyleList = dto.getUserStyle();
+        userDomainService.saveUserStyles(user, userStyleList);
     }
 }

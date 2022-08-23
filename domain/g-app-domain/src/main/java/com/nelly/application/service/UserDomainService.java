@@ -159,4 +159,14 @@ public class UserDomainService {
                 .build();
         return userNotificationTokensRepository.save(userNotificationToken);
     }
+
+    public void saveUserStyles(Users user, List<String> styleList) {
+        List<UserStyles> existStylesList = userStylesRepository.findAllByUser(user);
+        userStylesRepository.deleteAll(existStylesList);
+
+        for (String code: styleList) {
+            UserStyles userStyles = UserStyles.builder().styleType(StyleType.getStyleType(code)).user(user).build();
+            userStylesRepository.save(userStyles);
+        }
+    }
 }

@@ -168,4 +168,15 @@ public class UserController {
         userService.updateAgreement(user.get(), dto);
         return response.success();
     }
+
+    /**
+     * 사용자 스타일 변경
+     * */
+    @PutMapping("/users/styles")
+    public ResponseEntity<?> updateUserStyle(@RequestBody @Valid UpdateUserStyleRequest dto) {
+        Optional<Users> user = userService.getAppUser();
+        if (user.isEmpty()) throw new RuntimeException("사용자 정보를 조회할 수 없습니다.");
+        userService.updateUserStyle(user.get(), dto);
+        return response.success();
+    }
 }
