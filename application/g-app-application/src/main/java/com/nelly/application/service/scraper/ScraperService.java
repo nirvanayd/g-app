@@ -1,6 +1,8 @@
 package com.nelly.application.service.scraper;
 
 import com.nelly.application.domain.ScraperBrandDetails;
+import com.nelly.application.domain.ScraperRequest;
+import com.nelly.application.domain.Users;
 import com.nelly.application.dto.UrlInfoDto;
 import com.nelly.application.dto.request.WebviewRequest;
 import com.nelly.application.service.ScraperDomainService;
@@ -25,6 +27,7 @@ public class ScraperService {
                 .orElseThrow(() -> new RuntimeException("제품 URL 경로가 일치하지 않습니다."));
     }
 
-    public void scrapRequest(WebviewRequest dto) {
+    public void saveScrapRequest(WebviewRequest dto, Users user) {
+        scraperDomainService.createScraperRequest(dto.getUrl(), user == null ? null : user.getId());
     }
 }

@@ -8,7 +8,7 @@ import javax.persistence.*;
 
 @Entity
 @Builder
-@Table(name = "scraper_log")
+@Table(name = "scraper_request")
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
@@ -25,6 +25,6 @@ public class ScraperRequest extends BaseTime {
     @Column(name="user_id", nullable = true)
     private Long userId;
 
-    @Column(name="url", nullable = false)
+    @Column(name="url", nullable = false, length = 1000)
     private String targetUrl;
 }
