@@ -34,5 +34,5 @@ public class ContentImages extends BaseTime {
     private Contents content;
 
     @OneToMany(mappedBy = "contentImage")
-    private List<AppTags> tagsList;
+    private List<BrandTags> tagsList;
 }

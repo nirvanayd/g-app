@@ -23,5 +23,4 @@ public interface ContentsRepository extends JpaRepository<Contents, Long> {
     @Modifying
     @Query("UPDATE Contents c SET c.markCount = c.markCount + :value WHERE c.id = :contentId")
     void updateMarkCount(@Param("contentId") Long contentId, @Param("value") int value);
-
 }

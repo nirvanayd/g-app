@@ -4,7 +4,7 @@ import lombok.Data;
 
 @Data
 public class AddTagRequest {
-    private Integer id;
+    private Long id;
     private double x;
     private double y;
     private String tag;

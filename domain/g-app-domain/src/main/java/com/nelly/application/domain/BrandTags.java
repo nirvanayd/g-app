@@ -9,7 +9,7 @@ import javax.persistence.*;
 
 @Entity
 @Builder
-@Table(name = "brand_hash_tags")
+@Table(name = "brand_tags")
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
@@ -17,7 +17,7 @@ import javax.persistence.*;
 @JsonIdentityInfo(
         generator = ObjectIdGenerators.PropertyGenerator.class,
         property = "id")
-public class BrandHashTags extends BaseTime {
+public class BrandTags extends BaseTime {
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)
     @Column(name = "id")
@@ -31,6 +31,16 @@ public class BrandHashTags extends BaseTime {
     private Contents content;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "brand_id")
+    @JoinColumn(name = "brand_id", nullable = true)
     private Brands brand;
+
+    @Column(name = "x")
+    private Double x;
+
+    @Column(name = "y")
+    private Double y;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "content_imgate_id")
+    private ContentImages contentImage;
 }

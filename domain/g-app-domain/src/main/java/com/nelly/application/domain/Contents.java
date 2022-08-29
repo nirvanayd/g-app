@@ -5,11 +5,16 @@ import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import com.nelly.application.converter.YesOrNoTypeConverter;
 import com.nelly.application.enums.YesOrNoType;
 import lombok.*;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
+@Where(clause = "deleted_date is not null")
+@SQLDelete(sql = "UPDATE contents SET deleted_date = NOW() WHERE id = ?")
 @Builder
 @Table(name = "contents")
 @AllArgsConstructor
@@ -41,9 +46,8 @@ public class Contents extends BaseTime {
     @Column(name = "reply_count", nullable = false, columnDefinition = "integer default 0")
     private Integer replyCount;
 
-    @Convert(converter = YesOrNoTypeConverter.class)
-    @Column(name = "deleted_yn", nullable = false, length = 2)
-    private YesOrNoType deletedYn;
+    @Column(name = "deleted_date")
+    private LocalDateTime deletedDate;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
@@ -53,7 +57,7 @@ public class Contents extends BaseTime {
     private List<ContentImages> contentImages;
 
     @OneToMany(mappedBy = "content")
-    private List<BrandHashTags> brandHashTags;
+    private List<BrandTags> brandHashTags;
 
     @OneToMany(mappedBy = "content")
     private List<UserHashTags> userHashTags;

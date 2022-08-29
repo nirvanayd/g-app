@@ -6,5 +6,5 @@ import java.util.List;
 @Data
 public class AddImageRequest {
     private String photoURL;
-    private List<AddTagRequest> tagList;
+    private List<AddTagRequest> brandHashTags;
 }

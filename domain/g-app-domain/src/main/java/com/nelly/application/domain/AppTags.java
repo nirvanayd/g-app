@@ -24,14 +24,4 @@ public class AppTags extends BaseTime{
 
     @Column(name = "tag", nullable = false, length = 100)
     private String tag;
-
-    @Column(name = "x")
-    private Double x;
-
-    @Column(name = "y")
-    private Double y;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "content_imgate_id")
-    private ContentImages contentImage;
 }

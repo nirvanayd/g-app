@@ -27,49 +27,41 @@ import java.util.regex.Pattern;
 @Service
 @Slf4j
 public class ContentService {
-
     private final AwsProperties awsProperties;
     private final CacheTemplate cacheTemplate;
     private final S3Uploader s3Uploader;
     private final UserService userService;
     private final BrandService brandService;
-
     private final ContentDomainService contentDomainService;
-
     private static final String DIRECTORY_SEPARATOR = "/";
 
     @Transactional
     public void addContent(AddContentRequest dto) {
         Users user = userService.getUser();
 
-        Contents content = contentDomainService.createContent(user, dto.getContentText());
+        Contents content = contentDomainService.createContent(user, dto.getText());
         int imageSequence = 0;
         for (AddImageRequest imageRequest : dto.getPhotoList()) {
-            ContentImages contentImages = contentDomainService.createContentImage(content, imageRequest.getPhotoURL(), imageSequence);
+            ContentImages contentImage = contentDomainService.createContentImage(content, imageRequest.getPhotoURL(), imageSequence);
             imageSequence++;
-        }
 
-        for (UserTagDto userTag : dto.getUserHashTags()) {
-            Users tagUser = userService.getUser(userTag.getId());
-            contentDomainService.createUserTag(content, tagUser, userTag.getTag());
-        }
-
-        for (BrandTagDto brandTag : dto.getBrandHashTags()) {
-            Brands tagBrand = null;
-            if (brandTag.getId() != null) {
-                tagBrand = brandService.getBrand(brandTag.getId());
+            for (AddTagRequest brandTag : imageRequest.getBrandHashTags()) {
+                Brands tagBrand = null;
+                if (brandTag.getId() != null) {
+                    tagBrand = brandService.getBrand(brandTag.getId());
+                }
+                contentDomainService.createBrandTag(content, contentImage, tagBrand,
+                        brandTag.getX(), brandTag.getY(), brandTag.getTag());
             }
-            contentDomainService.createBrandTag(content, tagBrand, brandTag.getTag());
         }
 
         // user mention
         Pattern userTagPattern = Pattern.compile("@(\\S+)");
-        Matcher userTagMatcher = userTagPattern.matcher(dto.getContentText());
-
+        Matcher userTagMatcher = userTagPattern.matcher(dto.getText());
 
         // hash tag
         Pattern hashTagPattern = Pattern.compile("#(\\S+)");
-        Matcher hashTagMatcher = hashTagPattern.matcher(dto.getContentText());
+        Matcher hashTagMatcher = hashTagPattern.matcher(dto.getText());
         List<String> tagList = new ArrayList<>();
         while(hashTagMatcher.find()) {
             // matcher 를 해시태그로
@@ -97,16 +89,37 @@ public class ContentService {
 
     }
 
-
-    public void removeContent(RemoveContentRequest dto) {
+    @Transactional
+    public void updateContent(Long contentId, UpdateContentRequest dto) {
         Users user = userService.getUser();
-        Contents content = contentDomainService.selectContent(user, dto.getId())
+        Contents content = contentDomainService.selectContent(user, contentId)
                 .orElseThrow(() -> new RuntimeException("컨텐츠 정보를 조회할 수 없습니다."));
 
-        if (content.getDeletedYn().equals(YesOrNoType.YES)) {
+        // 이미지 초기화
+        contentDomainService.deleteContentImage(content);
+        // 브랜드태그 초기화
+        contentDomainService.deleteBrandTag(content);
+        // 앱태그 초기화
+        contentDomainService.deleteContentHashTag(content);
+
+        // content update
+
+        // 이미지 생성
+
+        // 브랩ㄴ드 태그 생성
+
+        // 앱태그 생성
+
+    }
+
+    public void removeContent(Long contentId) {
+        Users user = userService.getUser();
+        Contents content = contentDomainService.selectContent(user, contentId)
+                .orElseThrow(() -> new RuntimeException("컨텐츠 정보를 조회할 수 없습니다."));
+        if (content.getDeletedDate() != null) {
             throw new RuntimeException("이미 삭제된 컨텐츠입니다.");
         }
-        contentDomainService.updateDeleted(content, YesOrNoType.YES);
+        contentDomainService.removeContent(contentId);
     }
 
     @Transactional
@@ -199,5 +212,10 @@ public class ContentService {
             contentDomainService.updateContentMark(contentId, value);
             cacheTemplate.deleteCache(key);
         }
+    }
+
+    public void saveComment(AddCommentRequest dto) {
+        String comment = dto.getComment();
+//        Comments parent = contentDomainService.selectComment(dto.getParentId());
     }
 }
