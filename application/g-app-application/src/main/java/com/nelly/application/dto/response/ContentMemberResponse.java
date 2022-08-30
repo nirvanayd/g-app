@@ -18,7 +18,7 @@ public class ContentMemberResponse {
     public ContentMemberResponse contentUserToResponse(Users user) {
         return ContentMemberResponse.builder().
                 id(user.getId()).
-                nickname(user.getEmail()).
+                nickname(user.getLoginId()).
                 photoURL(user.getProfileImageUrl()).
                 build();
     }
