@@ -76,6 +76,10 @@ public class ContentDomainService {
         return contentsRepository.findByUserAndId(user, id);
     }
 
+    public void saveContent(Contents content) {
+        contentsRepository.save(content);
+    }
+
     public Optional<Contents> selectContent(Long id) {
         return contentsRepository.findById(id);
     }

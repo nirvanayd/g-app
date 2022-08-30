@@ -1,11 +1,13 @@
 package com.nelly.application.controller;
 
+import com.nelly.application.domain.Contents;
 import com.nelly.application.dto.Response;
 import com.nelly.application.dto.request.*;
 import com.nelly.application.dto.response.AddContentImageResponse;
 import com.nelly.application.service.content.ContentService;
 import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -24,6 +26,12 @@ public class ContentController {
     private final Response response;
     private final ModelMapper modelMapper;
 
+    @GetMapping("/contents")
+    public ResponseEntity<?> getContentList(GetContentListRequest dto) {
+        Page<Contents> contentList = contentService.getContentList(dto);
+        return response.success(contentList);
+    }
+
     @PostMapping("/contents")
     public ResponseEntity<?> addContent(@RequestBody AddContentRequest dto) {
         contentService.addContent(dto);
@@ -40,7 +48,6 @@ public class ContentController {
 
     @DeleteMapping("/contents/{id}")
     public ResponseEntity<?> removeContent(@NotBlank @PathVariable("id") String id) {
-
         // contentId Long convert
         Long contentId = Long.parseLong(id);
         contentService.removeContent(contentId);

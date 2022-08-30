@@ -9,6 +9,7 @@ import com.nelly.application.util.CacheTemplate;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -37,6 +38,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/hello", "/env").permitAll()
                 .antMatchers("/sign-up", "/login", "/authority", "/duplicate-id", "/find-id", "/reset-password").permitAll()
                 .antMatchers("/brands/rank", "/brands/intro/**", "/brands/keyword").permitAll()
+                .antMatchers(HttpMethod.GET, "/contents").permitAll()
                 .antMatchers("/scraper/web-url").permitAll()
                 .antMatchers( "/users/**").hasRole("USER")
                 .antMatchers( "/contents/**").hasRole("USER")

@@ -119,7 +119,10 @@ public class UserService {
         return userDomainService.getUsers(authId);
     }
 
-
+    /**
+     * Optional<Users>
+     * @return
+     */
     public Optional<Users> getAppUser() {
         Long authId = authService.getAppAuthenticationId();
         if (authId == null) return Optional.empty();

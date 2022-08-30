@@ -9,9 +9,11 @@ import com.nelly.application.exception.enums.ExceptionCode;
 import io.jsonwebtoken.ExpiredJwtException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.tomcat.util.http.fileupload.impl.FileSizeLimitExceededException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 
 @RestControllerAdvice
 @RequiredArgsConstructor
@@ -41,7 +43,17 @@ public class GAppExceptionHandler {
         return response.fail(exceptionCode.getCode(), exceptionCode.getMessage(), exceptionCode.getStatus());
     }
 
+    @ExceptionHandler(MaxUploadSizeExceededException.class)
+    public ResponseEntity<?> handleMaxUploadSizeExceededException(MaxUploadSizeExceededException exception) {
+        ExceptionCode exceptionCode = ExceptionCode.SYSTEM_EXCEPTION;
+        return response.fail(exceptionCode.getCode(), exception.getMessage(), exceptionCode.getStatus());
+    }
 
+    @ExceptionHandler(FileSizeLimitExceededException.class)
+    public ResponseEntity<?> handleFileSizeLimitExceededException(FileSizeLimitExceededException exception) {
+        ExceptionCode exceptionCode = ExceptionCode.SYSTEM_EXCEPTION;
+        return response.fail(exceptionCode.getCode(), exception.getMessage(), exceptionCode.getStatus());
+    }
 
     @ExceptionHandler(SystemException.class)
     public ResponseEntity<?> handleSystemException(SystemException exception) {

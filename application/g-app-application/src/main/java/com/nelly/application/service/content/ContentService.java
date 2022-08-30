@@ -14,6 +14,9 @@ import com.nelly.application.util.CacheTemplate;
 import com.nelly.application.util.S3Uploader;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -95,21 +98,55 @@ public class ContentService {
         Contents content = contentDomainService.selectContent(user, contentId)
                 .orElseThrow(() -> new RuntimeException("컨텐츠 정보를 조회할 수 없습니다."));
 
+        content.setContentText(dto.getText());
+        contentDomainService.saveContent(content);
         // 이미지 초기화
         contentDomainService.deleteContentImage(content);
         // 브랜드태그 초기화
         contentDomainService.deleteBrandTag(content);
         // 앱태그 초기화
         contentDomainService.deleteContentHashTag(content);
+        int imageSequence = 0;
+        for (AddImageRequest imageRequest : dto.getPhotoList()) {
+            ContentImages contentImage = contentDomainService.createContentImage(content, imageRequest.getPhotoURL(), imageSequence);
+            imageSequence++;
 
-        // content update
+            for (AddTagRequest brandTag : imageRequest.getBrandHashTags()) {
+                Brands tagBrand = null;
+                if (brandTag.getId() != null) {
+                    tagBrand = brandService.getBrand(brandTag.getId());
+                }
+                contentDomainService.createBrandTag(content, contentImage, tagBrand,
+                        brandTag.getX(), brandTag.getY(), brandTag.getTag());
+            }
+        }
 
-        // 이미지 생성
+        if (dto.getText() == null) return;
+        // user mention
+        Pattern userTagPattern = Pattern.compile("@(\\S+)");
+        Matcher userTagMatcher = userTagPattern.matcher(dto.getText());
 
-        // 브랩ㄴ드 태그 생성
-
-        // 앱태그 생성
-
+        // hash tag
+        Pattern hashTagPattern = Pattern.compile("#(\\S+)");
+        Matcher hashTagMatcher = hashTagPattern.matcher(dto.getText());
+        List<String> tagList = new ArrayList<>();
+        while(hashTagMatcher.find()) {
+            // matcher 를 해시태그로
+            String[] tags = hashTagMatcher.group().split("#");
+            for (String s : tags) {
+                String str = s.replaceAll("\\s+", "");
+                if (!str.isEmpty()) {
+                    tagList.add(str);
+                }
+            }
+        }
+        for (String s : tagList) {
+            AppTags appTag = contentDomainService.selectAppTag(s).orElse(null);
+            if (appTag == null) {
+                appTag = contentDomainService.createAppTag(s);
+            }
+            contentDomainService.createContentHashTag(content, appTag, s);
+        }
     }
 
     public void removeContent(Long contentId) {
@@ -212,6 +249,11 @@ public class ContentService {
             contentDomainService.updateContentMark(contentId, value);
             cacheTemplate.deleteCache(key);
         }
+    }
+
+    public Page<Contents> getContentList(GetContentListRequest dto) {
+        Optional<Users> users = userService.getAppUser();
+        return contentDomainService.selectContentList(dto.getPage(), dto.getSize());
     }
 
     public void saveComment(AddCommentRequest dto) {

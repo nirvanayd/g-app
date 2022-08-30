@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
-@Where(clause = "deleted_date is not null")
+@Where(clause = "deleted_date is null")
 @SQLDelete(sql = "UPDATE contents SET deleted_date = NOW() WHERE id = ?")
 @Builder
 @Table(name = "contents")

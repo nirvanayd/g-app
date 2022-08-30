@@ -22,10 +22,7 @@ public class ContentService {
     private final UserService userService;
 
     public Page<Contents> getContentList(GetContentListRequest requestDto) {
-        System.out.println(requestDto);
         List<Users> userList =  (requestDto.getLoginId() == null) ? null : userService.getAccountList(requestDto.getLoginId());
-        YesOrNoType isDeleted = (requestDto.getIsDeleted() == null) ? null : YesOrNoType.getYesOrNoType(requestDto.getIsDeleted());
-
         return contentDomainService.selectContentList(requestDto.getPage(), requestDto.getSize(),
                 userList, requestDto.getIsDeleted());
     }
