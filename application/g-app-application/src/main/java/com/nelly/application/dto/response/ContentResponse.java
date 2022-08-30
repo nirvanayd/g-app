@@ -22,9 +22,11 @@ public class ContentResponse {
     private Integer markCount;
     private Integer replyCount;
     private List<ContentImageResponse> photoList;
+    private ContentMemberResponse member;
     private String createdAt;
 
     public List<ContentResponse> toDtoList(List<Contents> contentList) {
+        ContentMemberResponse memberResponse = new ContentMemberResponse();
         return contentList.stream().map(c -> ContentResponse.builder().
                 id(c.getId()).
                 text(c.getContentText()).
@@ -40,6 +42,7 @@ public class ContentResponse {
                                 brandId(t.getBrand() == null ? null : t.getBrand().getId()).
                                 build()).collect(Collectors.toList())).
                         build()).collect(Collectors.toList())).
+                member(memberResponse.contentUserToResponse(c.getUser())).
                 build()).collect(Collectors.toList());
     }
 }
