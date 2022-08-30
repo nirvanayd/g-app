@@ -6,6 +6,7 @@ import com.nelly.application.dto.BrandTagDto;
 import com.nelly.application.dto.UserTagDto;
 import com.nelly.application.dto.request.*;
 import com.nelly.application.dto.response.AddContentImageResponse;
+import com.nelly.application.dto.response.ContentResponse;
 import com.nelly.application.enums.YesOrNoType;
 import com.nelly.application.service.ContentDomainService;
 import com.nelly.application.service.brand.BrandService;
@@ -251,9 +252,14 @@ public class ContentService {
         }
     }
 
-    public Page<Contents> getContentList(GetContentListRequest dto) {
+    public List<ContentResponse> getContentList(GetContentListRequest dto) {
+        Page<Contents> contentList = contentDomainService.selectContentList(dto.getPage(), dto.getSize());
         Optional<Users> users = userService.getAppUser();
-        return contentDomainService.selectContentList(dto.getPage(), dto.getSize());
+        if (!users.isEmpty()) {
+        }
+
+        ContentResponse response = new ContentResponse();
+        return response.toDtoList(contentList.getContent());
     }
 
     public void saveComment(AddCommentRequest dto) {

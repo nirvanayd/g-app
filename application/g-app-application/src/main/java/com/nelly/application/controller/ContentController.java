@@ -4,6 +4,8 @@ import com.nelly.application.domain.Contents;
 import com.nelly.application.dto.Response;
 import com.nelly.application.dto.request.*;
 import com.nelly.application.dto.response.AddContentImageResponse;
+import com.nelly.application.dto.response.ContentResponse;
+import com.nelly.application.dto.response.GetContentListResponse;
 import com.nelly.application.service.content.ContentService;
 import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -28,8 +30,8 @@ public class ContentController {
 
     @GetMapping("/contents")
     public ResponseEntity<?> getContentList(GetContentListRequest dto) {
-        Page<Contents> contentList = contentService.getContentList(dto);
-        return response.success(contentList);
+        List<ContentResponse> list = contentService.getContentList(dto);
+        return response.success(list);
     }
 
     @PostMapping("/contents")
