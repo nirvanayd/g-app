@@ -27,10 +27,6 @@ public class BrandTags extends BaseTime {
     private String tag;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "content_id")
-    private Contents content;
-
-    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "brand_id", nullable = true)
     private Brands brand;
 
@@ -39,6 +35,10 @@ public class BrandTags extends BaseTime {
 
     @Column(name = "y")
     private Double y;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "content_id")
+    private Contents content;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "content_image_id")

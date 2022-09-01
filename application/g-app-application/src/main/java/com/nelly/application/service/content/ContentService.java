@@ -99,14 +99,18 @@ public class ContentService {
         Contents content = contentDomainService.selectContent(user, contentId)
                 .orElseThrow(() -> new RuntimeException("컨텐츠 정보를 조회할 수 없습니다."));
 
-        content.setContentText(dto.getText());
-        contentDomainService.saveContent(content);
-        // 이미지 초기화
-        contentDomainService.deleteContentImage(content);
-        // 브랜드태그 초기화
-        contentDomainService.deleteBrandTag(content);
         // 앱태그 초기화
         contentDomainService.deleteContentHashTag(content);
+
+        // 브랜드태그 초기화
+        contentDomainService.deleteBrandTag(content);
+
+        // 이미지 초기화
+        contentDomainService.deleteContentImage(content);
+
+        content.setContentText(dto.getText());
+        contentDomainService.saveContent(content);
+
         int imageSequence = 0;
         for (AddImageRequest imageRequest : dto.getPhotoList()) {
             ContentImages contentImage = contentDomainService.createContentImage(content, imageRequest.getPhotoURL(), imageSequence);
