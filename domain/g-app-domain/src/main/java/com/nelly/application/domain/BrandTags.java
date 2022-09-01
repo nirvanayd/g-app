@@ -41,6 +41,6 @@ public class BrandTags extends BaseTime {
     private Double y;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "content_imgate_id")
+    @JoinColumn(name = "content_image_id")
     private ContentImages contentImage;
 }
