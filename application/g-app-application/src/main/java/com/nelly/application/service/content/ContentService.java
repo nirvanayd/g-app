@@ -8,6 +8,7 @@ import com.nelly.application.dto.request.*;
 import com.nelly.application.dto.response.AddContentImageResponse;
 import com.nelly.application.dto.response.ContentResponse;
 import com.nelly.application.enums.YesOrNoType;
+import com.nelly.application.exception.SystemException;
 import com.nelly.application.service.ContentDomainService;
 import com.nelly.application.service.brand.BrandService;
 import com.nelly.application.service.user.UserService;
@@ -260,14 +261,43 @@ public class ContentService {
         Page<Contents> contentList = contentDomainService.selectContentList(dto.getPage(), dto.getSize());
         Optional<Users> users = userService.getAppUser();
         if (!users.isEmpty()) {
+            // 좋아요, 마크 여부
         }
 
         ContentResponse response = new ContentResponse();
         return response.toDtoList(contentList.getContent());
     }
 
-    public void saveComment(AddCommentRequest dto) {
-        String comment = dto.getComment();
-//        Comments parent = contentDomainService.selectComment(dto.getParentId());
+    public void addComment(AddCommentRequest dto) {
+        Optional<Users> selectUsers = userService.getAppUser();
+        if (selectUsers.isEmpty()) throw new SystemException("사용자 정보를 조회할 수 없습니다.");
+        Users user = selectUsers.get();
+
+        Optional<Contents> selectContent = contentDomainService.selectContent(dto.getContentId());
+        if (selectContent.isEmpty()) throw new SystemException("컨텐츠 정보를 조회할 수 없습니다.");
+        Contents content = selectContent.get();
+
+        // parent check
+        Comments parentComment = null;
+        if (dto.getParentId() != null) {
+            Optional<Comments> selectComment = contentDomainService.selectComment(dto.getParentId());
+            if (selectComment.isEmpty()) throw new SystemException("댓글 정보를 조회할 수 없습니다.");
+            parentComment = selectComment.get();
+        }
+
+        contentDomainService.createComment(content, user, parentComment, dto.getComment());
+    }
+
+    public void updateComment(Long id, UpdateCommentRequest dto) {
+        Users user = userService.getUser();
+
+        Optional<Comments> selectExistComment = contentDomainService.selectComment(id, user);
+        if (selectExistComment.isEmpty()) throw new SystemException("댓글 정보를 조회할 수 없습니다.");
+        Comments existComment = selectExistComment.get();
+        contentDomainService.saveComment(existComment, dto.getComment());
+    }
+
+    public void getCommentList(Long contentId, GetCommentListRequest dto) {
+
     }
 }

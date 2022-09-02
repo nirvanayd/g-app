@@ -23,6 +23,7 @@ public class ContentDomainService {
     private final ContentMarksRepository contentMarksRepository;
     private final AppTagsRepository appTagsRepository;
     private final ContentHashTagsRepository contentHashTagsRepository;
+    private final CommentsRepository commentsRepository;
 
     public Contents createContent(Users user, String contentText) {
         Contents contents = Contents.builder()
@@ -166,5 +167,28 @@ public class ContentDomainService {
     public Page<Contents> selectContentList(Integer page, Integer size) {
         PageRequest pageRequest = PageRequest.of(page, size, Sort.by("id").descending());
         return contentsRepository.findAll(pageRequest);
+    }
+
+    public Optional<Comments> selectComment(Long commentId) {
+        if (commentId == null) return null;
+        return commentsRepository.findById(commentId);
+    }
+
+    public Optional<Comments> selectComment(Long commentId, Users user) {
+         return commentsRepository.findByIdAndUser(commentId, user);
+    }
+
+    public void createComment(Contents content, Users user, Comments parentComment, String text) {
+        Comments comment = Comments.builder().
+                content(content).
+                user(user).
+                comment(text).
+                parent(parentComment).build();
+        commentsRepository.save(comment);
+    }
+
+    public void saveComment(Comments comments, String comment) {
+        comments.setComment(comment);
+        commentsRepository.save(comments);
     }
 }

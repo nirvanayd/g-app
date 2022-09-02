@@ -5,6 +5,8 @@ import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import com.nelly.application.converter.YesOrNoTypeConverter;
 import com.nelly.application.enums.YesOrNoType;
 import lombok.*;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -15,6 +17,8 @@ import java.util.Set;
 @Entity
 @Builder
 @Table(name = "comments")
+@Where(clause = "deleted_date is null")
+@SQLDelete(sql = "UPDATE comments SET deleted_date = NOW() WHERE id = ?")
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
@@ -48,5 +52,5 @@ public class Comments extends BaseTime {
     private Set<Comments> comments = new HashSet<>();
 
     @Column(name = "deleted_date")
-    private LocalDateTime createdDate;
+    private LocalDateTime deletedDate;
 }

@@ -76,6 +76,24 @@ public class ContentController {
 
     @PostMapping("/comments")
     public ResponseEntity<?> addComment(@RequestBody AddCommentRequest dto) {
+        contentService.addComment(dto);
+        return response.success();
+    }
+
+    @PutMapping("/comments/{id}")
+    public ResponseEntity<?> updateComment(@NotBlank @PathVariable("id") String id,
+                                           @RequestBody UpdateCommentRequest dto) {
+        Long commentId = Long.parseLong(id);
+        contentService.updateComment(commentId, dto);
+        return response.success();
+    }
+
+    @GetMapping("/comments/{contentId}")
+    public ResponseEntity<?> getContentCommentList(@NotBlank @PathVariable("contentId") String id,
+                                           GetCommentListRequest dto
+                                           ) {
+        Long contentId = Long.parseLong(id);
+        contentService.getCommentList(contentId, dto);
         return response.success();
     }
 }
