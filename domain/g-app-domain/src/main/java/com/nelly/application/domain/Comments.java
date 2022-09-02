@@ -10,6 +10,7 @@ import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -49,7 +50,7 @@ public class Comments extends BaseTime {
     private Contents content;
 
     @OneToMany(mappedBy = "parent")
-    private Set<Comments> comments = new HashSet<>();
+    private List<Comments> comments = new ArrayList<>();
 
     @Column(name = "deleted_date")
     private LocalDateTime deletedDate;

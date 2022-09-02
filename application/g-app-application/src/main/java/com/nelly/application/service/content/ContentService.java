@@ -6,6 +6,7 @@ import com.nelly.application.dto.BrandTagDto;
 import com.nelly.application.dto.UserTagDto;
 import com.nelly.application.dto.request.*;
 import com.nelly.application.dto.response.AddContentImageResponse;
+import com.nelly.application.dto.response.CommentResponse;
 import com.nelly.application.dto.response.ContentResponse;
 import com.nelly.application.enums.YesOrNoType;
 import com.nelly.application.exception.SystemException;
@@ -297,7 +298,16 @@ public class ContentService {
         contentDomainService.saveComment(existComment, dto.getComment());
     }
 
-    public void getCommentList(Long contentId, GetCommentListRequest dto) {
+    public List<CommentResponse> getCommentList(Long contentId, GetCommentListRequest dto) {
+        Optional<Contents> selectContent = contentDomainService.selectContent(contentId);
+        if (selectContent.isEmpty()) throw new SystemException("컨텐츠 정보를 조회할 수 없습니다.");
+        Contents content = selectContent.get();
+        Page<Comments> selectComments = contentDomainService.selectCommentList(content, dto.getPage(), dto.getSize());
 
+        List<CommentResponse> list = new ArrayList<>();
+        if (selectComments.isEmpty()) return list;
+        List<Comments> commentList = selectComments.getContent();
+        CommentResponse commentResponse = new CommentResponse();
+        return commentResponse.toDtoList(commentList);
     }
 }

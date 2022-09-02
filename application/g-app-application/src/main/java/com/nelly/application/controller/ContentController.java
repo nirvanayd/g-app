@@ -1,9 +1,11 @@
 package com.nelly.application.controller;
 
+import com.nelly.application.domain.Comments;
 import com.nelly.application.domain.Contents;
 import com.nelly.application.dto.Response;
 import com.nelly.application.dto.request.*;
 import com.nelly.application.dto.response.AddContentImageResponse;
+import com.nelly.application.dto.response.CommentResponse;
 import com.nelly.application.dto.response.ContentResponse;
 import com.nelly.application.dto.response.GetContentListResponse;
 import com.nelly.application.service.content.ContentService;
@@ -93,7 +95,7 @@ public class ContentController {
                                            GetCommentListRequest dto
                                            ) {
         Long contentId = Long.parseLong(id);
-        contentService.getCommentList(contentId, dto);
-        return response.success();
+        List<CommentResponse> commentList = contentService.getCommentList(contentId, dto);
+        return response.success(commentList);
     }
 }

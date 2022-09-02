@@ -191,4 +191,9 @@ public class ContentDomainService {
         comments.setComment(comment);
         commentsRepository.save(comments);
     }
+
+    public Page<Comments> selectCommentList(Contents content, Integer page, Integer size) {
+        PageRequest pageRequest = PageRequest.of(page, size, Sort.by("id").descending());
+        return commentsRepository.findAllByContentAndParentNull(content, pageRequest);
+    }
 }
