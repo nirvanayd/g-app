@@ -1,6 +1,7 @@
 package com.nelly.application.domain;
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import com.nelly.application.converter.BrandStatusConverter;
 import com.nelly.application.converter.DisplayTypeConverter;
@@ -43,6 +44,9 @@ public class Brands extends BaseTime{
     @Column(name = "introduce_image_url", nullable = true, length = 500)
     private String introduceImageUrl;
 
+    @Column(name = "favorite_count", nullable = false, columnDefinition = "integer default 0")
+    private Integer favoriteCount;
+
     @OneToMany(mappedBy = "brand")
     private List<BrandStyles> brandStyles;
 
@@ -51,6 +55,14 @@ public class Brands extends BaseTime{
 
     @OneToMany(mappedBy = "brand")
     private List<BrandAges> brandAges;
+
+    @JsonIgnore
+    @OneToOne(mappedBy = "brand")
+    private BrandRank ranking;
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "brand")
+    private List<UserBrands> userBrandList;
 
     @PrePersist
     public void prePersist() {

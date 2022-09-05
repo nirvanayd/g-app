@@ -1,5 +1,7 @@
 package com.nelly.application.dto;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.gson.Gson;
 import lombok.Builder;
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
@@ -13,7 +15,6 @@ public class Response {
     @Getter
     @Builder
     private static class Body {
-
         private String code;
         private String message;
         private Object data;
@@ -42,8 +43,31 @@ public class Response {
     }
 
     public ResponseEntity<?> success() {
-        return success(Collections.emptyList(), null, HttpStatus.OK);
+        return success(null, null, HttpStatus.OK);
     }
+
+    /**
+     * List Response 대응
+     */
+    public ResponseEntity<?> success(ResponseData data, String msg, HttpStatus status) {
+        Body body = Body.builder()
+                .data(data)
+                .code("success")
+                .message(msg)
+                .error(Collections.emptyList())
+                .build();
+        if (data instanceof CommonListResponse) {
+            if (data.isEnded()) {
+                return ResponseEntity.status(HttpStatus.NO_CONTENT.value()).body("test...");
+            }
+        }
+        return ResponseEntity.status(status).body(body);
+    }
+
+    public ResponseEntity<?> success(ResponseData data) {
+        return success(data, null, HttpStatus.OK);
+    }
+
 
     /**
      * fail
@@ -77,5 +101,13 @@ public class Response {
         return fail(Collections.emptyList(), "fail", null, HttpStatus.NOT_EXTENDED);
     }
 
-
+    public String convertToJson(Object data, String code, String msg) {
+        Body body = Body.builder()
+                .data(data)
+                .code(code)
+                .message(msg)
+                .build();
+        Gson gson = new Gson();
+        return gson.toJson(body);
+    }
 }

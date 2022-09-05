@@ -1,5 +1,6 @@
 package com.nelly.application.service.brand;
 
+import com.nelly.application.config.AwsProperties;
 import com.nelly.application.domain.Brands;
 import com.nelly.application.dto.request.AddBrandRequest;
 import com.nelly.application.dto.request.GetBrandListRequest;
@@ -28,15 +29,15 @@ public class BrandService {
 
     private final S3Uploader s3Uploader;
     private final BrandDomainService brandDomainService;
-
-    @Value("${cloud.aws.s3.brand-dir}")
-    public String brandDirectory;
-
-    @Value("${cloud.aws.s3.cloudfront-url}")
-    public String cloudFrontUrl;
-
-    @Value("${cloud.aws.s3.default-image-url}")
-    public String defaultImageUrl;
+    private final AwsProperties awsProperties;
+//    @Value("${cloud.aws.s3.brand-dir}")
+//    public String brandDirectory;
+//
+//    @Value("${cloud.aws.s3.cloudfront-url}")
+//    public String cloudFrontUrl;
+//
+//    @Value("${cloud.aws.s3.default-image-url}")
+//    public String defaultImageUrl;
 
     public void addBrand(AddBrandRequest requestDto) {
         // set initial value
@@ -74,11 +75,11 @@ public class BrandService {
         String updateLogoImageUrl = null;
         String updateIntroduceImageUrl = null;
         if (logoImage != null) {
-            updateLogoImageUrl = s3Uploader.upload(logoImage, getS3BrandPath());
+            updateLogoImageUrl = s3Uploader.upload(awsProperties.getS3().getBucket(), logoImage, getS3BrandPath());
         }
 
         if (introduceImage != null) {
-            updateIntroduceImageUrl = s3Uploader.upload(introduceImage, getS3BrandPath());
+            updateIntroduceImageUrl = s3Uploader.upload(awsProperties.getS3().getBucket(), introduceImage, getS3BrandPath());
         }
 
         return BrandImageUploadResponse.builder()
@@ -95,8 +96,8 @@ public class BrandService {
 
         BrandImageUploadResponse brandImageUploadResponse = this.saveImages(logoImage, introduceImage);
 
-        String logoKey = logoImageUrl.replaceAll(cloudFrontUrl, "");
-        String introduceKey = introduceImageUrl.replaceAll(cloudFrontUrl, "");
+        String logoKey = logoImageUrl.replaceAll(awsProperties.getCloudFront().getUrl(), "");
+        String introduceKey = introduceImageUrl.replaceAll(awsProperties.getCloudFront().getUrl(), "");
 
         s3Uploader.removeObject(logoKey);
         s3Uploader.removeObject(introduceKey);
@@ -105,7 +106,7 @@ public class BrandService {
     }
 
     public String getS3BrandPath() {
-        return brandDirectory;
+        return awsProperties.getCloudFront().getBrandDir();
     }
 
     @Transactional

@@ -2,10 +2,8 @@ package com.nelly.application.service;
 
 import com.nelly.application.domain.*;
 import com.nelly.application.enums.*;
-import com.nelly.application.repository.BrandAgesRepository;
-import com.nelly.application.repository.BrandPlacesRepository;
-import com.nelly.application.repository.BrandStylesRepository;
-import com.nelly.application.repository.BrandsRepository;
+import com.nelly.application.exception.SystemException;
+import com.nelly.application.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -24,6 +22,8 @@ public class BrandDomainService {
     private final BrandStylesRepository brandStylesRepository;
     private final BrandPlacesRepository brandPlacesRepository;
     private final BrandAgesRepository brandAgesRepository;
+    private final BrandRankRepository brandRankRepository;
+    private final UserBrandsRepository userBrandsRepository;
 
     public Brands createBrands(String name, String logoImageUrl, String description, BrandStatus status,
                                DisplayType isDisplay, String homepage, String introduceImageUrl) {
@@ -35,6 +35,7 @@ public class BrandDomainService {
                 .isDisplay(isDisplay)
                 .homepage(homepage)
                 .introduceImageUrl(introduceImageUrl)
+                .favoriteCount(0)
                 .build();
         return brandsRepository.save(brands);
     }
@@ -123,4 +124,71 @@ public class BrandDomainService {
             brandStylesRepository.save(brandStyles);
         }
     }
+
+    // app brand search
+    public Page<BrandRank> selectAppBrandRankList(PageRequest pageRequest) {
+        return brandRankRepository.findAll(pageRequest);
+    }
+
+    public Page<BrandRank> selectAppBrandRankList(List<Brands> brandList, PageRequest pageRequest) {
+        return brandRankRepository.findAllByBrandIn(brandList, pageRequest);
+    }
+
+    public List<Brands> selectAppBrandRankList() {
+        // paging 없음.
+        return brandsRepository.findAll();
+    }
+
+
+    public List<UserBrands> selectAppUserBrandList(Long userId, List<Long> brandIdList) {
+        return userBrandsRepository.findAllByUserIdAndBrandIdIn(userId, brandIdList);
+    }
+
+    public Optional<UserBrands> selectAppUserBrand(Long userId, Brands brand) {
+        return userBrandsRepository.findByUserIdAndBrand(userId, brand);
+    }
+
+    public Optional<UserBrands> selectUserBrand(Long brandId, Long userId) {
+        return  userBrandsRepository.findByBrandIdAndUserId(brandId, userId);
+    }
+
+    public Page<UserBrands> selectUserBrandList(Long userId, Integer page, Integer size) {
+        PageRequest pageRequest = PageRequest.of(page, size, Sort.by("brandName").ascending());
+        return userBrandsRepository.findAllByUserId(userId, pageRequest);
+    }
+
+
+    public void createUserBrand(Brands brand, Long userId) {
+        UserBrands userBrands = UserBrands.builder().userId(userId).brand(brand).build();
+        userBrandsRepository.save(userBrands);
+    }
+
+    public void deleteUserBrand(UserBrands userBrand) {
+        userBrandsRepository.delete(userBrand);
+    }
+
+    public void updateBrandFavoriteCount(Long brandId, int value) {
+        brandsRepository.updateBrandFavoriteCount(brandId, value);
+    }
+
+    public List<BrandStyles> selectBrandStyles(List<StyleType> styleTypeList) {
+        return brandStylesRepository.findAllByBrandStyleIn(styleTypeList);
+    }
+
+    public List<BrandAges> selectBrandAges(List<AgeType> ageTypeList) {
+        return brandAgesRepository.findAllByAgeTypeIn(ageTypeList);
+    }
+
+    public List<BrandPlaces> selectBrandPlaces(List<PlaceType> placeTypeList) {
+        return brandPlacesRepository.findAllByPlaceTypeIn(placeTypeList);
+    }
+
+    public List<Brands> selectAppBrandList() {
+        List<BrandStatus> statusList = BrandStatus.getAppBrandStatusList();
+        return brandsRepository.findAllByStatusInAndIsDisplayOrderByName(statusList, DisplayType.DISPLAY);
+    }
+
+//    public List<Brands> selectBrandList(List<BrandStyles> brandStyleList, List<BrandAges> brandAgeList) {
+//        return brandsRepository.findAllByBrandStylesIn(brandStyleList);
+//    }
 }

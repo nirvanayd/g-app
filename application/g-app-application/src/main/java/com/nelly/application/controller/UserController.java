@@ -1,9 +1,12 @@
 package com.nelly.application.controller;
 
+import com.nelly.application.domain.UserAgreements;
 import com.nelly.application.domain.Users;
+import com.nelly.application.dto.TokenInfoDto;
 import com.nelly.application.dto.request.*;
 import com.nelly.application.dto.Response;
 import com.nelly.application.dto.response.LoginResponse;
+import com.nelly.application.dto.response.UserAgreementsResponse;
 import com.nelly.application.dto.response.UserResponse;
 import com.nelly.application.enums.StyleType;
 import com.nelly.application.mail.MailSender;
@@ -14,7 +17,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 
 @RestController
@@ -34,12 +39,24 @@ public class UserController {
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody @Valid LoginRequest dto) {
-        String accessToken = userService.login(dto.getLoginId(), dto.getPassword());
-        LoginResponse data = LoginResponse.builder().accessToken(accessToken).build();
+        TokenInfoDto tokenInfoDto = userService.login(dto);
+
+        LoginResponse data = LoginResponse.builder().accessToken(tokenInfoDto.getAccessToken())
+                .refreshToken(tokenInfoDto.getRefreshToken()).build();
         return response.success(data);
     }
 
-    @GetMapping("/logout")
+    @PostMapping("/reissue")
+    public ResponseEntity<?> userTest(@RequestBody ReissueRequest requestDto) {
+        TokenInfoDto tokenInfoDto = userService.reissue(requestDto);
+        LoginResponse data = LoginResponse.builder()
+                .accessToken(tokenInfoDto.getAccessToken())
+                .refreshToken(tokenInfoDto.getRefreshToken())
+                .build();
+        return response.success(data);
+    }
+
+    @GetMapping("/users/logout")
     public ResponseEntity<?> logout(@RequestHeader("Authorization") String bearerToken ) {
         String token = userService.getToken(bearerToken);
         userService.logout(token);
@@ -54,7 +71,14 @@ public class UserController {
     @GetMapping("/users")
     public ResponseEntity<?> getUser() {
         Users users = userService.getUser();
+        List<UserAgreements> list = userService.getAppUserAgreements(users);
         UserResponse userResponse = modelMapper.map(users, UserResponse.class);
+
+        List<UserAgreementsResponse> userAgreementList =
+                list.stream().map(l -> modelMapper.map(l, UserAgreementsResponse.class)).collect(Collectors.toList());
+
+        userResponse.setUserAgreements(userAgreementList);
+
         return response.success(userResponse);
     }
 
@@ -76,7 +100,6 @@ public class UserController {
 
     @PutMapping("/users")
     public ResponseEntity<?> updateUser(@RequestBody @Valid UpdateUserRequest dto) {
-
         return response.success("debug...");
     }
 
@@ -118,6 +141,42 @@ public class UserController {
     @PostMapping("/reset-password")
     public ResponseEntity<?> resetPassword(@RequestBody @Valid ResetPasswordRequest dto) {
         userService.resetPassword(dto.getEmail());
+        return response.success();
+    }
+
+    @PostMapping("/users/password")
+    public ResponseEntity<?> updatePassword(@RequestBody @Valid UpdatePasswordRequest dto) {
+        Optional<Users> user = userService.getAppUser();
+        if (user.isEmpty()) throw new RuntimeException("사용자 정보를 조회할 수 없습니다.");
+        userService.updatePassword(user.get(), dto);
+
+        return response.success();
+    }
+
+    @PostMapping("/users/email")
+    public ResponseEntity<?> updateEmail(@RequestBody @Valid UpdateEmailRequest dto) {
+        Optional<Users> user = userService.getAppUser();
+        if (user.isEmpty()) throw new RuntimeException("사용자 정보를 조회할 수 없습니다.");
+        userService.updateEmail(user.get(), dto);
+        return response.success();
+    }
+
+    @PostMapping("/users/agreement")
+    public ResponseEntity<?> updateAgreement(@RequestBody @Valid UpdateAgreementRequest dto) {
+        Optional<Users> user = userService.getAppUser();
+        if (user.isEmpty()) throw new RuntimeException("사용자 정보를 조회할 수 없습니다.");
+        userService.updateAgreement(user.get(), dto);
+        return response.success();
+    }
+
+    /**
+     * 사용자 스타일 변경
+     * */
+    @PutMapping("/users/styles")
+    public ResponseEntity<?> updateUserStyle(@RequestBody @Valid UpdateUserStyleRequest dto) {
+        Optional<Users> user = userService.getAppUser();
+        if (user.isEmpty()) throw new RuntimeException("사용자 정보를 조회할 수 없습니다.");
+        userService.updateUserStyle(user.get(), dto);
         return response.success();
     }
 }

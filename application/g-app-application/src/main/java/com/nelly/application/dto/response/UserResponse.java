@@ -1,5 +1,6 @@
 package com.nelly.application.dto.response;
 
+import com.nelly.application.domain.UserAgreements;
 import com.nelly.application.enums.UserStatus;
 import lombok.Data;
 
@@ -23,6 +24,7 @@ public class UserResponse {
     private LocalDateTime joinedDate;
     private LocalDateTime leaveDate;
     private List<UserStylesResponse> userStyles;
+    private List<UserAgreementsResponse> userAgreements;
 
     public void setStatus(UserStatus userStatus) {
         this.status = userStatus;

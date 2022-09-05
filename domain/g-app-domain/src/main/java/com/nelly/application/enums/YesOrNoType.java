@@ -1,6 +1,5 @@
 package com.nelly.application.enums;
 
-import com.nelly.application.enums.enumInterface.CommonEnums;
 import com.nelly.application.enums.enumInterface.CommonStringCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -12,7 +11,7 @@ import java.util.Arrays;
 public enum YesOrNoType implements CommonStringCode {
     YES("Y", "예"),
     NO("N", "아니오"),
-    EMPTY(null, "");
+    EMPTY("", "");
 
     private final String code;
     private final String desc;

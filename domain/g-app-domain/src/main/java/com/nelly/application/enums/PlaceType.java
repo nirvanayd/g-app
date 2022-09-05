@@ -6,6 +6,9 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Getter
@@ -25,5 +28,10 @@ public enum PlaceType implements CommonStringCode {
 
     public static PlaceType getPlaceType(String code) {
         return Arrays.stream(PlaceType.values()).filter(c -> c.code.equals(code)).findFirst().orElse(EMPTY);
+    }
+
+    public static List<PlaceType> getPlaceList(List<String> codeList) {
+        if (codeList == null || codeList.isEmpty()) return Collections.emptyList();
+        return Arrays.stream(PlaceType.values()).filter(c -> c.code != null & codeList.contains(c.code)).collect(Collectors.toList());
     }
 }

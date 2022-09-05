@@ -2,23 +2,22 @@ package com.nelly.application.enums;
 
 import com.nelly.application.enums.enumInterface.CommonEnums;
 import com.nelly.application.enums.enumInterface.CommonStringCode;
+import dto.EnumStringCodeValue;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Getter
 public enum AgeType implements CommonStringCode {
-    EARLY_20("20E", "20대 초반"),
-    MID_20("20M", "20대 중반"),
-    LATE_20("20L", "20대 후반"),
-    EARLY_30("30E", "30대 후반"),
-    MID_30("30M", "30대 후반"),
-    LATE_30("30L", "30대 후반"),
-    EARLY_40("40E", "40대 후반"),
-    MID_40("40M", "40대 후반"),
-    LATE_40("40L", "40대 후반"),
+    AGE_20("20", "20대"),
+    AGE_30("30", "30대"),
+    AGE_40("40", "40대"),
+    AGE_50("50", "50대"),
     ETC("etc", "기타"),
     EMPTY(null, "");
 
@@ -31,5 +30,14 @@ public enum AgeType implements CommonStringCode {
 
     public static AgeType getAgeType(String code) {
         return Arrays.stream(AgeType.values()).filter(c -> c.code.equals(code)).findFirst().orElse(EMPTY);
+    }
+
+    public static List<EnumStringCodeValue> getAgeList() {
+        return Arrays.stream(AgeType.values()).filter(c -> c.code != null).map(EnumStringCodeValue::new).collect(Collectors.toList());
+    }
+
+    public static List<AgeType> getAgeList(List<String> codeList) {
+        if (codeList == null || codeList.isEmpty()) return Collections.emptyList();
+        return Arrays.stream(AgeType.values()).filter(c -> c.code != null & codeList.contains(c.code)).collect(Collectors.toList());
     }
 }

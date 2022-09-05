@@ -3,14 +3,17 @@ package com.nelly.application.exception.handler;
 import com.nelly.application.dto.Response;
 import com.nelly.application.exception.AccessDeniedException;
 import com.nelly.application.exception.AuthenticationException;
+import com.nelly.application.exception.ExpireTokenException;
 import com.nelly.application.exception.SystemException;
 import com.nelly.application.exception.enums.ExceptionCode;
 import io.jsonwebtoken.ExpiredJwtException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.tomcat.util.http.fileupload.impl.FileSizeLimitExceededException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 
 @RestControllerAdvice
 @RequiredArgsConstructor
@@ -18,6 +21,13 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 public class GAppExceptionHandler {
 
     private final Response response;
+
+    @ExceptionHandler(ExpireTokenException.class)
+    public ResponseEntity<?> handleExpireTokenException() {
+        log.info(">>> AuthenticationException");
+        ExceptionCode exceptionCode = ExceptionCode.EXPIRED_TOKEN_EXCEPTION;
+        return response.fail(exceptionCode.getCode(), exceptionCode.getMessage(), exceptionCode.getStatus());
+    }
 
     @ExceptionHandler(AccessDeniedException.class)
     public ResponseEntity<?> handleAccessDeniedException() {
@@ -31,6 +41,18 @@ public class GAppExceptionHandler {
         log.info(">>> AuthenticationException");
         ExceptionCode exceptionCode = ExceptionCode.ACCESS_DENIED_EXCEPTION;
         return response.fail(exceptionCode.getCode(), exceptionCode.getMessage(), exceptionCode.getStatus());
+    }
+
+    @ExceptionHandler(MaxUploadSizeExceededException.class)
+    public ResponseEntity<?> handleMaxUploadSizeExceededException(MaxUploadSizeExceededException exception) {
+        ExceptionCode exceptionCode = ExceptionCode.SYSTEM_EXCEPTION;
+        return response.fail(exceptionCode.getCode(), exception.getMessage(), exceptionCode.getStatus());
+    }
+
+    @ExceptionHandler(FileSizeLimitExceededException.class)
+    public ResponseEntity<?> handleFileSizeLimitExceededException(FileSizeLimitExceededException exception) {
+        ExceptionCode exceptionCode = ExceptionCode.SYSTEM_EXCEPTION;
+        return response.fail(exceptionCode.getCode(), exception.getMessage(), exceptionCode.getStatus());
     }
 
     @ExceptionHandler(SystemException.class)

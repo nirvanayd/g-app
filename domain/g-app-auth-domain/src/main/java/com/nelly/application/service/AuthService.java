@@ -4,10 +4,12 @@ import com.nelly.application.domain.AppAuthentication;
 import com.nelly.application.dto.TokenInfoDto;
 import com.nelly.application.enums.Authority;
 import com.nelly.application.exception.AccessDeniedException;
+import com.nelly.application.exception.SystemException;
 import com.nelly.application.jwt.TokenProvider;
 import com.nelly.application.repository.AuthRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
@@ -62,24 +64,28 @@ public class AuthService {
 
         // 2. 실제 검증 (사용자 비밀번호 체크)이 이루어지는 부분
         // authenticate 매서드가 실행될 때 CustomUserDetailsService 에서 만든 loadUserByUsername 메서드가 실행
-        Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
+        try {
+            Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
 
-        TokenInfoDto tokenInfoDto = tokenProvider.generateToken(authentication);
+            TokenInfoDto tokenInfoDto = tokenProvider.generateToken(authentication);
 
-        // 3. refresh 토큰 DB 업데이트.
-        AppAuthentication auth = authRepository.findByLoginId(loginId).orElse(null);
+            // 3. refresh 토큰 DB 업데이트.
+            AppAuthentication auth = authRepository.findByLoginId(loginId).orElse(null);
 
-        if (auth == null) {
-            throw new RuntimeException("아이디를 찾을 수 없습니다.");
+            if (auth == null) {
+                throw new RuntimeException("아이디를 찾을 수 없습니다.");
+            }
+
+            auth.getRoles().stream().filter(c -> c.equals(role)).findFirst().orElseThrow(()->new AccessDeniedException("접근 권한이 없습니다."));
+
+            auth.setRt(tokenInfoDto.getRefreshToken());
+            authRepository.save(auth);
+
+            tokenInfoDto.setAuthId(auth.getId());
+            return tokenInfoDto;
+        } catch (BadCredentialsException be) {
+            throw new RuntimeException("아이디 또는 비밀번호가 일치하지 않습니다.");
         }
-
-        auth.getRoles().stream().filter(c -> c.equals(role)).findFirst().orElseThrow(()->new AccessDeniedException("접근 권한이 없습니다."));
-
-        auth.setRt(tokenInfoDto.getRefreshToken());
-        authRepository.save(auth);
-
-        tokenInfoDto.setAuthId(auth.getId());
-        return tokenInfoDto;
     }
 
     public TokenInfoDto getAppAuthentication(String token) {
@@ -102,6 +108,8 @@ public class AuthService {
         if(!tokenProvider.validateToken(refreshToken)) {
             log.info("##### validate fail");
         }
+
+
         Authentication authentication = tokenProvider.getAuthentication(accessToken);
         AppAuthentication auth = findByLoginId(authentication.getName());
 
@@ -126,6 +134,13 @@ public class AuthService {
         return auth.getId();
     }
 
+    public Long getAppAuthenticationId() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        AppAuthentication auth = findByLoginId(authentication.getName());
+        if (auth == null) return null;
+        return auth.getId();
+    }
+
     public void resetPassword(String loginId, String password) {
         AppAuthentication auth = authRepository.findByLoginId(loginId).orElse(null);
         if (auth == null) {
@@ -136,5 +151,17 @@ public class AuthService {
         SecurityContextHolder.clearContext();
     }
 
+    public void checkAppUserPassword(String loginId, String password, String role) {
+        UsernamePasswordAuthenticationToken authenticationToken =
+                new UsernamePasswordAuthenticationToken(loginId, password);
+        try {
+            Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
+        } catch (BadCredentialsException be) {
+            throw new SystemException("사용자 정보를 조회할 수 없습니다.");
+        }
+    }
 
+    public Long getExpiration(String accessToken) {
+        return tokenProvider.getExpiration(accessToken);
+    }
 }

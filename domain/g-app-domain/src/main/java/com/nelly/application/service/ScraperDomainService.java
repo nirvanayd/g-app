@@ -19,6 +19,7 @@ public class ScraperDomainService {
     private final ScrapItemsRepository scrapItemsRepository;
     private final ScrapItemImagesRepository scrapItemImagesRepository;
     private final ScraperLogRepository scraperLogRepository;
+    private final ScraperRequestRepository scraperRequestRepository;
 
 
     public List<ScraperBrandDetails> selectScraperBrandDetail(String host) {
@@ -84,5 +85,13 @@ public class ScraperDomainService {
         log.setResultCode(resultCode);
 
         scraperLogRepository.save(log);
+    }
+
+    public void createScraperRequest(String url, Long userId) {
+        ScraperRequest scraperRequest = ScraperRequest.builder()
+                .targetUrl(url)
+                .userId(userId)
+                .build();
+        scraperRequestRepository.save(scraperRequest);
     }
 }

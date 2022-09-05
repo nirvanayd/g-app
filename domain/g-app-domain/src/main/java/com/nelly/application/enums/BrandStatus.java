@@ -36,4 +36,8 @@ public enum BrandStatus implements CommonStringCode {
     public static List<EnumStringCodeValue> getBrandStatusList() {
         return Arrays.stream(BrandStatus.values()).filter(c -> c.code != null).map(EnumStringCodeValue::new).collect(Collectors.toList());
     }
+
+    public static List<BrandStatus> getAppBrandStatusList() {
+        return Arrays.stream(BrandStatus.values()).filter(c -> c.code != null && c.getCode().equals(NORMAL.getCode())).collect(Collectors.toList());
+    }
 }

@@ -1,8 +1,6 @@
 package com.nelly.application.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.nelly.application.domain.BrandHashTags;
-import com.nelly.application.domain.ContentImages;
 import com.nelly.application.domain.Users;
 import com.nelly.application.enums.YesOrNoType;
 import lombok.Data;

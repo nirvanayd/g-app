@@ -1,7 +1,10 @@
 package com.nelly.application.service.user;
 
+import com.nelly.application.domain.UserAgreements;
+import com.nelly.application.domain.UserNotificationTokens;
+import com.nelly.application.domain.UserStyles;
 import com.nelly.application.domain.Users;
-import com.nelly.application.dto.request.SignUpRequest;
+import com.nelly.application.dto.request.*;
 import com.nelly.application.dto.TokenInfoDto;
 import com.nelly.application.enums.Authority;
 import com.nelly.application.enums.RoleType;
@@ -12,6 +15,8 @@ import com.nelly.application.util.CacheTemplate;
 import com.nelly.application.util.EncryptUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
 import java.util.List;
@@ -32,25 +37,54 @@ public class UserService {
     private static final String BEARER_TYPE = "Bearer";
 
 
+    @Transactional
     public void signUp(SignUpRequest dto) {
-        if(authService.findByLoginId(dto.getLoginId()) != null) throw new RuntimeException("사용 중인 아이디입니다.");
+        if (authService.findByLoginId(dto.getLoginId()) != null) throw new RuntimeException("사용 중인 아이디입니다.");
+        if (userDomainService.existEmail(dto.getEmail())) throw new RuntimeException("사용 중인 이메일입니다.");
         // 비밀번호 암호화
         String encryptPassword = encryptUtils.encrypt(dto.getPassword());
+        // 마케팅 수신동의
         Long authId = authService.signUp(dto.getLoginId(), encryptPassword);
         if (authId == null) throw new RuntimeException("회원가입 중 오류가 발생하였습니다.");
-        Users user = userDomainService.addUser(authId, dto.getLoginId(), dto.getEmail(), dto.getBirth(),
-                Authority.ROLE_USER);
+        Users user = userDomainService.addUser(authId, dto.getLoginId(), dto.getEmail(), dto.getBirth(), Authority.ROLE_USER);
+
+        addUserAgreement(user, dto.getAgreementList());
 
         userDomainService.addUserStyle(user, dto.getUserStyle());
+        userDomainService.addUserMarketingType(user, dto.getUserMarketingType());
     }
 
-    public String login(String loginId, String password) {
+    @Transactional
+    public TokenInfoDto login(LoginRequest request) {
+
+        String loginId = request.getLoginId();
+        String password = request.getPassword();
+
         TokenInfoDto tokenInfoDto = authService.login(loginId, password, RoleType.USER.getCode());
+
+        if (request.getFcmToken() != null) {
+            Optional<Users> users = userDomainService.selectAppUsers(tokenInfoDto.getAuthId());
+            users.ifPresent(value -> createUserFcmToken(value, request.getFcmToken()));
+        }
+
+        // 해당 authId의 토큰은 로그아웃처리.
+        String existToken = cacheTemplate.getValue(String.valueOf(tokenInfoDto.getAuthId()), "accessToken");
+        if (existToken != null) {
+            try {
+                Long expireTime = authService.getExpiration(existToken);
+                cacheTemplate.putValue(existToken, "logout", expireTime, TimeUnit.MILLISECONDS);
+            } catch (Exception e) {}
+        }
+
         // redis 저장
         cacheTemplate.putValue(String.valueOf(tokenInfoDto.getAuthId()), tokenInfoDto.getRefreshToken(), "token",
                 tokenInfoDto.getRefreshTokenExpirationTime(), TimeUnit.MILLISECONDS);
+
+        cacheTemplate.putValue(String.valueOf(tokenInfoDto.getAuthId()), tokenInfoDto.getAccessToken(), "accessToken",
+                tokenInfoDto.getRefreshTokenExpirationTime(), TimeUnit.MILLISECONDS);
+
         // return
-        return tokenInfoDto.getAccessToken();
+        return tokenInfoDto;
     }
 
     public String getToken(String bearerToken) {
@@ -83,6 +117,16 @@ public class UserService {
         // 회원정보 조회
         // 추후 캐시로 전환
         return userDomainService.getUsers(authId);
+    }
+
+    /**
+     * Optional<Users>
+     * @return
+     */
+    public Optional<Users> getAppUser() {
+        Long authId = authService.getAppAuthenticationId();
+        if (authId == null) return Optional.empty();
+        return userDomainService.selectAppUsers(authId);
     }
 
     public Users getUser(long userId) {
@@ -140,5 +184,68 @@ public class UserService {
         String content = "회원님의 비밀번호는 <strong>" + generatedString + "</strong> 입니다.";
         String subject = "Filunaway 비밀번호 초기화 결과 =";
         mailSender.sendMail(subject, content, email);
+    }
+
+    public TokenInfoDto reissue(ReissueRequest requestDto) {
+        TokenInfoDto tokenInfoDto = authService.getExistTokenInfo(requestDto.getAccessToken(), requestDto.getRefreshToken());
+
+        // token 값 취득
+        String cacheToken = cacheTemplate.getValue(String.valueOf(tokenInfoDto.getAuthId()), "token");
+        if (!cacheToken.equals(requestDto.getRefreshToken())) {
+            throw new RuntimeException("토큰정보가 일치하지 않습니다.");
+        }
+        if (ObjectUtils.isEmpty(cacheToken)) {
+            throw new RuntimeException("잘못된 요청입니다.");
+        }
+
+        TokenInfoDto newTokenInfoDto = authService.reissue(requestDto.getAccessToken());
+        cacheTemplate.putValue(String.valueOf(newTokenInfoDto.getAuthId()), newTokenInfoDto.getRefreshToken(), "token",
+                newTokenInfoDto.getRefreshTokenExpirationTime(), TimeUnit.MILLISECONDS);
+        return newTokenInfoDto;
+    }
+
+    public void updatePassword(Users user, UpdatePasswordRequest dto) {
+        authService.checkAppUserPassword(user.getLoginId(), dto.getOldPassword(), RoleType.USER.getCode());
+
+        String encryptPassword = encryptUtils.encrypt(dto.getNewPassword());
+        authService.resetPassword(user.getLoginId(), encryptPassword);
+    }
+
+    public void updateEmail(Users user, UpdateEmailRequest dto) {
+        // 기존 이메일 일치여부
+        if (!user.getEmail().equals(dto.getOldEmail())) {
+            throw new RuntimeException("기존 이메일 정보가 일치하지 않습니다.");
+        }
+        if (userDomainService.existEmail(dto.getNewEmail())) throw new RuntimeException("사용 중인 이메일입니다.");
+        userDomainService.saveAccountEmail(user, dto.getNewEmail());
+    }
+
+    public void updateAgreement(Users user, UpdateAgreementRequest dto) {
+        userDomainService.saveUserAgreement(user.getId(), dto.getAgreementType(), dto.getUseYn());
+    }
+
+    public List<UserAgreements> getAppUserAgreements(Users user) {
+        return userDomainService.getUserAgreements(user);
+    }
+
+    public void addUserAgreement(Users user, List<UserAgreementRequest> list) {
+        list.forEach(l -> userDomainService.addUserAgreement(user, l.getAgreementType(), l.getValue()));
+    }
+
+    public UserNotificationTokens createUserFcmToken(Users user, String fcmToken) {
+        if (fcmToken == null || fcmToken.isEmpty()) return null;
+        // exist check
+        Optional<UserNotificationTokens> userTokens = userDomainService.existFcmToken(user);
+
+        // insert or update
+        if (userTokens.isPresent()) {
+            return userDomainService.saveUserToken(userTokens.get(), fcmToken);
+        }
+        return userDomainService.saveUserToken(user, fcmToken);
+    }
+
+    public void updateUserStyle(Users user, UpdateUserStyleRequest dto) {
+        List<String> userStyleList = dto.getUserStyle();
+        userDomainService.saveUserStyles(user, userStyleList);
     }
 }

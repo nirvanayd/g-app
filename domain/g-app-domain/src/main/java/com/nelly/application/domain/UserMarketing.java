@@ -2,14 +2,15 @@ package com.nelly.application.domain;
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
-import com.nelly.application.converter.HashTagTypeConverter;
+import com.nelly.application.converter.MarketingTypeConverter;
+import com.nelly.application.enums.MarketingType;
 import lombok.*;
 
 import javax.persistence.*;
 
 @Entity
 @Builder
-@Table(name = "brand_hash_tags")
+@Table(name = "user_marketing")
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
@@ -17,20 +18,19 @@ import javax.persistence.*;
 @JsonIdentityInfo(
         generator = ObjectIdGenerators.PropertyGenerator.class,
         property = "id")
-public class BrandHashTags extends BaseTime {
+public class UserMarketing extends BaseTime{
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)
     @Column(name = "id")
     private Long id;
 
-    @Column(name = "tag", nullable = false, length = 100)
-    private String tag;
+    @Convert(converter = MarketingTypeConverter.class)
+    @Column(name = "marketing_code", nullable = false, length = 50)
+    private MarketingType marketingType;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "content_id")
-    private Contents content;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "brand_id")
-    private Brands brand;
+    @JoinColumn(name = "user_id")
+    private Users user;
 }
+
+

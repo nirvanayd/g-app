@@ -10,7 +10,7 @@ spring:
     generate-ddl: true
     show-sql: true
     hibernate:
-      ddl-auto: update # update create-drop
+      ddl-auto: update # update create-drop create
     properties:
       hibernate:
         format_sql: true
@@ -29,6 +29,11 @@ spring:
   cache:
     type: redis
 
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 50MB
+
 jwt:
   header: Authorization
   secret: c2lsdmVybmluZS10ZWNoLXNwcmluZy1ib290LWp3dC10dXRvcmlhbC1zZWNyZXQtc2lsdmVybmluZS10ZWNoLXNwcmluZy1ib290LWp3dC10dXRvcmlhbC1zZWNyZXQK
@@ -41,10 +46,12 @@ cloud:
       secretKey: ++AnjnmYXBYmPtNZa15g40/nGFbKiTNZBlz4L/2I
     s3:
       bucket: g-app-resource
-      directory: local
-      cloudfront-url: 'https://d3b7cshusafhca.cloudfront.net/'
+      directory: prod
+    cloudFront:
+      default-dir: 'prod'
+      url: 'https://d3b7cshusafhca.cloudfront.net/'
       brand-dir: 'prod/brand'
-      default-image-url: 'https://d3b7cshusafhca.cloudfront.net/local/default/logo-default.png'
+      default-image-url: 'https://d3b7cshusafhca.cloudfront.net/prod/default/logo-default.png'
       content-dir: 'prod/content'
     region:
       static: ap-northeast-2

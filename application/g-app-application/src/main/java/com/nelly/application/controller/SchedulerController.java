@@ -1,5 +1,6 @@
 package com.nelly.application.controller;
 
+import com.nelly.application.service.brand.BrandService;
 import com.nelly.application.service.content.ContentService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -12,10 +13,18 @@ import org.springframework.stereotype.Component;
 public class SchedulerController {
 
     private final ContentService contentService;
+    private final BrandService brandService;
 
     @Scheduled(fixedDelay = 10000)
     public void updateContentCounts() {
         contentService.scheduleContentLikes();
         contentService.scheduleContentMarks();
     }
+
+    @Scheduled(fixedDelay = 10000)
+    public void updateFavoriteCounts() {
+        brandService.scheduleBrandFavorite();
+    }
+
+
 }

@@ -1,13 +1,8 @@
 package com.nelly.application.service;
 
-import com.nelly.application.domain.UserStyles;
-import com.nelly.application.domain.Users;
-import com.nelly.application.enums.Authority;
-import com.nelly.application.enums.RoleType;
-import com.nelly.application.enums.StyleType;
-import com.nelly.application.enums.UserStatus;
-import com.nelly.application.repository.AppUserRepository;
-import com.nelly.application.repository.UserStylesRepository;
+import com.nelly.application.domain.*;
+import com.nelly.application.enums.*;
+import com.nelly.application.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -25,6 +20,9 @@ public class UserDomainService {
 
     private final AppUserRepository userRepository;
     private final UserStylesRepository userStylesRepository;
+    private final UserMarketingTypeRepository userMarketingTypeRepository;
+    private final UserAgreementsRepository userAgreementsRepository;
+    private final UserNotificationTokensRepository userNotificationTokensRepository;
 
     public Users addUser(Long authId, String loginId, String email, String birth, Authority authority) {
         Users user = Users.builder().authId(authId)
@@ -47,8 +45,27 @@ public class UserDomainService {
         }
     }
 
+    public void addUserMarketingType(Users user, List<String> userMarketingType) {
+        Users refUser = userRepository.getById(user.getId());
+        for (String code: userMarketingType) {
+            UserMarketing userMarketing = UserMarketing.builder().marketingType(MarketingType.getMarketingType(code)).user(refUser).build();
+            userMarketingTypeRepository.save(userMarketing);
+        }
+    }
+
+
     public Users getUsers(long authId) {
         Users user = userRepository.findByAuthId(authId).orElse(null);
+        if (user == null) throw new RuntimeException("사용자를 찾을 수 없습니다.");
+        return user;
+    }
+
+    public Optional<Users> selectAppUsers(long authId) {
+        return userRepository.findByAuthId(authId);
+    }
+
+    public Users selectAccount(long userId) {
+        Users user = userRepository.findById(userId).orElse(null);
         if (user == null) throw new RuntimeException("사용자를 찾을 수 없습니다.");
         return user;
     }
@@ -78,10 +95,10 @@ public class UserDomainService {
         return userRepository.findAllByLoginIdContainsAndEmailContainsAndStatusAndRole(loginId, email, status, role, pageRequest);
     }
 
-    public Users selectAccount(long userId) {
-        Users user = userRepository.findById(userId).orElse(null);
-        if (user == null) throw new RuntimeException("사용자를 찾을 수 없습니다.");
-        return user;
+
+    public boolean existEmail(String email) {
+        Optional<Users> user = userRepository.findByEmailAndRole(email, RoleType.USER.getCode());
+        return user.isPresent();
     }
 
     public List<Users> selectAccountListByLoginId(String loginId) {
@@ -96,4 +113,60 @@ public class UserDomainService {
         return userRepository.findByEmailAndRole(email, RoleType.USER.getCode());
     }
 
+    public Users saveAccountEmail(Users user, String email) {
+        user.setEmail(email);
+        return userRepository.save(user);
+    }
+
+    public List<UserAgreements> getUserAgreements(Users user) {
+        return userAgreementsRepository.findAllByUserId(user.getId());
+    }
+
+    public void addUserAgreement(Users user, String agreementType, String value) {
+        Users refUser = userRepository.getById(user.getId());
+        UserAgreements userAgreement = UserAgreements.builder()
+                .userId(refUser.getId())
+                .useYn(value)
+                .agreementType(agreementType)
+                .build();
+        userAgreementsRepository.save(userAgreement);
+    }
+
+    public void saveUserAgreement(Long userId, String agreementType, String value) {
+        Optional<UserAgreements> userAgreements = userAgreementsRepository.findByUserIdAndAgreementType(userId, agreementType);
+        if (userAgreements.isEmpty()) return;
+        UserAgreements refUserAgreement = userAgreementsRepository.findById(userAgreements.get().getId()).orElse(null);
+        if (refUserAgreement == null) return;
+        if (value == null) return;
+        refUserAgreement.setUseYn(value);
+        userAgreementsRepository.save(refUserAgreement);
+    }
+
+    public Optional<UserNotificationTokens> existFcmToken(Users user) {
+        return userNotificationTokensRepository.findByUser(user);
+    }
+
+    public UserNotificationTokens saveUserToken(UserNotificationTokens userNotificationToken, String token) {
+        UserNotificationTokens existNotificationToken = userNotificationTokensRepository.getById(userNotificationToken.getId());
+        existNotificationToken.setFcmToken(token);
+        return userNotificationTokensRepository.save(existNotificationToken);
+    }
+
+    public UserNotificationTokens saveUserToken(Users user, String token) {
+        UserNotificationTokens userNotificationToken = UserNotificationTokens.builder()
+                .user(user)
+                .fcmToken(token)
+                .build();
+        return userNotificationTokensRepository.save(userNotificationToken);
+    }
+
+    public void saveUserStyles(Users user, List<String> styleList) {
+        List<UserStyles> existStylesList = userStylesRepository.findAllByUser(user);
+        userStylesRepository.deleteAll(existStylesList);
+
+        for (String code: styleList) {
+            UserStyles userStyles = UserStyles.builder().styleType(StyleType.getStyleType(code)).user(user).build();
+            userStylesRepository.save(userStyles);
+        }
+    }
 }

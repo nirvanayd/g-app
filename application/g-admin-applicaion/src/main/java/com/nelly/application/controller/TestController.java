@@ -1,5 +1,6 @@
 package com.nelly.application.controller;
 
+import com.nelly.application.config.AwsProperties;
 import com.nelly.application.dto.Response;
 import com.nelly.application.util.S3Uploader;
 import lombok.RequiredArgsConstructor;
@@ -21,6 +22,7 @@ public class TestController {
 
     private final Response response;
     private final S3Uploader s3Uploader;
+    private final AwsProperties awsProperties;
 
     @Value("${spring.config.activate.on-profile}")
     private String env;
@@ -46,7 +48,7 @@ public class TestController {
 
     @PostMapping("/file-upload/test")
     public ResponseEntity<?> fileUpload(@RequestParam("images") MultipartFile multipartFile) throws IOException {
-        String result = s3Uploader.upload(multipartFile, "static");
+        String result = s3Uploader.upload(awsProperties.getS3().getBucket(), multipartFile, "static");
         log.info("#####");
         log.info(result);
         return response.success();
