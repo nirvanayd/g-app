@@ -31,6 +31,8 @@ public class Brands extends BaseTime{
     private Long id;
     @Column(name = "name", nullable = false, length = 100)
     private String name;
+    @Column(name = "name_kr", nullable = true, length = 100)
+    private String nameKr;
     @Column(name = "logo_image_url", nullable = true, length = 500)
     private String logoImageUrl;
     @Column(name = "description", nullable = true, columnDefinition = "TEXT")

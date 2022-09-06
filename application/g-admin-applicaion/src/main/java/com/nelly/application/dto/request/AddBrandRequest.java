@@ -16,6 +16,7 @@ public class AddBrandRequest {
     private Long id;
     @NotEmpty(message = "이름은 필수값입니다.")
     private String name;
+    private String namekr;
     private String description;
     private String status;
     private Integer isDisplay;
