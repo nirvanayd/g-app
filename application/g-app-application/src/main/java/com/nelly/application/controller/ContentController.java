@@ -4,10 +4,7 @@ import com.nelly.application.domain.Comments;
 import com.nelly.application.domain.Contents;
 import com.nelly.application.dto.Response;
 import com.nelly.application.dto.request.*;
-import com.nelly.application.dto.response.AddContentImageResponse;
-import com.nelly.application.dto.response.CommentResponse;
-import com.nelly.application.dto.response.ContentResponse;
-import com.nelly.application.dto.response.GetContentListResponse;
+import com.nelly.application.dto.response.*;
 import com.nelly.application.service.content.ContentService;
 import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -38,8 +35,12 @@ public class ContentController {
 
     @PostMapping("/contents")
     public ResponseEntity<?> addContent(@RequestBody AddContentRequest dto) {
-        contentService.addContent(dto);
-        return response.success();
+        Contents content = contentService.addContent(dto);
+
+        AddContentResponse addContentResponse = new AddContentResponse();
+        addContentResponse.setId(content.getId());
+
+        return response.success(addContentResponse);
     }
 
     @PutMapping("/contents/{id}")

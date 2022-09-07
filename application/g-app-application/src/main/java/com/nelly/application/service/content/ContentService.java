@@ -42,7 +42,7 @@ public class ContentService {
     private static final String DIRECTORY_SEPARATOR = "/";
 
     @Transactional
-    public void addContent(AddContentRequest dto) {
+    public Contents addContent(AddContentRequest dto) {
         Users user = userService.getUser();
 
         Contents content = contentDomainService.createContent(user, dto.getText());
@@ -86,6 +86,7 @@ public class ContentService {
             }
             contentDomainService.createContentHashTag(content, appTag, s);
         }
+        return content;
     }
 
     /**
