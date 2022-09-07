@@ -40,8 +40,6 @@ public class ContentController {
         return response.success(createdContent);
     }
 
-
-
     @PutMapping("/contents/{id}")
     public ResponseEntity<?> updateContent(@NotBlank @PathVariable("id") String id,
                                            @RequestBody UpdateContentRequest dto) {

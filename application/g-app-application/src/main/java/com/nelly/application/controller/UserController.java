@@ -12,6 +12,7 @@ import com.nelly.application.enums.StyleType;
 import com.nelly.application.mail.MailSender;
 import com.nelly.application.service.user.UserService;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -24,6 +25,7 @@ import java.util.stream.Collectors;
 
 @RestController
 @AllArgsConstructor
+@Slf4j
 public class UserController {
 
     private final UserService userService;
@@ -41,6 +43,9 @@ public class UserController {
     public ResponseEntity<?> login(@RequestBody @Valid LoginRequest dto) {
         TokenInfoDto tokenInfoDto = userService.login(dto);
 
+        log.info("access token --> " + tokenInfoDto.getAccessToken());
+        log.info("refresh token --> " + tokenInfoDto.getRefreshToken());
+
         LoginResponse data = LoginResponse.builder().accessToken(tokenInfoDto.getAccessToken())
                 .refreshToken(tokenInfoDto.getRefreshToken()).build();
         return response.success(data);
@@ -48,6 +53,8 @@ public class UserController {
 
     @PostMapping("/reissue")
     public ResponseEntity<?> userTest(@RequestBody ReissueRequest requestDto) {
+        log.info("access token --> " + requestDto.getAccessToken());
+        log.info("refresh token --> " + requestDto.getRefreshToken());
         TokenInfoDto tokenInfoDto = userService.reissue(requestDto);
         LoginResponse data = LoginResponse.builder()
                 .accessToken(tokenInfoDto.getAccessToken())
