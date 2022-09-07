@@ -60,6 +60,10 @@ public class UserController {
                 .accessToken(tokenInfoDto.getAccessToken())
                 .refreshToken(tokenInfoDto.getRefreshToken())
                 .build();
+
+        log.info("response access token --> " + tokenInfoDto.getAccessToken());
+        log.info("response refresh token --> " + tokenInfoDto.getRefreshToken());
+
         return response.success(data);
     }
 
