@@ -24,6 +24,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.persistence.EntityManager;
+import javax.swing.text.html.Option;
 import java.io.IOException;
 import java.util.*;
 import java.util.regex.Matcher;
@@ -39,6 +41,7 @@ public class ContentService {
     private final UserService userService;
     private final BrandService brandService;
     private final ContentDomainService contentDomainService;
+    private final EntityManager entityManager;
     private static final String DIRECTORY_SEPARATOR = "/";
 
     @Transactional
@@ -86,6 +89,7 @@ public class ContentService {
             }
             contentDomainService.createContentHashTag(content, appTag, s);
         }
+        contentDomainService.saveContent(content);
         return content;
     }
 
@@ -165,6 +169,16 @@ public class ContentService {
             throw new RuntimeException("이미 삭제된 컨텐츠입니다.");
         }
         contentDomainService.removeContent(contentId);
+    }
+
+    public ContentResponse getContent(Long id) {
+        entityManager.clear();
+        Optional<Contents> selectContent = contentDomainService.selectContent(id);
+        if (selectContent.isEmpty()) throw new SystemException("게시글이 정상적으로 등록되지 않았습니다.");
+        Contents content = selectContent.get();
+
+        ContentResponse response = new ContentResponse();
+        return response.toDto(content);
     }
 
     @Transactional

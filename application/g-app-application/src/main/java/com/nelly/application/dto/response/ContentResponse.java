@@ -26,8 +26,12 @@ public class ContentResponse {
     private String createdAt;
 
     public List<ContentResponse> toDtoList(List<Contents> contentList) {
+        return contentList.stream().map(this::toDto).collect(Collectors.toList());
+    }
+
+    public ContentResponse toDto(Contents c) {
         ContentMemberResponse memberResponse = new ContentMemberResponse();
-        return contentList.stream().map(c -> ContentResponse.builder().
+        return ContentResponse.builder().
                 id(c.getId()).
                 text(c.getContentText()).
                 likeCount(c.getLikeCount()).
@@ -43,6 +47,6 @@ public class ContentResponse {
                                 build()).collect(Collectors.toList())).
                         build()).collect(Collectors.toList())).
                 member(memberResponse.contentUserToResponse(c.getUser())).
-                build()).collect(Collectors.toList());
+                build();
     }
 }

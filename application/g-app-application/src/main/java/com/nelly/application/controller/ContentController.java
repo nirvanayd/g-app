@@ -36,12 +36,11 @@ public class ContentController {
     @PostMapping("/contents")
     public ResponseEntity<?> addContent(@RequestBody AddContentRequest dto) {
         Contents content = contentService.addContent(dto);
-
-        AddContentResponse addContentResponse = new AddContentResponse();
-        addContentResponse.setId(content.getId());
-
-        return response.success(addContentResponse);
+        ContentResponse createdContent = contentService.getContent(content.getId());
+        return response.success(createdContent);
     }
+
+
 
     @PutMapping("/contents/{id}")
     public ResponseEntity<?> updateContent(@NotBlank @PathVariable("id") String id,

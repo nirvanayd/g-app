@@ -85,6 +85,10 @@ public class ContentDomainService {
         return contentsRepository.findById(id);
     }
 
+    public Optional<Contents> selectContent(Long id, boolean flush) {
+        return contentsRepository.findById(id);
+    }
+
     public void removeContent(Long contentId) {
         contentsRepository.deleteById(contentId);
     }
