@@ -1,6 +1,7 @@
 package com.nelly.application.service;
 
 import com.nelly.application.domain.*;
+import com.nelly.application.enums.DeleteStatus;
 import com.nelly.application.enums.YesOrNoType;
 import com.nelly.application.repository.*;
 import lombok.RequiredArgsConstructor;
@@ -9,6 +10,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -187,6 +189,7 @@ public class ContentDomainService {
                 content(content).
                 user(user).
                 comment(text).
+                status(DeleteStatus.NORMAL).
                 parent(parentComment).build();
         commentsRepository.save(comment);
     }
@@ -199,5 +202,11 @@ public class ContentDomainService {
     public Page<Comments> selectCommentList(Contents content, Integer page, Integer size) {
         PageRequest pageRequest = PageRequest.of(page, size, Sort.by("id").descending());
         return commentsRepository.findAllByContentAndParentNull(content, pageRequest);
+    }
+
+    public void saveCommentDelete(DeleteStatus status, Comments comment) {
+        comment.setStatus(status);
+        comment.setDeletedDate(LocalDateTime.now());
+        commentsRepository.save(comment);
     }
 }

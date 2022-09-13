@@ -8,6 +8,8 @@ import com.nelly.application.dto.request.*;
 import com.nelly.application.dto.response.AddContentImageResponse;
 import com.nelly.application.dto.response.CommentResponse;
 import com.nelly.application.dto.response.ContentResponse;
+import com.nelly.application.enums.DeleteStatus;
+import com.nelly.application.enums.RoleType;
 import com.nelly.application.enums.YesOrNoType;
 import com.nelly.application.exception.SystemException;
 import com.nelly.application.service.ContentDomainService;
@@ -210,12 +212,15 @@ public class ContentService {
         if (contents.getUser().getId().equals(user.getId())) {
             throw new RuntimeException("작성자가 본인입니다.");
         }
+        ContentLikes contentLike =
+                contentDomainService.selectContentLike(dto.getContentId(), user.getId()).orElse(null);
 
         if (YesOrNoType.YES.getCode().equals(dto.getLikeYn())) {
-            contentDomainService.createContentLike(dto.getContentId(), user.getId());
-            cacheTemplate.incrValue(String.valueOf(dto.getContentId()), "like");
+            if (contentLike == null){
+                contentDomainService.createContentLike(dto.getContentId(), user.getId());
+                cacheTemplate.incrValue(String.valueOf(dto.getContentId()), "like");
+            }
         } else if (YesOrNoType.NO.getCode().equals(dto.getLikeYn())) {
-            ContentLikes contentLike = contentDomainService.selectContentLike(dto.getContentId(), user.getId()).orElse(null);
             if (contentLike != null) {
                 contentDomainService.deleteContentLike(contentLike.getId());
                 cacheTemplate.decrValue(String.valueOf(dto.getContentId()), "like");
@@ -226,19 +231,21 @@ public class ContentService {
     public void saveContentMark(SaveMarkRequest dto) {
         // get user id
         Users user = userService.getUser();
-
         Contents contents = contentDomainService.selectContent(dto.getContentId())
                 .orElseThrow(() -> new RuntimeException("컨텐츠를 조회할 수 없습니다."));
 
         if (contents.getUser().getId().equals(user.getId())) {
             throw new RuntimeException("작성자가 본인입니다.");
         }
+        ContentMarks contentMark =
+                contentDomainService.selectContentMark(dto.getContentId(), user.getId()).orElse(null);
 
         if (YesOrNoType.YES.getCode().equals(dto.getMarkYn())) {
-            contentDomainService.createContentMark(dto.getContentId(), user.getId());
-            cacheTemplate.incrValue(String.valueOf(dto.getContentId()), "mark");
+            if (contentMark == null) {
+                contentDomainService.createContentMark(dto.getContentId(), user.getId());
+                cacheTemplate.incrValue(String.valueOf(dto.getContentId()), "mark");
+            }
         } else if (YesOrNoType.NO.getCode().equals(dto.getMarkYn())) {
-            ContentMarks contentMark = contentDomainService.selectContentMark(dto.getContentId(), user.getId()).orElse(null);
             if (contentMark != null) {
                 contentDomainService.deleteContentMark(contentMark.getId());
                 cacheTemplate.decrValue(String.valueOf(dto.getContentId()), "mark");
@@ -311,6 +318,25 @@ public class ContentService {
         if (selectExistComment.isEmpty()) throw new SystemException("댓글 정보를 조회할 수 없습니다.");
         Comments existComment = selectExistComment.get();
         contentDomainService.saveComment(existComment, dto.getComment());
+    }
+
+    public void removeComment(Long id) {
+        Users user = userService.getUser();
+        Optional<Comments> selectComment = contentDomainService.selectComment(id);
+        // 관리자, 원글 작성자, 댓글 작성자 삭제 가능
+        if (selectComment.isEmpty()) {
+            throw new SystemException("댓글 정보를 조회활 수 없습니다.");
+        }
+        Comments comment = selectComment.get();
+        Contents content = comment.getContent();
+
+        if (comment.getUser().equals(user)) {
+            contentDomainService.saveCommentDelete(DeleteStatus.WRITER, comment);
+        } else if (content.getUser().equals(user)) {
+            contentDomainService.saveCommentDelete(DeleteStatus.CONTENT_WRITER, comment);
+        } else {
+            throw new SystemException("삭제 권한이 없습니다.");
+        }
     }
 
     public List<CommentResponse> getCommentList(Long contentId, GetCommentListRequest dto) {

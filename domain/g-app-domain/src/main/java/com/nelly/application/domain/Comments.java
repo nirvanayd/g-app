@@ -2,7 +2,10 @@ package com.nelly.application.domain;
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+import com.nelly.application.converter.AgeTypeConverter;
+import com.nelly.application.converter.DeleteStatusConverter;
 import com.nelly.application.converter.YesOrNoTypeConverter;
+import com.nelly.application.enums.DeleteStatus;
 import com.nelly.application.enums.YesOrNoType;
 import lombok.*;
 import org.hibernate.annotations.SQLDelete;
@@ -54,4 +57,8 @@ public class Comments extends BaseTime {
 
     @Column(name = "deleted_date")
     private LocalDateTime deletedDate;
+
+    @Convert(converter = DeleteStatusConverter.class)
+    @Column(name = "status")
+    private DeleteStatus status;
 }

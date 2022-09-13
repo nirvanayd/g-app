@@ -88,6 +88,13 @@ public class ContentController {
         return response.success();
     }
 
+    @DeleteMapping("/comments/{id}")
+    public ResponseEntity<?> removeComment(@NotBlank @PathVariable("id") String id) {
+        Long commentId = Long.parseLong(id);
+        contentService.removeComment(commentId);
+        return response.success();
+    }
+
     @GetMapping("/comments/{contentId}")
     public ResponseEntity<?> getContentCommentList(@NotBlank @PathVariable("contentId") String id,
                                            GetCommentListRequest dto

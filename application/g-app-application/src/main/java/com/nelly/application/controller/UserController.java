@@ -53,16 +53,16 @@ public class UserController {
 
     @PostMapping("/reissue")
     public ResponseEntity<?> userTest(@RequestBody ReissueRequest requestDto) {
-        log.info("access token --> " + requestDto.getAccessToken());
-        log.info("refresh token --> " + requestDto.getRefreshToken());
+        log.info("reissue/access token --> " + requestDto.getAccessToken());
+        log.info("reissue/refresh token --> " + requestDto.getRefreshToken());
         TokenInfoDto tokenInfoDto = userService.reissue(requestDto);
         LoginResponse data = LoginResponse.builder()
                 .accessToken(tokenInfoDto.getAccessToken())
                 .refreshToken(tokenInfoDto.getRefreshToken())
                 .build();
 
-        log.info("response access token --> " + tokenInfoDto.getAccessToken());
-        log.info("response refresh token --> " + tokenInfoDto.getRefreshToken());
+        log.info("reissue/response access token --> " + tokenInfoDto.getAccessToken());
+        log.info("reissue/response refresh token --> " + tokenInfoDto.getRefreshToken());
 
         return response.success(data);
     }
