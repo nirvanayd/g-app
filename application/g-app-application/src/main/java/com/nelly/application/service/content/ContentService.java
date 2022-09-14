@@ -9,6 +9,7 @@ import com.nelly.application.dto.response.*;
 import com.nelly.application.enums.DeleteStatus;
 import com.nelly.application.enums.RoleType;
 import com.nelly.application.enums.YesOrNoType;
+import com.nelly.application.exception.NoContentException;
 import com.nelly.application.exception.SystemException;
 import com.nelly.application.service.ContentDomainService;
 import com.nelly.application.service.brand.BrandService;
@@ -282,6 +283,10 @@ public class ContentService {
     public List<ContentResponse> getContentList(GetContentListRequest dto) {
         Page<Contents> contentList = contentDomainService.selectContentList(dto.getPage(), dto.getSize());
         Optional<Users> users = userService.getAppUser();
+        if (contentList.isEmpty()) {
+            throw new NoContentException();
+        }
+
         if (!users.isEmpty()) {
             // 좋아요, 마크 여부
         }
@@ -345,7 +350,9 @@ public class ContentService {
         Page<Comments> selectComments = contentDomainService.selectCommentList(content, dto.getPage(), dto.getSize());
 
         List<CommentResponse> list = new ArrayList<>();
-        if (selectComments.isEmpty()) return list;
+        if (selectComments.isEmpty()) {
+            throw new NoContentException();
+        }
         List<Comments> commentList = selectComments.getContent();
         CommentResponse commentResponse = new CommentResponse();
         return commentResponse.toDtoList(commentList);

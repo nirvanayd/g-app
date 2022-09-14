@@ -5,6 +5,7 @@ import com.nelly.application.domain.Contents;
 import com.nelly.application.dto.Response;
 import com.nelly.application.dto.request.*;
 import com.nelly.application.dto.response.*;
+import com.nelly.application.exception.NoContentException;
 import com.nelly.application.service.content.ContentService;
 import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;

@@ -5,6 +5,8 @@ import org.springframework.http.HttpStatus;
 
 @AllArgsConstructor
 public enum ExceptionCode {
+    // 2xx
+    NO_CONTENT(HttpStatus.NO_CONTENT, "NO CONTENT", ""),
     // 4xx
     NOT_FOUND_EXCEPTION(HttpStatus.NOT_FOUND, "NOT FOUND EXCEPTION", ""),
     AUTHENTICATION_EXCEPTION(HttpStatus.GONE, "AUTHENTICATION EXCEPTION", "토큰 정보가 올바르지 않습니다."),
