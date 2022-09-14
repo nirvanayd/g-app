@@ -22,6 +22,20 @@ public class CommentResponse {
     private String deletedAt;
     private List<ChildCommentResponse> commentList;
 
+    public CommentResponse toDto(Comments c) {
+        ContentMemberResponse memberResponse = new ContentMemberResponse();
+        ChildCommentResponse childCommentResponse = new ChildCommentResponse();
+
+        return CommentResponse.builder().
+                id(c.getId()).
+                comment(c.getComment()).
+                createdAt(c.getCreatedDate().toString()).
+                updatedAt(c.getModifiedDate().toString()).
+                deletedAt(c.getDeletedDate() == null ? null : c.getDeletedDate().toString()).
+                member(memberResponse.contentUserToResponse(c.getUser())).
+                commentList(childCommentResponse.toDtoList(c.getComments())).build();
+    }
+
     public List<CommentResponse> toDtoList(List<Comments> commentList) {
         ContentMemberResponse memberResponse = new ContentMemberResponse();
         ChildCommentResponse childCommentResponse = new ChildCommentResponse();

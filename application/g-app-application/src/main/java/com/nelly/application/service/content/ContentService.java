@@ -304,7 +304,7 @@ public class ContentService {
         return list;
     }
 
-    public void addComment(AddCommentRequest dto) {
+    public CommentResponse addComment(AddCommentRequest dto) {
         Optional<Users> selectUsers = userService.getAppUser();
         if (selectUsers.isEmpty()) throw new SystemException("사용자 정보를 조회할 수 없습니다.");
         Users user = selectUsers.get();
@@ -321,7 +321,10 @@ public class ContentService {
             parentComment = selectComment.get();
         }
 
-        contentDomainService.createComment(content, user, parentComment, dto.getComment());
+        Comments savedComment =
+                contentDomainService.createComment(content, user, parentComment, dto.getComment());
+        CommentResponse commentResponse = new CommentResponse();
+        return commentResponse.toDto(savedComment);
     }
 
     public void updateComment(Long id, UpdateCommentRequest dto) {

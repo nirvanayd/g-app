@@ -76,8 +76,8 @@ public class ContentController {
 
     @PostMapping("/comments")
     public ResponseEntity<?> addComment(@RequestBody AddCommentRequest dto) {
-        contentService.addComment(dto);
-        return response.success();
+        CommentResponse commentResponse = contentService.addComment(dto);
+        return response.success(commentResponse);
     }
 
     @PutMapping("/comments/{id}")
@@ -97,16 +97,16 @@ public class ContentController {
 
     @GetMapping("/comments/{contentId}")
     public ResponseEntity<?> getContentCommentList(@NotBlank @PathVariable("contentId") String id,
-                                                   @RequestBody GetCommentListRequest dto
+                                                   GetCommentListRequest dto
                                            ) {
         Long contentId = Long.parseLong(id);
         List<CommentResponse> commentList = contentService.getCommentList(contentId, dto);
-        return response.success(commentList);
+        return response.success();
     }
 
     @GetMapping("/comments/child/{commentId}")
     public ResponseEntity<?> getChildCommentList(@NotBlank @PathVariable("commentId") String id,
-                                                   @RequestBody GetCommentListRequest dto
+                                                 GetCommentListRequest dto
     ) {
         Long parentId = Long.parseLong(id);
         GetChildCommentListResponse getChildCommentListResponse =

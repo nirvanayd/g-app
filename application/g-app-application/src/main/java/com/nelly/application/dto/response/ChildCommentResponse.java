@@ -5,7 +5,9 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import net.bytebuddy.implementation.bind.annotation.Empty;
 
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -23,6 +25,7 @@ public class ChildCommentResponse {
     private String deletedAt;
 
     public List<ChildCommentResponse> toDtoList(List<Comments> commentList) {
+        if (commentList == null) return Collections.<ChildCommentResponse>emptyList();
         ContentMemberResponse memberResponse = new ContentMemberResponse();
 
         return commentList.stream().map(c -> ChildCommentResponse.builder().

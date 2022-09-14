@@ -184,14 +184,14 @@ public class ContentDomainService {
          return commentsRepository.findByIdAndUser(commentId, user);
     }
 
-    public void createComment(Contents content, Users user, Comments parentComment, String text) {
+    public Comments createComment(Contents content, Users user, Comments parentComment, String text) {
         Comments comment = Comments.builder().
                 content(content).
                 user(user).
                 comment(text).
                 status(DeleteStatus.NORMAL).
                 parent(parentComment).build();
-        commentsRepository.save(comment);
+        return commentsRepository.save(comment);
     }
 
     public void saveComment(Comments comments, String comment) {
