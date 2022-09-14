@@ -24,6 +24,8 @@ public class ContentResponse {
     private List<ContentImageResponse> photoList;
     private ContentMemberResponse member;
     private String createdAt;
+    private boolean liked;
+    private boolean marked;
 
     public List<ContentResponse> toDtoList(List<Contents> contentList) {
         return contentList.stream().map(this::toDto).collect(Collectors.toList());

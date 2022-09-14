@@ -282,17 +282,26 @@ public class ContentService {
 
     public List<ContentResponse> getContentList(GetContentListRequest dto) {
         Page<Contents> contentList = contentDomainService.selectContentList(dto.getPage(), dto.getSize());
-        Optional<Users> users = userService.getAppUser();
+        Optional<Users> selectUser = userService.getAppUser();
         if (contentList.isEmpty()) {
             throw new NoContentException();
         }
 
-        if (!users.isEmpty()) {
+        ContentResponse response = new ContentResponse();
+        List<ContentResponse> list = response.toDtoList(contentList.getContent());
+
+        if (selectUser.isPresent()) {
+            Users user = selectUser.get();
             // 좋아요, 마크 여부
+            list.forEach(l -> {
+                boolean liked = contentDomainService.selectContentLike(l.getId(), user.getId()).isPresent();
+                boolean marked = contentDomainService.selectContentMark(l.getId(), user.getId()).isPresent();
+                l.setLiked(liked);
+                l.setMarked(marked);
+            });
         }
 
-        ContentResponse response = new ContentResponse();
-        return response.toDtoList(contentList.getContent());
+        return list;
     }
 
     public void addComment(AddCommentRequest dto) {
