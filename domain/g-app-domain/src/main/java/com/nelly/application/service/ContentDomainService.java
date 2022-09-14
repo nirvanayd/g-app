@@ -204,6 +204,12 @@ public class ContentDomainService {
         return commentsRepository.findAllByContentAndParentNull(content, pageRequest);
     }
 
+    public Page<Comments> selectChildCommentList(Comments parent, Integer page, Integer size) {
+        PageRequest pageRequest = PageRequest.of(page, size, Sort.by("id").ascending());
+        return commentsRepository.findAllByParent(parent, pageRequest);
+    }
+
+
     public void saveCommentDelete(DeleteStatus status, Comments comment) {
         comment.setStatus(status);
         comment.setDeletedDate(LocalDateTime.now());

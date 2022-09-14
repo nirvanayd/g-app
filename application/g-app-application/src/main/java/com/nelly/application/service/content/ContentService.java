@@ -5,9 +5,7 @@ import com.nelly.application.domain.*;
 import com.nelly.application.dto.BrandTagDto;
 import com.nelly.application.dto.UserTagDto;
 import com.nelly.application.dto.request.*;
-import com.nelly.application.dto.response.AddContentImageResponse;
-import com.nelly.application.dto.response.CommentResponse;
-import com.nelly.application.dto.response.ContentResponse;
+import com.nelly.application.dto.response.*;
 import com.nelly.application.enums.DeleteStatus;
 import com.nelly.application.enums.RoleType;
 import com.nelly.application.enums.YesOrNoType;
@@ -24,6 +22,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.persistence.EntityManager;
@@ -350,5 +349,24 @@ public class ContentService {
         List<Comments> commentList = selectComments.getContent();
         CommentResponse commentResponse = new CommentResponse();
         return commentResponse.toDtoList(commentList);
+    }
+
+    public GetChildCommentListResponse getChildCommentList(Long parentId, GetCommentListRequest dto) {
+        Optional<Comments> selectComment = contentDomainService.selectComment(parentId);
+        if (selectComment.isEmpty()) throw new SystemException("댓글 정보를 조회할 수 없습니다.");
+        Comments parent = selectComment.get();
+        Page<Comments> childCommentList =
+                contentDomainService.selectChildCommentList(parent, dto.getPage(), dto.getSize());
+
+        List<Comments> commentList = childCommentList.getContent();
+        long contentSize = childCommentList.getContent().size();
+        ChildCommentResponse childCommentResponse = new ChildCommentResponse();
+        List<ChildCommentResponse> childCommentResponseList = childCommentResponse.toDtoList(commentList);
+
+        GetChildCommentListResponse getChildCommentListResponse = GetChildCommentListResponse.builder().
+                list(childCommentResponseList).totalCount(childCommentList.getTotalElements()).build();
+        getChildCommentListResponse.setEnded(contentSize == 0);
+
+        return getChildCommentListResponse;
     }
 }

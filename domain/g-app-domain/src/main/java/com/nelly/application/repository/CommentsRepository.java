@@ -14,4 +14,5 @@ public interface CommentsRepository extends JpaRepository<Comments, Long> {
     Optional<Comments> findById(Long id);
     Optional<Comments> findByIdAndUser(Long id, Users user);
     Page<Comments> findAllByContentAndParentNull(Contents contents , Pageable pageable);
+    Page<Comments> findAllByParent(Comments comment, Pageable pageable);
 }

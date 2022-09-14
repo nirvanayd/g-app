@@ -25,7 +25,6 @@ public class ContentController {
 
     private final ContentService contentService;
     private final Response response;
-    private final ModelMapper modelMapper;
 
     @GetMapping("/contents")
     public ResponseEntity<?> getContentList(GetContentListRequest dto) {
@@ -97,10 +96,21 @@ public class ContentController {
 
     @GetMapping("/comments/{contentId}")
     public ResponseEntity<?> getContentCommentList(@NotBlank @PathVariable("contentId") String id,
-                                           GetCommentListRequest dto
+                                                   @RequestBody GetCommentListRequest dto
                                            ) {
         Long contentId = Long.parseLong(id);
         List<CommentResponse> commentList = contentService.getCommentList(contentId, dto);
         return response.success(commentList);
+    }
+
+    @GetMapping("/comments/child/{commentId}")
+    public ResponseEntity<?> getChildCommentList(@NotBlank @PathVariable("commentId") String id,
+                                                   @RequestBody GetCommentListRequest dto
+    ) {
+        Long parentId = Long.parseLong(id);
+        GetChildCommentListResponse getChildCommentListResponse =
+                contentService.getChildCommentList(parentId, dto);
+
+        return response.success(getChildCommentListResponse);
     }
 }

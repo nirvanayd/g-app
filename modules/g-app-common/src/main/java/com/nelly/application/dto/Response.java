@@ -58,7 +58,7 @@ public class Response {
                 .build();
         if (data instanceof CommonListResponse) {
             if (data.isEnded()) {
-                return ResponseEntity.status(HttpStatus.NO_CONTENT.value()).body("test...");
+                return ResponseEntity.noContent().build();
             }
         }
         return ResponseEntity.status(status).body(body);

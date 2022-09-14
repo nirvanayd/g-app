@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -13,26 +14,25 @@ import java.util.stream.Collectors;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class CommentResponse {
+public class ChildCommentResponse {
     private long id;
     private ContentMemberResponse member;
     private String comment;
     private String createdAt;
     private String updatedAt;
     private String deletedAt;
-    private List<ChildCommentResponse> commentList;
 
-    public List<CommentResponse> toDtoList(List<Comments> commentList) {
+    public List<ChildCommentResponse> toDtoList(List<Comments> commentList) {
         ContentMemberResponse memberResponse = new ContentMemberResponse();
-        ChildCommentResponse childCommentResponse = new ChildCommentResponse();
-        return commentList.stream().map(c -> CommentResponse.builder().
+
+        return commentList.stream().map(c -> ChildCommentResponse.builder().
                 id(c.getId()).
                 comment(c.getComment()).
                 createdAt(c.getCreatedDate().toString()).
                 updatedAt(c.getModifiedDate().toString()).
                 deletedAt(c.getDeletedDate() == null ? null : c.getDeletedDate().toString()).
                 member(memberResponse.contentUserToResponse(c.getUser())).
-                commentList(childCommentResponse.toDtoList(c.getComments())).build()
+                build()
         ).collect(Collectors.toList());
     }
 }

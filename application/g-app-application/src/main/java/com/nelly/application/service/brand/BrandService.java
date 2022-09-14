@@ -129,11 +129,14 @@ public class BrandService {
         Optional<Users> user = userService.getAppUser();
         long totalCount = rankPage.getTotalElements();
         long totalPage = rankPage.getTotalPages();
+        long contentSize = rankPage.getContent().size();
         List<BrandRank> rankList = rankPage.getContent();
 
         if (totalPage == 0) {
             isEnded = true;
-        } else if (totalPage < getRankRequest.getPage() + 1) {
+        }
+
+        if (contentSize == 0) {
             isEnded = true;
         }
 
@@ -187,10 +190,12 @@ public class BrandService {
 
         long totalCount = userBrandsPage.getTotalElements();
         long totalPage = userBrandsPage.getTotalPages();
+        long contentSize = userBrandsPage.getContent().size();
 
         if (totalPage == 0) {
             isEnded = true;
-        } else if (totalPage < getUserBrandsRequest.getPage() + 1) {
+        }
+        if (contentSize == 0) {
             isEnded = true;
         }
 
