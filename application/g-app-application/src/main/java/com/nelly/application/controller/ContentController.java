@@ -101,7 +101,7 @@ public class ContentController {
                                            ) {
         Long contentId = Long.parseLong(id);
         List<CommentResponse> commentList = contentService.getCommentList(contentId, dto);
-        return response.success();
+        return response.success(commentList);
     }
 
     @GetMapping("/comments/child/{commentId}")
