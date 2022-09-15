@@ -33,6 +33,13 @@ public class ContentController {
         return response.success(list);
     }
 
+    @GetMapping("/contents/{id}")
+    public ResponseEntity<?> getContentList(@NotBlank @PathVariable("id") String id) {
+        Long contentId = Long.parseLong(id);
+        ContentResponse contentResponse = contentService.getContent(contentId);
+        return response.success(contentResponse);
+    }
+
     @PostMapping("/contents")
     public ResponseEntity<?> addContent(@RequestBody AddContentRequest dto) {
         Contents content = contentService.addContent(dto);
