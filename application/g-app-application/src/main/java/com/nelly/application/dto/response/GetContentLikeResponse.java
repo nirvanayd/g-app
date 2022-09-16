@@ -15,8 +15,8 @@ public class GetContentLikeResponse {
     private ContentMemberResponse member;
     private boolean follow;
 
-    public GetContentLikeResponse toDto(ContentLikes contentLikes) {
-        ContentMemberResponse memberResponse = new ContentMemberResponse();
-
-    }
+//    public GetContentLikeResponse toDto(ContentLikes contentLikes) {
+//        ContentMemberResponse memberResponse = new ContentMemberResponse();
+//
+//    }
 }
