@@ -354,7 +354,7 @@ public class ContentService {
         contentDomainService.saveComment(existComment, dto.getComment());
     }
 
-    public void removeComment(Long id) {
+    public String removeComment(Long id) {
         Users user = userService.getUser();
         Optional<Comments> selectComment = contentDomainService.selectComment(id);
         // 관리자, 원글 작성자, 댓글 작성자 삭제 가능
@@ -364,14 +364,19 @@ public class ContentService {
         Comments comment = selectComment.get();
         Contents content = comment.getContent();
 
+        DeleteStatus returnStatus = null;
+
         if (comment.getUser().equals(user)) {
             contentDomainService.saveCommentDelete(DeleteStatus.WRITER, comment);
+            returnStatus = DeleteStatus.WRITER;
         } else if (content.getUser().equals(user)) {
             contentDomainService.saveCommentDelete(DeleteStatus.CONTENT_WRITER, comment);
+            returnStatus = DeleteStatus.CONTENT_WRITER;
         } else {
             throw new SystemException("삭제 권한이 없습니다.");
         }
         cacheTemplate.incrValue(String.valueOf(content.getId()), "reply");
+        return returnStatus.getCode();
     }
 
     public List<CommentResponse> getCommentList(Long contentId, GetCommentListRequest dto) {

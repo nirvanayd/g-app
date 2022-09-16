@@ -106,8 +106,9 @@ public class ContentController {
     @DeleteMapping("/comments/{id}")
     public ResponseEntity<?> removeComment(@NotBlank @PathVariable("id") String id) {
         Long commentId = Long.parseLong(id);
-        contentService.removeComment(commentId);
-        return response.success();
+        String returnStatus = contentService.removeComment(commentId);
+        Integer returnStatusNumber = returnStatus == null ? null : Integer.parseInt(returnStatus);
+        return response.success(returnStatusNumber);
     }
 
     @GetMapping("/comments/{contentId}")

@@ -21,7 +21,6 @@ import java.util.Set;
 @Entity
 @Builder
 @Table(name = "comments")
-@Where(clause = "deleted_date is null")
 @SQLDelete(sql = "UPDATE comments SET deleted_date = NOW() WHERE id = ?")
 @AllArgsConstructor
 @NoArgsConstructor

@@ -21,6 +21,7 @@ public class CommentResponse {
     private String updatedAt;
     private String deletedAt;
     private List<ChildCommentResponse> commentList;
+    private Integer status;
 
     public CommentResponse toDto(Comments c) {
         ContentMemberResponse memberResponse = new ContentMemberResponse();
@@ -45,6 +46,7 @@ public class CommentResponse {
                 createdAt(c.getCreatedDate().toString()).
                 updatedAt(c.getModifiedDate().toString()).
                 deletedAt(c.getDeletedDate() == null ? null : c.getDeletedDate().toString()).
+                status(c.getStatus().getCode() == null ? null : Integer.parseInt(c.getStatus().getCode())).
                 member(memberResponse.contentUserToResponse(c.getUser())).
                 commentList(childCommentResponse.toDtoList(c.getComments())).build()
         ).collect(Collectors.toList());
