@@ -131,6 +131,10 @@ public class ContentDomainService {
         contentsRepository.updateLikeCount(contentId, value);
     }
 
+    public void updateContentReply(Long contentId, int value) {
+        contentsRepository.updateContentReply(contentId, value);
+    }
+
     public void updateContentMark(Long contentId, int value) {
         contentsRepository.updateMarkCount(contentId, value);
     }
@@ -214,5 +218,10 @@ public class ContentDomainService {
         comment.setStatus(status);
         comment.setDeletedDate(LocalDateTime.now());
         commentsRepository.save(comment);
+    }
+
+    public Page<ContentLikes> selectContentLikeList(Long contentId, Integer page, Integer size) {
+        PageRequest pageRequest = PageRequest.of(page, size, Sort.by("id").descending());
+        return contentLikesRepository.findAllByContentId(contentId, pageRequest);
     }
 }

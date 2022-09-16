@@ -26,5 +26,8 @@ public class SchedulerController {
         brandService.scheduleBrandFavorite();
     }
 
-
+    @Scheduled(fixedDelay = 10000)
+    public void updateContentReplyCounts() {
+        contentService.scheduleContentReply();
+    }
 }

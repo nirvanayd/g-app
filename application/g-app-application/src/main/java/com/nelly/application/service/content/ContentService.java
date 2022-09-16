@@ -202,6 +202,22 @@ public class ContentService {
                 .build();
     }
 
+    public void getContentLike(Long contentId, GetContentLikeRequest dto) {
+
+        Optional<Users> user = userService.getAppUser();
+        Page<ContentLikes> selectLikeList =
+                contentDomainService.selectContentLikeList(contentId, dto.getPage(), dto.getSize());
+        if (selectLikeList.isEmpty()) {
+            throw new NoContentException();
+        }
+
+        List<ContentLikes> likeList = selectLikeList.getContent();
+        GetContentLikeResponse responseDto = new GetContentLikeResponse();
+        if (user.isPresent()) {
+
+        }
+    }
+
     public void saveContentLike(SaveLikeRequest dto) {
         // get user id
         Users user = userService.getUser();
@@ -323,6 +339,8 @@ public class ContentService {
 
         Comments savedComment =
                 contentDomainService.createComment(content, user, parentComment, dto.getComment());
+        cacheTemplate.incrValue(String.valueOf(dto.getContentId()), "reply");
+
         CommentResponse commentResponse = new CommentResponse();
         return commentResponse.toDto(savedComment);
     }
@@ -353,6 +371,7 @@ public class ContentService {
         } else {
             throw new SystemException("삭제 권한이 없습니다.");
         }
+        cacheTemplate.incrValue(String.valueOf(content.getId()), "reply");
     }
 
     public List<CommentResponse> getCommentList(Long contentId, GetCommentListRequest dto) {
@@ -387,5 +406,17 @@ public class ContentService {
         getChildCommentListResponse.setEnded(contentSize == 0);
 
         return getChildCommentListResponse;
+    }
+
+    @Transactional
+    public void scheduleContentReply() {
+        Set<String> keys = cacheTemplate.getKeys("reply");
+        for (String key : keys) {
+            int value = Integer.parseInt(cacheTemplate.getValue(key));
+            Long contentId = Long.parseLong(cacheTemplate.parseCashNameKey(key).get("key"));
+            System.out.println("content ID : " + contentId + " , value : " + value);
+            contentDomainService.updateContentReply(contentId, value);
+            cacheTemplate.deleteCache(key);
+        }
     }
 }

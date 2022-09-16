@@ -69,6 +69,14 @@ public class ContentController {
         return response.success(addContentImageResponse);
     }
 
+    @GetMapping("/contents/like/{id}")
+    public ResponseEntity<?> getContentLike(@NotBlank @PathVariable("id") String id,
+                                            GetContentLikeRequest dto) {
+        Long contentId = Long.parseLong(id);
+        contentService.getContentLike(contentId, dto);
+        return response.success();
+    }
+
     @PostMapping("/contents/like")
     public ResponseEntity<?> saveContentLike(@RequestBody SaveLikeRequest dto) {
         contentService.saveContentLike(dto);

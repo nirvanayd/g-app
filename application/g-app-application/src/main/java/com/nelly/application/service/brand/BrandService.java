@@ -11,6 +11,7 @@ import com.nelly.application.enums.StyleType;
 import com.nelly.application.enums.YesOrNoType;
 import com.nelly.application.exception.SystemException;
 import com.nelly.application.service.BrandDomainService;
+import com.nelly.application.service.ContentDomainService;
 import com.nelly.application.service.ScraperDomainService;
 import com.nelly.application.service.scraper.ScraperService;
 import com.nelly.application.service.user.UserService;
@@ -44,6 +45,7 @@ public class BrandService {
     private final ScraperDomainService scraperDomainService;
     private final ModelMapper modelMapper;
     private final CacheTemplate cacheTemplate;
+    private final ContentDomainService contentDomainService;
 
     public Brands getBrand(Long brandId) {
         return brandDomainService.selectBrand(brandId);
