@@ -23,6 +23,7 @@ public class UserDomainService {
     private final UserMarketingTypeRepository userMarketingTypeRepository;
     private final UserAgreementsRepository userAgreementsRepository;
     private final UserNotificationTokensRepository userNotificationTokensRepository;
+    private final UserFollowRepository userFollowRepository;
 
     public Users addUser(Long authId, String loginId, String email, String birth, Authority authority) {
         Users user = Users.builder().authId(authId)
@@ -168,5 +169,29 @@ public class UserDomainService {
             UserStyles userStyles = UserStyles.builder().styleType(StyleType.getStyleType(code)).user(user).build();
             userStylesRepository.save(userStyles);
         }
+    }
+
+    public Optional<UserFollow> selectUserFollow(Users user, Users followingUser) {
+        return userFollowRepository.findByUserAndFollower(user, followingUser);
+    }
+
+    public void saveUserFollow(Users user, Users follower) {
+        UserFollow userFollow = UserFollow.builder().
+                user(user).
+                follower(follower).
+                build();
+        userFollowRepository.save(userFollow);
+    }
+
+    public void deleteUserFollow(long id) {
+        userFollowRepository.deleteById(id);
+    }
+
+    public void updateUserFollowerCount(Long userId, Integer count) {
+        userFollowRepository.updateFollowerCount(userId, count);
+    }
+
+    public void updateUserFollowingCount(Long userId, Integer count) {
+        userFollowRepository.updateFollowingCount(userId, count);
     }
 }

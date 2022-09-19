@@ -1,13 +1,12 @@
 package com.nelly.application.service.user;
 
-import com.nelly.application.domain.UserAgreements;
-import com.nelly.application.domain.UserNotificationTokens;
-import com.nelly.application.domain.UserStyles;
-import com.nelly.application.domain.Users;
+import com.nelly.application.domain.*;
 import com.nelly.application.dto.request.*;
 import com.nelly.application.dto.TokenInfoDto;
 import com.nelly.application.enums.Authority;
 import com.nelly.application.enums.RoleType;
+import com.nelly.application.enums.YesOrNoType;
+import com.nelly.application.exception.SystemException;
 import com.nelly.application.mail.MailSender;
 import com.nelly.application.service.UserDomainService;
 import com.nelly.application.service.AuthService;
@@ -22,6 +21,7 @@ import org.springframework.util.StringUtils;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 @RequiredArgsConstructor
@@ -247,5 +247,46 @@ public class UserService {
     public void updateUserStyle(Users user, UpdateUserStyleRequest dto) {
         List<String> userStyleList = dto.getUserStyle();
         userDomainService.saveUserStyles(user, userStyleList);
+    }
+
+
+    public void saveUserFollow(Users user, SaveFollowRequest dto) {
+        Long followingId = Long.parseLong(dto.getUserId());
+        Users followingUser = userDomainService.selectAccount(followingId);
+
+        Optional<UserFollow> selectUserFollow = userDomainService.selectUserFollow(user, followingUser);
+
+        if (dto.getFollowYn().equals(YesOrNoType.YES.getCode())) {
+            if (selectUserFollow.isEmpty()) {
+                userDomainService.saveUserFollow(user, followingUser);
+                cacheTemplate.incrValue(String.valueOf(user.getId()), "follower");
+                cacheTemplate.incrValue(String.valueOf(followingUser.getId()), "following");
+            }
+        } else if (dto.getFollowYn().equals(YesOrNoType.NO.getCode())) {
+            if (selectUserFollow.isPresent()) {
+                UserFollow userFollow = selectUserFollow.get();
+                userDomainService.deleteUserFollow(userFollow.getId());
+                cacheTemplate.decrValue(String.valueOf(user.getId()), "follower");
+                cacheTemplate.decrValue(String.valueOf(followingUser.getId()), "following");
+            }
+        }
+    }
+
+    public void scheduleFollow() {
+        Set<String> followerKeys = cacheTemplate.getKeys("follower");
+        for (String key : followerKeys) {
+            int value = Integer.parseInt(cacheTemplate.getValue(key));
+            Long userId = Long.parseLong(cacheTemplate.parseCashNameKey(key).get("key"));
+            userDomainService.updateUserFollowerCount(userId, value);
+            cacheTemplate.deleteCache(key);
+        }
+
+        Set<String> followingKeys = cacheTemplate.getKeys("following");
+        for (String key : followingKeys) {
+            int value = Integer.parseInt(cacheTemplate.getValue(key));
+            Long userId = Long.parseLong(cacheTemplate.parseCashNameKey(key).get("key"));
+            userDomainService.updateUserFollowingCount(userId, value);
+            cacheTemplate.deleteCache(key);
+        }
     }
 }

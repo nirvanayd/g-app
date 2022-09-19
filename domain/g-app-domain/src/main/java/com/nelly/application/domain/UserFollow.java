@@ -30,7 +30,7 @@ public class UserFollow extends BaseTime {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "follow_id")
-    private Users following;
+    private Users follower;
 }
 
 
