@@ -10,6 +10,7 @@ import com.nelly.application.dto.response.UserAgreementsResponse;
 import com.nelly.application.dto.response.UserResponse;
 import com.nelly.application.enums.StyleType;
 import com.nelly.application.mail.MailSender;
+import com.nelly.application.service.content.ContentService;
 import com.nelly.application.service.user.UserService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -29,6 +30,7 @@ import java.util.stream.Collectors;
 public class UserController {
 
     private final UserService userService;
+    private final ContentService contentService;
     private final Response response;
     private final ModelMapper modelMapper;
     private final MailSender mailSender;
@@ -197,5 +199,13 @@ public class UserController {
         if (user.isEmpty()) throw new RuntimeException("사용자 정보를 조회할 수 없습니다.");
         userService.saveUserFollow(user.get(), dto);
         return response.success();
+    }
+
+    @GetMapping("/users/like")
+    public ResponseEntity<?> getUserLike(GetUserLikeRequest dto) {
+        Optional<Users> user = userService.getAppUser();
+        if (user.isEmpty()) throw new RuntimeException("사용자 정보를 조회할 수 없습니다.");
+        Users appUser = user.get();
+        return response.success(contentService.getUserLikeList(appUser, dto));
     }
 }

@@ -261,7 +261,7 @@ public class ContentService {
 
         if (YesOrNoType.YES.getCode().equals(dto.getLikeYn())) {
             if (contentLike == null){
-                contentDomainService.createContentLike(dto.getContentId(), user);
+                contentDomainService.createContentLike(contents, user);
                 cacheTemplate.incrValue(String.valueOf(dto.getContentId()), "like");
             }
         } else if (YesOrNoType.NO.getCode().equals(dto.getLikeYn())) {
@@ -451,5 +451,15 @@ public class ContentService {
             contentDomainService.updateContentReply(contentId, value);
             cacheTemplate.deleteCache(key);
         }
+    }
+
+    public List<GetUserLikeResponse> getUserLikeList(Users user, GetUserLikeRequest dto) {
+        Page<ContentLikes> selectLikeList = contentDomainService.selectUserContentLike(user, dto.getPage(), dto.getSize());
+        if (selectLikeList.isEmpty()) {
+            throw new NoContentException();
+        }
+        List<ContentLikes> likeList = selectLikeList.getContent();
+        GetUserLikeResponse getUserLikeResponse = new GetUserLikeResponse();
+        return getUserLikeResponse.toDtoList(likeList);
     }
 }

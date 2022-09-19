@@ -26,7 +26,8 @@ public class ContentLikes extends BaseTime{
     @JoinColumn(name = "user_id")
     private Users user;
 
-    @Column(name = "content_id")
-    private Long contentId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "content_id")
+    private Contents content;
 }
 

@@ -12,4 +12,5 @@ import java.util.Optional;
 public interface ContentLikesRepository extends JpaRepository<ContentLikes, Long> {
     Optional<ContentLikes> findByContentIdAndAndUserId(Long contentId, Long userId);
     Page<ContentLikes> findAllByContentId(Long contentId, Pageable pageable);
+    Page<ContentLikes> findAllByContent_User(Users user, Pageable pageable);
 }
