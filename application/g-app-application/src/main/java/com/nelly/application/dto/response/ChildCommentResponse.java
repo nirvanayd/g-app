@@ -23,6 +23,7 @@ public class ChildCommentResponse {
     private String createdAt;
     private String updatedAt;
     private String deletedAt;
+    private Integer status;
 
     public List<ChildCommentResponse> toDtoList(List<Comments> commentList) {
         if (commentList == null) return Collections.<ChildCommentResponse>emptyList();
@@ -35,6 +36,7 @@ public class ChildCommentResponse {
                 updatedAt(c.getModifiedDate().toString()).
                 deletedAt(c.getDeletedDate() == null ? null : c.getDeletedDate().toString()).
                 member(memberResponse.contentUserToResponse(c.getUser())).
+                status(c.getStatus().getCode() == null ? null : Integer.parseInt(c.getStatus().getCode())).
                 build()
         ).collect(Collectors.toList());
     }

@@ -26,6 +26,7 @@ public class ContentResponse {
     private String createdAt;
     private boolean liked;
     private boolean marked;
+    private String updatedAt;
 
     public List<ContentResponse> toDtoList(List<Contents> contentList) {
         return contentList.stream().map(this::toDto).collect(Collectors.toList());
@@ -49,6 +50,7 @@ public class ContentResponse {
                                 build()).collect(Collectors.toList())).
                         build()).collect(Collectors.toList())).
                 member(memberResponse.contentUserToResponse(c.getUser())).
+                updatedAt(c.getModifiedDate().toString()).
                 build();
     }
 }
