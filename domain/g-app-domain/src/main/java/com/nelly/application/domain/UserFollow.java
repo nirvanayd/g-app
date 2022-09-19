@@ -8,7 +8,9 @@ import javax.persistence.*;
 
 @Entity
 @Builder
-@Table(name = "content_likes", uniqueConstraints = { @UniqueConstraint(columnNames = { "user_id", "content_id" }) })
+@Table(name = "user_follow",
+uniqueConstraints = { //other constraints
+        @UniqueConstraint(name = "UniqueUserBrands", columnNames = { "follow_id", "user_id" })})
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
@@ -16,7 +18,7 @@ import javax.persistence.*;
 @JsonIdentityInfo(
         generator = ObjectIdGenerators.PropertyGenerator.class,
         property = "id")
-public class ContentLikes extends BaseTime{
+public class UserFollow extends BaseTime {
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)
     @Column(name = "id")
@@ -26,7 +28,9 @@ public class ContentLikes extends BaseTime{
     @JoinColumn(name = "user_id")
     private Users user;
 
-    @Column(name = "content_id")
-    private Long contentId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "follow_id")
+    private Users following;
 }
+
 

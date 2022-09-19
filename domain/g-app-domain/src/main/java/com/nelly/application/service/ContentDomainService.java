@@ -95,10 +95,10 @@ public class ContentDomainService {
         contentsRepository.deleteById(contentId);
     }
 
-    public void createContentLike(Long contentId, Long UserId) {
+    public void createContentLike(Long contentId, Users user) {
         ContentLikes contentLikes = ContentLikes.builder()
                 .contentId(contentId)
-                .userId(UserId)
+                .user(user)
                 .build();
         contentLikesRepository.save(contentLikes);
     }
@@ -111,10 +111,10 @@ public class ContentDomainService {
         return contentLikesRepository.findByContentIdAndAndUserId(contentId, userId);
     }
 
-    public void createContentMark(Long contentId, Long UserId) {
+    public void createContentMark(Long contentId, Users user) {
         ContentMarks contentMarks = ContentMarks.builder()
                 .contentId(contentId)
-                .userId(UserId)
+                .user(user)
                 .build();
         contentMarksRepository.save(contentMarks);
     }
@@ -223,5 +223,10 @@ public class ContentDomainService {
     public Page<ContentLikes> selectContentLikeList(Long contentId, Integer page, Integer size) {
         PageRequest pageRequest = PageRequest.of(page, size, Sort.by("id").descending());
         return contentLikesRepository.findAllByContentId(contentId, pageRequest);
+    }
+
+    public Page<ContentMarks> selectContentMarkList(Long contentId, Integer page, Integer size) {
+        PageRequest pageRequest = PageRequest.of(page, size, Sort.by("id").descending());
+        return contentMarksRepository.findAllByContentId(contentId, pageRequest);
     }
 }

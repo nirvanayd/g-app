@@ -73,8 +73,14 @@ public class ContentController {
     public ResponseEntity<?> getContentLike(@NotBlank @PathVariable("id") String id,
                                             GetContentLikeRequest dto) {
         Long contentId = Long.parseLong(id);
-        contentService.getContentLike(contentId, dto);
-        return response.success();
+        return response.success(contentService.getContentLike(contentId, dto));
+    }
+
+    @GetMapping("/contents/mark/{id}")
+    public ResponseEntity<?> getContentMark(@NotBlank @PathVariable("id") String id,
+                                            GetContentMarkRequest dto) {
+        Long contentId = Long.parseLong(id);
+        return response.success(contentService.getContentMark(contentId, dto));
     }
 
     @PostMapping("/contents/like")
@@ -127,7 +133,6 @@ public class ContentController {
         Long parentId = Long.parseLong(id);
         GetChildCommentListResponse getChildCommentListResponse =
                 contentService.getChildCommentList(parentId, dto);
-
         return response.success(getChildCommentListResponse);
     }
 }

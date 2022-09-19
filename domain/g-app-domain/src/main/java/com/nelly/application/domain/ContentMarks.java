@@ -22,8 +22,9 @@ public class ContentMarks extends BaseTime{
     @Column(name = "id")
     private Long id;
 
-    @Column(name = "user_id")
-    private Long userId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private Users user;
 
     @Column(name = "content_id")
     private Long contentId;

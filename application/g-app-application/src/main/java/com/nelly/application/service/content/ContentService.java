@@ -202,7 +202,7 @@ public class ContentService {
                 .build();
     }
 
-    public void getContentLike(Long contentId, GetContentLikeRequest dto) {
+    public List<GetContentLikeResponse> getContentLike(Long contentId, GetContentLikeRequest dto) {
 
         Optional<Users> user = userService.getAppUser();
         Page<ContentLikes> selectLikeList =
@@ -213,9 +213,37 @@ public class ContentService {
 
         List<ContentLikes> likeList = selectLikeList.getContent();
         GetContentLikeResponse responseDto = new GetContentLikeResponse();
-        if (user.isPresent()) {
 
+        List<GetContentLikeResponse> responseDtoList = responseDto.toDtoList(likeList);
+
+        if (user.isPresent()) {
+//            responseDtoList.stream().forEach(l -> {
+//
+//            });
         }
+        return responseDtoList;
+    }
+
+    public List<GetContentMarkResponse> getContentMark(Long contentId, GetContentMarkRequest dto) {
+
+        Optional<Users> user = userService.getAppUser();
+        Page<ContentMarks> selectMarkList =
+                contentDomainService.selectContentMarkList(contentId, dto.getPage(), dto.getSize());
+        if (selectMarkList.isEmpty()) {
+            throw new NoContentException();
+        }
+
+        List<ContentMarks> markList = selectMarkList.getContent();
+        GetContentMarkResponse responseDto = new GetContentMarkResponse();
+        List<GetContentMarkResponse> responseDtoList = responseDto.toDtoList(markList);
+
+        if (user.isPresent()) {
+//            responseDtoList.stream().forEach(l -> {
+//
+//            });
+        }
+
+        return responseDtoList;
     }
 
     public void saveContentLike(SaveLikeRequest dto) {
@@ -233,7 +261,7 @@ public class ContentService {
 
         if (YesOrNoType.YES.getCode().equals(dto.getLikeYn())) {
             if (contentLike == null){
-                contentDomainService.createContentLike(dto.getContentId(), user.getId());
+                contentDomainService.createContentLike(dto.getContentId(), user);
                 cacheTemplate.incrValue(String.valueOf(dto.getContentId()), "like");
             }
         } else if (YesOrNoType.NO.getCode().equals(dto.getLikeYn())) {
@@ -258,7 +286,7 @@ public class ContentService {
 
         if (YesOrNoType.YES.getCode().equals(dto.getMarkYn())) {
             if (contentMark == null) {
-                contentDomainService.createContentMark(dto.getContentId(), user.getId());
+                contentDomainService.createContentMark(dto.getContentId(), user);
                 cacheTemplate.incrValue(String.valueOf(dto.getContentId()), "mark");
             }
         } else if (YesOrNoType.NO.getCode().equals(dto.getMarkYn())) {
