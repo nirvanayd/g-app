@@ -16,6 +16,7 @@ import java.util.stream.Collectors;
 @NoArgsConstructor
 public class GetUserLikeResponse {
     private long id;
+    private String createdAt;
     private ContentMemberResponse member;
     private ContentThumbResponse content;
 
@@ -27,6 +28,7 @@ public class GetUserLikeResponse {
         ContentMemberResponse contentMemberResponse = new ContentMemberResponse();
         ContentThumbResponse contentThumbResponse = new ContentThumbResponse();
         return GetUserLikeResponse.builder().id(contentLikes.getId()).
+                createdAt(contentLikes.getCreatedDate().toString()).
                 member(contentMemberResponse.contentUserToResponse(contentLikes.getUser())).
                 content(contentThumbResponse.toDto(contentLikes.getContent())).build();
     }

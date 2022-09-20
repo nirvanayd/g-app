@@ -16,6 +16,7 @@ import java.util.stream.Collectors;
 @NoArgsConstructor
 public class GetUserMarkResponse {
     private long id;
+    private String createdAt;
     private ContentMemberResponse member;
     private ContentThumbResponse content;
 
@@ -27,6 +28,7 @@ public class GetUserMarkResponse {
         ContentMemberResponse contentMemberResponse = new ContentMemberResponse();
         ContentThumbResponse contentThumbResponse = new ContentThumbResponse();
         return GetUserMarkResponse.builder().id(contentMark.getId()).
+                createdAt(contentMark.getCreatedDate().toString()).
                 member(contentMemberResponse.contentUserToResponse(contentMark.getUser())).
                 content(contentThumbResponse.toDto(contentMark.getContent())).build();
     }
