@@ -208,4 +208,12 @@ public class UserController {
         Users appUser = user.get();
         return response.success(contentService.getUserLikeList(appUser, dto));
     }
+
+    @GetMapping("/users/mark")
+    public ResponseEntity<?> getUserMark(GetUserLikeRequest dto) {
+        Optional<Users> user = userService.getAppUser();
+        if (user.isEmpty()) throw new RuntimeException("사용자 정보를 조회할 수 없습니다.");
+        Users appUser = user.get();
+        return response.success(contentService.getUserMarkList(appUser, dto));
+    }
 }
