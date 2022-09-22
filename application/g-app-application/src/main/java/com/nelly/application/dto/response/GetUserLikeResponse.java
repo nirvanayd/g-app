@@ -1,7 +1,6 @@
 package com.nelly.application.dto.response;
 
 import com.nelly.application.domain.ContentLikes;
-import com.nelly.application.dto.request.PageRequest;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

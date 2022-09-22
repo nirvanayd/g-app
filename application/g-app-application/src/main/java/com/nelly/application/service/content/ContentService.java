@@ -12,6 +12,7 @@ import com.nelly.application.enums.YesOrNoType;
 import com.nelly.application.exception.NoContentException;
 import com.nelly.application.exception.SystemException;
 import com.nelly.application.service.ContentDomainService;
+import com.nelly.application.service.UserDomainService;
 import com.nelly.application.service.brand.BrandService;
 import com.nelly.application.service.user.UserService;
 import com.nelly.application.util.CacheTemplate;
@@ -32,6 +33,7 @@ import java.io.IOException;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.IntStream;
 
 @RequiredArgsConstructor
 @Service
@@ -43,6 +45,7 @@ public class ContentService {
     private final UserService userService;
     private final BrandService brandService;
     private final ContentDomainService contentDomainService;
+    private final UserDomainService userDomainService;
     private final EntityManager entityManager;
     private static final String DIRECTORY_SEPARATOR = "/";
 
@@ -216,11 +219,13 @@ public class ContentService {
 
         List<GetContentLikeResponse> responseDtoList = responseDto.toDtoList(likeList);
 
-        if (user.isPresent()) {
-//            responseDtoList.stream().forEach(l -> {
-//
-//            });
-        }
+        user.ifPresent(users -> IntStream.range(0, likeList.size()).forEach(idx -> {
+            Users contentUser = likeList.get(idx).getUser();
+            Optional<UserFollow> selectFollow = userDomainService.selectUserFollow(contentUser, users);
+            if (selectFollow.isPresent()) {
+                responseDtoList.get(idx).setFollow(true);
+            }
+        }));
         return responseDtoList;
     }
 
@@ -237,11 +242,13 @@ public class ContentService {
         GetContentMarkResponse responseDto = new GetContentMarkResponse();
         List<GetContentMarkResponse> responseDtoList = responseDto.toDtoList(markList);
 
-        if (user.isPresent()) {
-//            responseDtoList.stream().forEach(l -> {
-//
-//            });
-        }
+        user.ifPresent(users -> IntStream.range(0, markList.size()).forEach(idx -> {
+            Users contentUser = markList.get(idx).getUser();
+            Optional<UserFollow> selectFollow = userDomainService.selectUserFollow(contentUser, users);
+            if (selectFollow.isPresent()) {
+                responseDtoList.get(idx).setFollow(true);
+            }
+        }));
 
         return responseDtoList;
     }
@@ -307,7 +314,6 @@ public class ContentService {
         for (String key : keys) {
             int value = Integer.parseInt(cacheTemplate.getValue(key));
             Long contentId = Long.parseLong(cacheTemplate.parseCashNameKey(key).get("key"));
-            System.out.println("content ID : " + contentId + " , value : " + value);
             contentDomainService.updateContentLike(contentId, value);
             cacheTemplate.deleteCache(key);
         }
