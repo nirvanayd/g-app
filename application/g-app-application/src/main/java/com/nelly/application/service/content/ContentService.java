@@ -221,7 +221,7 @@ public class ContentService {
 
         user.ifPresent(users -> IntStream.range(0, likeList.size()).forEach(idx -> {
             Users contentUser = likeList.get(idx).getUser();
-            Optional<UserFollow> selectFollow = userDomainService.selectUserFollow(contentUser, users);
+            Optional<UserFollow> selectFollow = userDomainService.selectUserFollow(users, contentUser);
             if (selectFollow.isPresent()) {
                 responseDtoList.get(idx).setFollow(true);
             }
@@ -244,7 +244,7 @@ public class ContentService {
 
         user.ifPresent(users -> IntStream.range(0, markList.size()).forEach(idx -> {
             Users contentUser = markList.get(idx).getUser();
-            Optional<UserFollow> selectFollow = userDomainService.selectUserFollow(contentUser, users);
+            Optional<UserFollow> selectFollow = userDomainService.selectUserFollow(users, contentUser);
             if (selectFollow.isPresent()) {
                 responseDtoList.get(idx).setFollow(true);
             }
