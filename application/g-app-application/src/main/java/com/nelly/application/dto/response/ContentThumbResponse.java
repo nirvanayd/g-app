@@ -18,6 +18,10 @@ public class ContentThumbResponse {
     private Long id;
     private String photo;
 
+    public List<ContentThumbResponse> toDtoList(List<Contents> list) {
+        return list.stream().map(this::toDto).collect(Collectors.toList());
+    }
+
     public ContentThumbResponse toDto(Contents c) {
         ContentImages contentImage = c.getContentImages().stream().findFirst().orElse(null);
         return ContentThumbResponse.builder().
@@ -25,4 +29,6 @@ public class ContentThumbResponse {
                 photo(contentImage == null ? null : contentImage.getContentImageUrl()).
                 build();
     }
+
+
 }

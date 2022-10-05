@@ -179,6 +179,11 @@ public class ContentDomainService {
         return contentsRepository.findAll(pageRequest);
     }
 
+    public Page<Contents> selectContentList(Users user, Integer page, Integer size) {
+        PageRequest pageRequest = PageRequest.of(page, size, Sort.by("id").descending());
+        return contentsRepository.findAllByUser(user, pageRequest);
+    }
+
     public Optional<Comments> selectComment(Long commentId) {
         if (commentId == null) return null;
         return commentsRepository.findById(commentId);

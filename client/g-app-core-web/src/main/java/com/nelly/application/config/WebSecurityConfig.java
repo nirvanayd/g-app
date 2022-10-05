@@ -40,6 +40,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/brands/rank", "/brands/intro/**", "/brands/keyword").permitAll()
                 .antMatchers(HttpMethod.GET, "/contents/**").permitAll()
                 .antMatchers(HttpMethod.GET, "/comments/**").permitAll()
+                .antMatchers( "/users/detail/**").permitAll()
                 .antMatchers("/scraper/web-url").permitAll()
                 .antMatchers( "/users/**").hasRole("USER")
                 .antMatchers( "/contents/**").hasRole("USER")

@@ -5,6 +5,7 @@ import com.nelly.application.domain.Users;
 import com.nelly.application.dto.TokenInfoDto;
 import com.nelly.application.dto.request.*;
 import com.nelly.application.dto.Response;
+import com.nelly.application.dto.response.GetUserDetailResponse;
 import com.nelly.application.dto.response.LoginResponse;
 import com.nelly.application.dto.response.UserAgreementsResponse;
 import com.nelly.application.dto.response.UserResponse;
@@ -215,5 +216,17 @@ public class UserController {
         if (user.isEmpty()) throw new RuntimeException("사용자 정보를 조회할 수 없습니다.");
         Users appUser = user.get();
         return response.success(contentService.getUserMarkList(appUser, dto));
+    }
+
+    @GetMapping("/users/detail/{id}")
+    public ResponseEntity<?> getUserMark(@PathVariable String id) {
+        Long userDetailId = Long.parseLong(id);
+        Optional<Users> user = userService.getAppUser();
+
+        if (user.isPresent()) {
+            return response.success(userService.getUserDetail(userDetailId, user.get()));
+        } else {
+            return response.success(userService.getUserDetail(userDetailId));
+        }
     }
 }

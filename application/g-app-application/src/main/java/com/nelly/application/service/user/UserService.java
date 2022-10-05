@@ -3,25 +3,27 @@ package com.nelly.application.service.user;
 import com.nelly.application.domain.*;
 import com.nelly.application.dto.request.*;
 import com.nelly.application.dto.TokenInfoDto;
+import com.nelly.application.dto.response.ContentThumbResponse;
+import com.nelly.application.dto.response.GetUserDetailResponse;
 import com.nelly.application.enums.Authority;
 import com.nelly.application.enums.RoleType;
 import com.nelly.application.enums.YesOrNoType;
 import com.nelly.application.exception.SystemException;
 import com.nelly.application.mail.MailSender;
+import com.nelly.application.service.ContentDomainService;
 import com.nelly.application.service.UserDomainService;
 import com.nelly.application.service.AuthService;
+import com.nelly.application.util.AgeUtil;
 import com.nelly.application.util.CacheTemplate;
 import com.nelly.application.util.EncryptUtils;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.Random;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 @RequiredArgsConstructor
@@ -30,6 +32,7 @@ public class UserService {
 
     private final AuthService authService;
     private final UserDomainService userDomainService;
+    private final ContentDomainService contentDomainService;
     private final EncryptUtils encryptUtils;
     private final CacheTemplate cacheTemplate;
     private final MailSender mailSender;
@@ -41,6 +44,12 @@ public class UserService {
     public void signUp(SignUpRequest dto) {
         if (authService.findByLoginId(dto.getLoginId()) != null) throw new RuntimeException("사용 중인 아이디입니다.");
         if (userDomainService.existEmail(dto.getEmail())) throw new RuntimeException("사용 중인 이메일입니다.");
+        // 14세 확인
+        int age = AgeUtil.getAge(AgeUtil.getYear(dto.getBirth()), AgeUtil.getMonth(dto.getBirth()),
+                AgeUtil.getDate(dto.getBirth()));
+        if (age < 14) {
+            throw new SystemException("만 14세 미만은 가입할 수 없습니다.");
+        }
         // 비밀번호 암호화
         String encryptPassword = encryptUtils.encrypt(dto.getPassword());
         // 마케팅 수신동의
@@ -288,5 +297,28 @@ public class UserService {
             userDomainService.updateUserFollowingCount(userId, value);
             cacheTemplate.deleteCache(key);
         }
+    }
+
+    public GetUserDetailResponse getUserDetail(Long userDetailId, Users user) {
+        return getUserDetail(userDetailId);
+    }
+
+    public GetUserDetailResponse getUserDetail(Long userDetailId) {
+        Users detailUser = getUser(userDetailId);
+        GetUserDetailResponse getUserDetailResponse = new GetUserDetailResponse();
+        GetUserDetailResponse response = getUserDetailResponse.toDto(detailUser);
+
+        int page = 0;
+        int size = 0;
+        Page<Contents> selectContentList = contentDomainService.selectContentList(detailUser, page, size);
+        List<ContentThumbResponse> list = new ArrayList<>();
+        long totalContentCount = selectContentList.getTotalElements();
+        ContentThumbResponse contentThumbResponse = new ContentThumbResponse();
+        List<ContentThumbResponse> contentList =
+                contentThumbResponse.toDtoList(selectContentList.getContent());
+
+        response.setContentsCount((int)totalContentCount);
+        response.setContentsList(contentList);
+        return response;
     }
 }

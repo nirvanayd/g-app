@@ -80,6 +80,4 @@ public class BrandController {
         brandService.brandBrandList(searchRequest);
         return response.success();
     }
-
-
 }
