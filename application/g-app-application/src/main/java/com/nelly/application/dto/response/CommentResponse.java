@@ -22,6 +22,7 @@ public class CommentResponse {
     private String deletedAt;
     private List<ChildCommentResponse> commentList;
     private Integer status;
+    private Integer childCount;
 
     public CommentResponse toDto(Comments c) {
         ContentMemberResponse memberResponse = new ContentMemberResponse();
@@ -41,7 +42,9 @@ public class CommentResponse {
         ContentMemberResponse memberResponse = new ContentMemberResponse();
         ChildCommentResponse childCommentResponse = new ChildCommentResponse();
         return commentList.stream().map(c -> {
+
             int size = c.getComments().size();
+
             if (c.getComments().size() > 2) size = 2;
             List<Comments> childCommentList = c.getComments().subList(0,size);
             return CommentResponse.builder().
@@ -52,6 +55,7 @@ public class CommentResponse {
                     deletedAt(c.getDeletedDate() == null ? null : c.getDeletedDate().toString()).
                     status(c.getStatus().getCode() == null ? null : Integer.parseInt(c.getStatus().getCode())).
                     member(memberResponse.contentUserToResponse(c.getUser())).
+                    childCount(c.getComments().size()).
                     commentList(childCommentResponse.toDtoList(childCommentList)).build();
                 }
         ).collect(Collectors.toList());

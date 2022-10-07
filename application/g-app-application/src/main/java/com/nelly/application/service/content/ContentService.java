@@ -350,7 +350,6 @@ public class ContentService {
                 l.setMarked(marked);
             });
         }
-
         return list;
     }
 
@@ -428,9 +427,6 @@ public class ContentService {
         ContentCommentResponse response = new ContentCommentResponse();
         response.setList(commentResponse.toDtoList(commentList));
         response.setCount(selectComments.getTotalElements());
-        if (selectComments.getTotalPages() > dto.getPage()) {
-            response.setHasNext(true);
-        }
         return response;
     }
 
@@ -453,9 +449,6 @@ public class ContentService {
         GetChildCommentListResponse getChildCommentListResponse = GetChildCommentListResponse.builder().
                 list(childCommentResponseList).totalCount(childCommentList.getTotalElements()).build();
 
-        if (childCommentList.getTotalPages() > dto.getPage()) {
-            getChildCommentListResponse.setHasNext(true);
-        }
         return getChildCommentListResponse;
     }
 

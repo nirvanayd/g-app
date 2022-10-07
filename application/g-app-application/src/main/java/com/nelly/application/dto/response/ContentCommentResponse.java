@@ -8,6 +8,5 @@ import java.util.List;
 @Data
 public class ContentCommentResponse {
     private Long count;
-    private boolean hasNext;
     private List<CommentResponse> list;
 }
