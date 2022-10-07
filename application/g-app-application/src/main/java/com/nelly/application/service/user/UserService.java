@@ -300,6 +300,9 @@ public class UserService {
     }
 
     public GetUserDetailResponse getUserDetail(Long userDetailId, Users user) {
+        // 토큰이 없을 때는 다른 사람 페이지
+        // 토큰이 있을 때 user.id === userDetailId --> 본인 마이페이지
+        // 토큰이 있을 때 user.id !== userDetailId --> 다른 사람 페이지
         return getUserDetail(userDetailId);
     }
 
@@ -309,7 +312,7 @@ public class UserService {
         GetUserDetailResponse response = getUserDetailResponse.toDto(detailUser);
 
         int page = 0;
-        int size = 0;
+        int size = 20;
         Page<Contents> selectContentList = contentDomainService.selectContentList(detailUser, page, size);
         List<ContentThumbResponse> list = new ArrayList<>();
         long totalContentCount = selectContentList.getTotalElements();

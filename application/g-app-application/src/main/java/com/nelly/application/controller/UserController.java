@@ -66,7 +66,6 @@ public class UserController {
 
         log.info("reissue/response access token --> " + tokenInfoDto.getAccessToken());
         log.info("reissue/response refresh token --> " + tokenInfoDto.getRefreshToken());
-
         return response.success(data);
     }
 
@@ -219,13 +218,15 @@ public class UserController {
     }
 
     @GetMapping("/users/detail/{id}")
-    public ResponseEntity<?> getUserMark(@PathVariable String id) {
+    public ResponseEntity<?> getUserDetailById(@PathVariable String id) {
         Long userDetailId = Long.parseLong(id);
         Optional<Users> user = userService.getAppUser();
 
         if (user.isPresent()) {
+            log.info("case 1");
             return response.success(userService.getUserDetail(userDetailId, user.get()));
         } else {
+            log.info("case 1");
             return response.success(userService.getUserDetail(userDetailId));
         }
     }

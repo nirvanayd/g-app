@@ -4,6 +4,7 @@ import com.nelly.application.domain.*;
 import com.nelly.application.enums.*;
 import com.nelly.application.repository.*;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -16,6 +17,7 @@ import java.util.Optional;
 
 @RequiredArgsConstructor
 @Service
+@Slf4j
 public class UserDomainService {
 
     private final AppUserRepository userRepository;
