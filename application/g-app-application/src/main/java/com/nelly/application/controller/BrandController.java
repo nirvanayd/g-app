@@ -5,6 +5,7 @@ import com.nelly.application.dto.Response;
 import com.nelly.application.dto.request.*;
 import com.nelly.application.dto.response.*;
 import com.nelly.application.exception.SystemException;
+import com.nelly.application.repository.BrandTagsRepository;
 import com.nelly.application.service.brand.BrandService;
 import com.nelly.application.service.user.UserService;
 import lombok.AllArgsConstructor;
@@ -77,7 +78,12 @@ public class BrandController {
 
     @PostMapping("/brands/search")
     public ResponseEntity<?> searchBrand(SearchBrandRequest searchRequest) {
-        brandService.brandBrandList(searchRequest);
+        return response.success();
+    }
+
+    @GetMapping("/brands/tagList")
+    public ResponseEntity<?> getBrandTagList() {
+//        BrandTagsRepository brandTagsRepository = brandService.getBrandTagList();
         return response.success();
     }
 }

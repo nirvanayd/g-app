@@ -13,6 +13,7 @@ import java.util.List;
 public class BrandInitResponse {
     private long id;
     private String name;
+    private String nameKr;
     private String description;
     @JsonIgnore
     private String logoImageUrl;

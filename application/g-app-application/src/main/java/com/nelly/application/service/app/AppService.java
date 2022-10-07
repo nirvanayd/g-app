@@ -40,7 +40,7 @@ public class AppService {
 
         List<Brands> brandList = brandDomainService.selectAppBrandList();
         List<BrandInitResponse> brandResponseList =
-                brandList.stream().map(u -> modelMapper.map(u, BrandInitResponse.class)).collect(Collectors.toList());;
+                brandList.stream().map(u -> modelMapper.map(u, BrandInitResponse.class)).collect(Collectors.toList());
 
         AppInitDataResponse response = new AppInitDataResponse();
 

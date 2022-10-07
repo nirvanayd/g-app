@@ -244,7 +244,7 @@ public class BrandService {
     }
 
 
-    public void brandBrandList(SearchBrandRequest dto) {
+    public void getBrandTagList() {
 
     }
 
