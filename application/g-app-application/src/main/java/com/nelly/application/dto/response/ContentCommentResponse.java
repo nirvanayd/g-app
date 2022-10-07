@@ -7,6 +7,5 @@ import java.util.List;
 
 @Data
 public class ContentCommentResponse {
-    private Long count;
     private List<CommentResponse> list;
 }

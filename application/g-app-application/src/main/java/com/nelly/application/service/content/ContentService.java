@@ -412,7 +412,7 @@ public class ContentService {
         return returnStatus.getCode();
     }
 
-    public ContentCommentResponse getCommentList(Long contentId, GetCommentListRequest dto) {
+    public List<CommentResponse> getCommentList(Long contentId, GetCommentListRequest dto) {
         Optional<Contents> selectContent = contentDomainService.selectContent(contentId);
         if (selectContent.isEmpty()) throw new SystemException("컨텐츠 정보를 조회할 수 없습니다.");
         Contents content = selectContent.get();
@@ -424,10 +424,7 @@ public class ContentService {
         }
         List<Comments> commentList = selectComments.getContent();
         CommentResponse commentResponse = new CommentResponse();
-        ContentCommentResponse response = new ContentCommentResponse();
-        response.setList(commentResponse.toDtoList(commentList));
-        response.setCount(selectComments.getTotalElements());
-        return response;
+        return commentResponse.toDtoList(commentList);
     }
 
     public List<ChildCommentResponse> getChildCommentList(Long parentId, GetCommentListRequest dto) {
