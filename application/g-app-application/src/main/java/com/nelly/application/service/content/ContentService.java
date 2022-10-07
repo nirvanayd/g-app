@@ -430,7 +430,7 @@ public class ContentService {
         return response;
     }
 
-    public GetChildCommentListResponse getChildCommentList(Long parentId, GetCommentListRequest dto) {
+    public List<ChildCommentResponse> getChildCommentList(Long parentId, GetCommentListRequest dto) {
         Optional<Comments> selectComment = contentDomainService.selectComment(parentId);
         if (selectComment.isEmpty()) throw new SystemException("댓글 정보를 조회할 수 없습니다.");
         Comments parent = selectComment.get();
@@ -443,13 +443,7 @@ public class ContentService {
         if (dto.getPage() == 0) {
             commentList = commentList.subList(2, commentList.size());
         }
-
-        List<ChildCommentResponse> childCommentResponseList = childCommentResponse.toDtoList(commentList);
-
-        GetChildCommentListResponse getChildCommentListResponse = GetChildCommentListResponse.builder().
-                list(childCommentResponseList).totalCount(childCommentList.getTotalElements()).build();
-
-        return getChildCommentListResponse;
+        return childCommentResponse.toDtoList(commentList);
     }
 
     @Transactional

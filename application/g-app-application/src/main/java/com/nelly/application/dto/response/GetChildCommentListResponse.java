@@ -8,6 +8,5 @@ import java.util.List;
 @Data
 @Builder
 public class GetChildCommentListResponse {
-    private Long totalCount;
     private List<ChildCommentResponse> list;
 }

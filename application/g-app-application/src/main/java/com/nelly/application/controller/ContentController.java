@@ -131,8 +131,6 @@ public class ContentController {
                                                  GetCommentListRequest dto
     ) {
         Long parentId = Long.parseLong(id);
-        GetChildCommentListResponse getChildCommentListResponse =
-                contentService.getChildCommentList(parentId, dto);
-        return response.success(getChildCommentListResponse);
+        return response.success(contentService.getChildCommentList(parentId, dto));
     }
 }
