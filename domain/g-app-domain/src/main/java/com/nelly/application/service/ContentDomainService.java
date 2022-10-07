@@ -218,7 +218,6 @@ public class ContentDomainService {
         return commentsRepository.findAllByParent(parent, pageRequest);
     }
 
-
     public void saveCommentDelete(DeleteStatus status, Comments comment) {
         comment.setStatus(status);
         comment.setDeletedDate(LocalDateTime.now());

@@ -8,15 +8,13 @@ import com.nelly.application.converter.YesOrNoTypeConverter;
 import com.nelly.application.enums.DeleteStatus;
 import com.nelly.application.enums.YesOrNoType;
 import lombok.*;
+import org.hibernate.annotations.BatchSize;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Entity
 @Builder
@@ -51,7 +49,7 @@ public class Comments extends BaseTime {
     @JoinColumn(name = "content_id")
     private Contents content;
 
-    @OneToMany(mappedBy = "parent")
+    @OneToMany(mappedBy = "parent", fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
     private List<Comments> comments = new ArrayList<>();
 
     @Column(name = "deleted_date")

@@ -1,15 +1,13 @@
 package com.nelly.application.dto.response;
 
 import com.nelly.application.dto.CommonListResponse;
-import lombok.Builder;
 import lombok.Data;
 
 import java.util.List;
 
 @Data
-@Builder
-public class GetChildCommentListResponse {
-    private Long totalCount;
+public class ContentCommentResponse {
+    private Long count;
     private boolean hasNext;
-    private List<ChildCommentResponse> list;
+    private List<CommentResponse> list;
 }

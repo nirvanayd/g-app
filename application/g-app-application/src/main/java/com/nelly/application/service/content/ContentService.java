@@ -409,11 +409,11 @@ public class ContentService {
         } else {
             throw new SystemException("삭제 권한이 없습니다.");
         }
-        cacheTemplate.incrValue(String.valueOf(content.getId()), "reply");
+        cacheTemplate.decrValue(String.valueOf(content.getId()), "reply");
         return returnStatus.getCode();
     }
 
-    public List<CommentResponse> getCommentList(Long contentId, GetCommentListRequest dto) {
+    public ContentCommentResponse getCommentList(Long contentId, GetCommentListRequest dto) {
         Optional<Contents> selectContent = contentDomainService.selectContent(contentId);
         if (selectContent.isEmpty()) throw new SystemException("컨텐츠 정보를 조회할 수 없습니다.");
         Contents content = selectContent.get();
@@ -425,7 +425,13 @@ public class ContentService {
         }
         List<Comments> commentList = selectComments.getContent();
         CommentResponse commentResponse = new CommentResponse();
-        return commentResponse.toDtoList(commentList);
+        ContentCommentResponse response = new ContentCommentResponse();
+        response.setList(commentResponse.toDtoList(commentList));
+        response.setCount(selectComments.getTotalElements());
+        if (selectComments.getTotalPages() > dto.getPage()) {
+            response.setHasNext(true);
+        }
+        return response;
     }
 
     public GetChildCommentListResponse getChildCommentList(Long parentId, GetCommentListRequest dto) {
@@ -436,14 +442,20 @@ public class ContentService {
                 contentDomainService.selectChildCommentList(parent, dto.getPage(), dto.getSize());
 
         List<Comments> commentList = childCommentList.getContent();
-        long contentSize = childCommentList.getContent().size();
         ChildCommentResponse childCommentResponse = new ChildCommentResponse();
+
+        if (dto.getPage() == 0) {
+            commentList = commentList.subList(2, commentList.size());
+        }
+
         List<ChildCommentResponse> childCommentResponseList = childCommentResponse.toDtoList(commentList);
 
         GetChildCommentListResponse getChildCommentListResponse = GetChildCommentListResponse.builder().
                 list(childCommentResponseList).totalCount(childCommentList.getTotalElements()).build();
-        getChildCommentListResponse.setEnded(contentSize == 0);
 
+        if (childCommentList.getTotalPages() > dto.getPage()) {
+            getChildCommentListResponse.setHasNext(true);
+        }
         return getChildCommentListResponse;
     }
 

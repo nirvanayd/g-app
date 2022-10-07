@@ -40,15 +40,20 @@ public class CommentResponse {
     public List<CommentResponse> toDtoList(List<Comments> commentList) {
         ContentMemberResponse memberResponse = new ContentMemberResponse();
         ChildCommentResponse childCommentResponse = new ChildCommentResponse();
-        return commentList.stream().map(c -> CommentResponse.builder().
-                id(c.getId()).
-                comment(c.getComment()).
-                createdAt(c.getCreatedDate().toString()).
-                updatedAt(c.getModifiedDate().toString()).
-                deletedAt(c.getDeletedDate() == null ? null : c.getDeletedDate().toString()).
-                status(c.getStatus().getCode() == null ? null : Integer.parseInt(c.getStatus().getCode())).
-                member(memberResponse.contentUserToResponse(c.getUser())).
-                commentList(childCommentResponse.toDtoList(c.getComments())).build()
+        return commentList.stream().map(c -> {
+            int size = c.getComments().size();
+            if (c.getComments().size() > 2) size = 2;
+            List<Comments> childCommentList = c.getComments().subList(0,size);
+            return CommentResponse.builder().
+                    id(c.getId()).
+                    comment(c.getComment()).
+                    createdAt(c.getCreatedDate().toString()).
+                    updatedAt(c.getModifiedDate().toString()).
+                    deletedAt(c.getDeletedDate() == null ? null : c.getDeletedDate().toString()).
+                    status(c.getStatus().getCode() == null ? null : Integer.parseInt(c.getStatus().getCode())).
+                    member(memberResponse.contentUserToResponse(c.getUser())).
+                    commentList(childCommentResponse.toDtoList(childCommentList)).build();
+                }
         ).collect(Collectors.toList());
     }
 }

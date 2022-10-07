@@ -122,8 +122,8 @@ public class ContentController {
                                                    GetCommentListRequest dto
                                            ) {
         Long contentId = Long.parseLong(id);
-        List<CommentResponse> commentList = contentService.getCommentList(contentId, dto);
-        return response.success(commentList);
+        ContentCommentResponse contentCommentResponse = contentService.getCommentList(contentId, dto);
+        return response.success(contentCommentResponse);
     }
 
     @GetMapping("/comments/child/{commentId}")

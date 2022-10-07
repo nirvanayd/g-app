@@ -72,4 +72,3 @@ mail:
   protocol: smtp
   debug: true
   encoding: UTF-8
-
