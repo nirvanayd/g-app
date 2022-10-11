@@ -226,7 +226,7 @@ public class UserController {
             log.info("case 1");
             return response.success(userService.getUserDetail(userDetailId, user.get()));
         } else {
-            log.info("case 1");
+            log.info("case 2");
             return response.success(userService.getUserDetail(userDetailId));
         }
     }
