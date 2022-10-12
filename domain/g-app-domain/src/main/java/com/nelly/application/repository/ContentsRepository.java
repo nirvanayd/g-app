@@ -31,4 +31,10 @@ public interface ContentsRepository extends JpaRepository<Contents, Long> {
     void updateContentReply(@Param("contentId") Long contentId, @Param("value") int value);
 
     Page<Contents> findAllByUser(Users user, Pageable pageable);
+
+    @Query("SELECT SUM(c.likeCount) FROM Contents c WHERE c.deletedDate IS NULL")
+    Long countUserLike(@Param("user") Users user);
+
+    @Query("SELECT SUM(c.markCount) FROM Contents c WHERE c.deletedDate IS NULL")
+    Long countUserMark(@Param("detailUser") Users detailUser);
 }

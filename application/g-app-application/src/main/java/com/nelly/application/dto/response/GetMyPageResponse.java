@@ -23,23 +23,22 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class GetUserDetailResponse {
+public class GetMyPageResponse {
     private Long id;
     private String nickname;
     private String photoURL;
     private String profileTitle;
     private String profileText;
     private String status;
-    private String description;
     private int followerCount;
-    private long likeCount;
-    private long markCount;
+    private int likeCount;
+    private int markCount;
     private int contentsCount;
     private boolean followed;
     private List<ContentThumbResponse> contentsList;
 
-    public GetUserDetailResponse toDto(Users u) {
-        return GetUserDetailResponse.builder().
+    public GetMyPageResponse toDto(Users u) {
+        return GetMyPageResponse.builder().
                 id(u.getId()).
                 nickname(u.getLoginId()).
                 photoURL(u.getProfileImageUrl()).

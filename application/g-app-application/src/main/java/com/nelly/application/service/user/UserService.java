@@ -22,6 +22,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
+import org.yaml.snakeyaml.error.Mark;
 
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -106,7 +107,6 @@ public class UserService {
 
     public void logout(String token) {
         TokenInfoDto tokenInfoDto = authService.getAppAuthentication(token);
-
         if (cacheTemplate.getValue(String.valueOf(tokenInfoDto.getAuthId()), "token") != null) {
             cacheTemplate.deleteCache(String.valueOf(tokenInfoDto.getAuthId()), "token");
         }
@@ -116,7 +116,6 @@ public class UserService {
     public Users userTest(String token) {
         TokenInfoDto tokenInfoDto = authService.getAppAuthentication(token);
         long authId = tokenInfoDto.getAuthId();
-
         return userDomainService.getUsers(authId);
     }
 
@@ -303,6 +302,9 @@ public class UserService {
         // 토큰이 없을 때는 다른 사람 페이지
         // 토큰이 있을 때 user.id === userDetailId --> 본인 마이페이지
         // 토큰이 있을 때 user.id !== userDetailId --> 다른 사람 페이지
+        if (Objects.equals(user.getId(), userDetailId)) {
+            return getUserDetailOwner(userDetailId);
+        }
         return getUserDetail(userDetailId);
     }
 
@@ -314,6 +316,31 @@ public class UserService {
         int page = 0;
         int size = 20;
         Page<Contents> selectContentList = contentDomainService.selectContentList(detailUser, page, size);
+
+        Long userLikeCount = contentDomainService.countUserLike(detailUser);
+        Long userMarkCount = contentDomainService.countUserMark(detailUser);
+
+        List<ContentThumbResponse> list = new ArrayList<>();
+        long totalContentCount = selectContentList.getTotalElements();
+        ContentThumbResponse contentThumbResponse = new ContentThumbResponse();
+        List<ContentThumbResponse> contentList =
+                contentThumbResponse.toDtoList(selectContentList.getContent());
+
+        response.setContentsCount((int)totalContentCount);
+        response.setLikeCount(userLikeCount);
+        response.setMarkCount(userMarkCount);
+        response.setContentsList(contentList);
+        return response;
+    }
+
+    public GetUserDetailResponse getUserDetailOwner(Long userDetailId) {
+        Users ownerUser = getUser(userDetailId);
+        GetUserDetailResponse getUserDetailResponse = new GetUserDetailResponse();
+        GetUserDetailResponse response = getUserDetailResponse.toDto(ownerUser);
+        int page = 0;
+        int size = 20;
+        Page<Contents> selectContentList = contentDomainService.selectContentList(ownerUser, page, size);
+        Page<ContentMarks> selectMarkList = contentDomainService.selectUserMarkList(ownerUser, page, size);
         List<ContentThumbResponse> list = new ArrayList<>();
         long totalContentCount = selectContentList.getTotalElements();
         ContentThumbResponse contentThumbResponse = new ContentThumbResponse();
@@ -323,5 +350,17 @@ public class UserService {
         response.setContentsCount((int)totalContentCount);
         response.setContentsList(contentList);
         return response;
+    }
+
+    public void getMyPageContentList() {
+
+    }
+
+    public void getMyPageMarkList() {
+
+    }
+
+    public void getMyPageCartList() {
+
     }
 }

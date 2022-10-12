@@ -234,6 +234,11 @@ public class ContentDomainService {
         return contentMarksRepository.findAllByContentId(contentId, pageRequest);
     }
 
+    public Page<ContentMarks> selectUserMarkList(Users user, Integer page, Integer size) {
+        PageRequest pageRequest = PageRequest.of(page, size, Sort.by("id").descending());
+        return contentMarksRepository.findAllByUser(user, pageRequest);
+    }
+
     public Page<ContentLikes> selectUserContentLike(Users user, Integer page, Integer size) {
         PageRequest pageRequest = PageRequest.of(page, size, Sort.by("modifiedDate").descending());
         return contentLikesRepository.findAllByContent_User(user, pageRequest);
@@ -242,5 +247,13 @@ public class ContentDomainService {
     public Page<ContentMarks> selectUserContentMark(Users user, Integer page, Integer size) {
         PageRequest pageRequest = PageRequest.of(page, size, Sort.by("modifiedDate").descending());
         return contentMarksRepository.findAllByContent_User(user, pageRequest);
+    }
+
+    public Long countUserLike(Users user) {
+        return contentsRepository.countUserLike(user);
+    }
+
+    public Long countUserMark(Users user) {
+        return contentsRepository.countUserMark(user);
     }
 }
