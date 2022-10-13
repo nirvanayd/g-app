@@ -34,8 +34,11 @@ public class GetMyPageResponse {
     private int likeCount;
     private int markCount;
     private int contentsCount;
+    private int contentMarkCount;
     private boolean followed;
-    private List<ContentThumbResponse> contentsList;
+    private boolean isOwner;
+    private List<ContentThumbResponse> contentList;
+    private List<ContentThumbResponse> contentMarkList;
 
     public GetMyPageResponse toDto(Users u) {
         return GetMyPageResponse.builder().

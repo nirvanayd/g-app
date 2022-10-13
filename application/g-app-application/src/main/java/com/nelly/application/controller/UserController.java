@@ -5,10 +5,7 @@ import com.nelly.application.domain.Users;
 import com.nelly.application.dto.TokenInfoDto;
 import com.nelly.application.dto.request.*;
 import com.nelly.application.dto.Response;
-import com.nelly.application.dto.response.GetUserDetailResponse;
-import com.nelly.application.dto.response.LoginResponse;
-import com.nelly.application.dto.response.UserAgreementsResponse;
-import com.nelly.application.dto.response.UserResponse;
+import com.nelly.application.dto.response.*;
 import com.nelly.application.enums.StyleType;
 import com.nelly.application.mail.MailSender;
 import com.nelly.application.service.content.ContentService;
@@ -18,9 +15,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -223,9 +223,43 @@ public class UserController {
         Optional<Users> user = userService.getAppUser();
 
         if (user.isPresent()) {
-            return response.success(userService.getUserDetail(userDetailId, user.get()));
+            // 토큰이 없을 때는 다른 사람 페이지
+            // 토큰이 있을 때 user.id === userDetailId --> 본인 마이페이지
+            // 토큰이 있을 때 user.id !== userDetailId --> 다른 사람 페이지
+            if (Objects.equals(user.get().getId(), userDetailId)) {
+                return response.success(userService.getUserDetailOwner(userDetailId));
+            }
+            return response.success(userService.getUserDetail(userDetailId, user));
         } else {
-            return response.success(userService.getUserDetail(userDetailId));
+            return response.success(userService.getUserDetail(userDetailId, user));
         }
+    }
+
+    @GetMapping("/user/detail/content/{id}")
+    public ResponseEntity<?> getUserDetailContentList(@PathVariable String id,
+                                                      GetContentListRequest dto) {
+        Long userDetailId = Long.parseLong(id);
+        Optional<Users> user = userService.getAppUser();
+        userService.getUserDetailContentList(userDetailId, dto);
+        return response.success();
+    }
+
+    @GetMapping("/user/detail/mark/{id}")
+    public ResponseEntity<?> getUserDetailMarkContentList(@PathVariable String id,
+                                                      GetContentListRequest dto) {
+        Long userDetailId = Long.parseLong(id);
+        Optional<Users> user = userService.getAppUser();
+        userService.getUserDetailMarkContentList(userDetailId, dto);
+        return response.success();
+    }
+
+    @PostMapping("/users/profile-image")
+    public ResponseEntity<?> saveProfileImage(@NotNull @RequestParam("image") MultipartFile image) {
+        return response.success();
+    }
+
+    @PostMapping("/users/background-image")
+    public ResponseEntity<?> saveBackgroundImage() {
+        return response.success();
     }
 }

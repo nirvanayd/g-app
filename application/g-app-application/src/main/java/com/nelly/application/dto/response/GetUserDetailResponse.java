@@ -36,7 +36,7 @@ public class GetUserDetailResponse {
     private long markCount;
     private int contentsCount;
     private boolean followed;
-    private List<ContentThumbResponse> contentsList;
+    private List<ContentThumbResponse> contentList;
 
     public GetUserDetailResponse toDto(Users u) {
         return GetUserDetailResponse.builder().

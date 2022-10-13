@@ -4,10 +4,12 @@ import com.nelly.application.domain.*;
 import com.nelly.application.dto.request.*;
 import com.nelly.application.dto.TokenInfoDto;
 import com.nelly.application.dto.response.ContentThumbResponse;
+import com.nelly.application.dto.response.GetMyPageResponse;
 import com.nelly.application.dto.response.GetUserDetailResponse;
 import com.nelly.application.enums.Authority;
 import com.nelly.application.enums.RoleType;
 import com.nelly.application.enums.YesOrNoType;
+import com.nelly.application.exception.NoContentException;
 import com.nelly.application.exception.SystemException;
 import com.nelly.application.mail.MailSender;
 import com.nelly.application.service.ContentDomainService;
@@ -298,21 +300,10 @@ public class UserService {
         }
     }
 
-    public GetUserDetailResponse getUserDetail(Long userDetailId, Users user) {
-        // 토큰이 없을 때는 다른 사람 페이지
-        // 토큰이 있을 때 user.id === userDetailId --> 본인 마이페이지
-        // 토큰이 있을 때 user.id !== userDetailId --> 다른 사람 페이지
-        if (Objects.equals(user.getId(), userDetailId)) {
-            return getUserDetailOwner(userDetailId);
-        }
-        return getUserDetail(userDetailId);
-    }
-
-    public GetUserDetailResponse getUserDetail(Long userDetailId) {
+    public GetUserDetailResponse getUserDetail(Long userDetailId, Optional<Users> user) {
         Users detailUser = getUser(userDetailId);
         GetUserDetailResponse getUserDetailResponse = new GetUserDetailResponse();
         GetUserDetailResponse response = getUserDetailResponse.toDto(detailUser);
-
         int page = 0;
         int size = 20;
         Page<Contents> selectContentList = contentDomainService.selectContentList(detailUser, page, size);
@@ -326,38 +317,60 @@ public class UserService {
         List<ContentThumbResponse> contentList =
                 contentThumbResponse.toDtoList(selectContentList.getContent());
 
+        // 팔로우 유무
+        if (user.isPresent()) {
+            Optional<UserFollow> selectUserFollow = userDomainService.selectUserFollow(user.get(), detailUser);
+            if (selectUserFollow.isPresent()) {
+                response.setFollowed(true);
+            }
+        }
+
         response.setContentsCount((int)totalContentCount);
         response.setLikeCount(userLikeCount);
         response.setMarkCount(userMarkCount);
-        response.setContentsList(contentList);
+        response.setContentList(contentList);
         return response;
     }
 
-    public GetUserDetailResponse getUserDetailOwner(Long userDetailId) {
+    public GetMyPageResponse getUserDetailOwner(Long userDetailId) {
         Users ownerUser = getUser(userDetailId);
-        GetUserDetailResponse getUserDetailResponse = new GetUserDetailResponse();
-        GetUserDetailResponse response = getUserDetailResponse.toDto(ownerUser);
+        GetMyPageResponse getMyPageResponse = new GetMyPageResponse();
+        GetMyPageResponse response = getMyPageResponse.toDto(ownerUser);
         int page = 0;
         int size = 20;
         Page<Contents> selectContentList = contentDomainService.selectContentList(ownerUser, page, size);
         Page<ContentMarks> selectMarkList = contentDomainService.selectUserMarkList(ownerUser, page, size);
         List<ContentThumbResponse> list = new ArrayList<>();
         long totalContentCount = selectContentList.getTotalElements();
+        long totalContentMarkCount = selectMarkList.getTotalElements();
         ContentThumbResponse contentThumbResponse = new ContentThumbResponse();
         List<ContentThumbResponse> contentList =
                 contentThumbResponse.toDtoList(selectContentList.getContent());
+        List<ContentThumbResponse> markList =
+                contentThumbResponse.toDtoList(selectContentList.getContent());
 
         response.setContentsCount((int)totalContentCount);
-        response.setContentsList(contentList);
+        response.setContentMarkCount((int)totalContentMarkCount);
+        response.setContentList(contentList);
+        response.setContentMarkList(markList);
+        response.setOwner(true);
         return response;
     }
 
-    public void getMyPageContentList() {
-
+    public List<ContentThumbResponse> getUserDetailContentList(Long userDetailId, GetContentListRequest dto) {
+        Users detailUser = getUser(userDetailId);
+        Page<Contents> selectContentList = contentDomainService.selectContentList(detailUser, dto.getPage(), dto.getSize());
+        ContentThumbResponse contentThumbResponse = new ContentThumbResponse();
+        if (selectContentList.isEmpty()) throw new NoContentException();
+        return contentThumbResponse.toDtoList(selectContentList.getContent());
     }
 
-    public void getMyPageMarkList() {
-
+    public List<ContentThumbResponse> getUserDetailMarkContentList(Long userDetailId, GetContentListRequest dto) {
+        Users detailUser = getUser(userDetailId);
+        Page<ContentMarks> selectMarkList = contentDomainService.selectUserMarkList(detailUser, dto.getPage(), dto.getSize());
+        ContentThumbResponse contentThumbResponse = new ContentThumbResponse();
+        if (selectMarkList.isEmpty()) throw new NoContentException();
+        return contentThumbResponse.toDtoMarkList(selectMarkList.getContent());
     }
 
     public void getMyPageCartList() {
