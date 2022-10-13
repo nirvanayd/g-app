@@ -240,8 +240,7 @@ public class UserController {
                                                       GetContentListRequest dto) {
         Long userDetailId = Long.parseLong(id);
         Optional<Users> user = userService.getAppUser();
-        userService.getUserDetailContentList(userDetailId, dto);
-        return response.success();
+        return response.success(userService.getUserDetailContentList(userDetailId, dto));
     }
 
     @GetMapping("/user/detail/mark/{id}")
@@ -249,8 +248,7 @@ public class UserController {
                                                       GetContentListRequest dto) {
         Long userDetailId = Long.parseLong(id);
         Optional<Users> user = userService.getAppUser();
-        userService.getUserDetailMarkContentList(userDetailId, dto);
-        return response.success();
+        return response.success(userService.getUserDetailMarkContentList(userDetailId, dto));
     }
 
     @PostMapping("/users/profile-image")
