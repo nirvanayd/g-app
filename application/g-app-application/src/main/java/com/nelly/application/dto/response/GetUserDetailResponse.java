@@ -27,6 +27,7 @@ public class GetUserDetailResponse {
     private Long id;
     private String nickname;
     private String photoURL;
+    private String backgroundPhotoURL;
     private String profileTitle;
     private String profileText;
     private String status;
@@ -43,6 +44,7 @@ public class GetUserDetailResponse {
                 id(u.getId()).
                 nickname(u.getLoginId()).
                 photoURL(u.getProfileImageUrl()).
+                backgroundPhotoURL(u.getBackgroundImageUrl()).
                 profileTitle(u.getProfileTitle()).
                 profileText(u.getProfileText()).
                 status(u.getStatus().toString()).

@@ -23,6 +23,7 @@ public class AwsProperties {
         private String url;
         private String brandDir;
         private String contentDir;
+        private String profileDir;
         private String defaultImageUrl;
     }
 

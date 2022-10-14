@@ -53,6 +53,7 @@ cloud:
       brand-dir: 'prod/brand'
       default-image-url: 'https://d3b7cshusafhca.cloudfront.net/prod/default/logo-default.png'
       content-dir: 'prod/content'
+      profile-dir: 'prod/profile'
     region:
       static: ap-northeast-2
     stack:

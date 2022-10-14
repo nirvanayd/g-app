@@ -1,11 +1,10 @@
 package com.nelly.application.service.user;
 
+import com.nelly.application.config.AwsProperties;
 import com.nelly.application.domain.*;
 import com.nelly.application.dto.request.*;
 import com.nelly.application.dto.TokenInfoDto;
-import com.nelly.application.dto.response.ContentThumbResponse;
-import com.nelly.application.dto.response.GetMyPageResponse;
-import com.nelly.application.dto.response.GetUserDetailResponse;
+import com.nelly.application.dto.response.*;
 import com.nelly.application.enums.Authority;
 import com.nelly.application.enums.RoleType;
 import com.nelly.application.enums.YesOrNoType;
@@ -18,14 +17,17 @@ import com.nelly.application.service.AuthService;
 import com.nelly.application.util.AgeUtil;
 import com.nelly.application.util.CacheTemplate;
 import com.nelly.application.util.EncryptUtils;
+import com.nelly.application.util.S3Uploader;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
+import org.springframework.web.multipart.MultipartFile;
 import org.yaml.snakeyaml.error.Mark;
 
+import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
@@ -39,9 +41,11 @@ public class UserService {
     private final EncryptUtils encryptUtils;
     private final CacheTemplate cacheTemplate;
     private final MailSender mailSender;
+    private final AwsProperties awsProperties;
+    private final S3Uploader s3Uploader;
 
     private static final String BEARER_TYPE = "Bearer";
-
+    private static final String DIRECTORY_SEPARATOR = "/";
 
     @Transactional
     public void signUp(SignUpRequest dto) {
@@ -344,10 +348,11 @@ public class UserService {
         long totalContentCount = selectContentList.getTotalElements();
         long totalContentMarkCount = selectMarkList.getTotalElements();
         ContentThumbResponse contentThumbResponse = new ContentThumbResponse();
+        MarkContentThumbResponse markContentThumbResponse = new MarkContentThumbResponse();
         List<ContentThumbResponse> contentList =
                 contentThumbResponse.toDtoList(selectContentList.getContent());
-        List<ContentThumbResponse> markList =
-                contentThumbResponse.toDtoList(selectContentList.getContent());
+        List<MarkContentThumbResponse> markList =
+                markContentThumbResponse.toDtoList(selectContentList.getContent());
 
         response.setContentsCount((int)totalContentCount);
         response.setContentMarkCount((int)totalContentMarkCount);
@@ -365,15 +370,55 @@ public class UserService {
         return contentThumbResponse.toDtoList(selectContentList.getContent());
     }
 
-    public List<ContentThumbResponse> getUserDetailMarkContentList(Long userDetailId, GetContentListRequest dto) {
+    public List<MarkContentThumbResponse> getUserDetailMarkContentList(Long userDetailId, GetContentListRequest dto) {
         Users detailUser = getUser(userDetailId);
         Page<ContentMarks> selectMarkList = contentDomainService.selectUserMarkList(detailUser, dto.getPage(), dto.getSize());
-        ContentThumbResponse contentThumbResponse = new ContentThumbResponse();
+        MarkContentThumbResponse contentThumbResponse = new MarkContentThumbResponse();
         if (selectMarkList.isEmpty()) throw new NoContentException();
         return contentThumbResponse.toDtoMarkList(selectMarkList.getContent());
     }
 
     public void getMyPageCartList() {
 
+    }
+
+    @Transactional
+    public ImageResponse uploadUserProfileImage(List<MultipartFile> images) throws IOException {
+        if (images.size() != 1 ) throw new SystemException("첨부파일 양식이 올바르지 않습니다.");
+        // get user id
+        Users user = getUser();
+        String imageUrl = null;
+        for (MultipartFile file: images) {
+            imageUrl = awsProperties.getCloudFront().getUrl() +
+                    s3Uploader.upload(
+                            awsProperties.getS3().getBucket(),
+                            file,
+                            getS3ProfilePath() + DIRECTORY_SEPARATOR + user.getId());
+        }
+
+        if (imageUrl == null) throw new SystemException("이미지 업로드가 ");
+
+        return ImageResponse.builder()
+                .url(imageUrl)
+                .build();
+    }
+
+    public String getS3ProfilePath() {
+        return awsProperties.getCloudFront().getProfileDir();
+    }
+
+    public void saveUserProfile(SaveProfileRequest dto) {
+        Users user = getUser();
+        userDomainService.saveAccountProfile(user, dto.getProfileTitle(), dto.getProfileText());
+    }
+
+    public void saveUserProfileImage(SaveProfileImageRequest dto) {
+        Users user = getUser();
+        userDomainService.saveAccountProfileImage(user, dto.getImageUrl());
+    }
+
+    public void saveUserBackgroundImage(SaveBackgroundImageRequest dto) {
+        Users user = getUser();
+        userDomainService.saveAccountBackgroundImage(user, dto.getImageUrl());
     }
 }

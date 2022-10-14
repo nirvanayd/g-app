@@ -19,6 +19,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
+import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -251,13 +252,33 @@ public class UserController {
         return response.success(userService.getUserDetailMarkContentList(userDetailId, dto));
     }
 
+    @PostMapping("/users/upload-profile")
+    public ResponseEntity<?> uploadProfileImage(@NotNull @RequestParam("images") List<MultipartFile> images) throws IOException {
+        ImageResponse imageResponse = userService.uploadUserProfileImage(images);
+        return response.success(imageResponse);
+    }
+
+    @PostMapping("/users/upload-background")
+    public ResponseEntity<?> uploadBackgroundImage(@NotNull @RequestParam("images") List<MultipartFile> images) throws IOException {
+        ImageResponse imageResponse = userService.uploadUserProfileImage(images);
+        return response.success(imageResponse);
+    }
+
     @PostMapping("/users/profile-image")
-    public ResponseEntity<?> saveProfileImage(@NotNull @RequestParam("image") MultipartFile image) {
+    public ResponseEntity<?> saveProfileImage(@RequestBody SaveProfileImageRequest dto){
+        userService.saveUserProfileImage(dto);
         return response.success();
     }
 
     @PostMapping("/users/background-image")
-    public ResponseEntity<?> saveBackgroundImage() {
+    public ResponseEntity<?> saveBackgroundImage(@RequestBody SaveBackgroundImageRequest dto) throws IOException {
+        userService.saveUserBackgroundImage(dto);
+        return response.success();
+    }
+
+    @PostMapping("/users/profile")
+    public ResponseEntity<?> saveProfileText(@RequestBody SaveProfileRequest dto) throws IOException {
+        userService.saveUserProfile(dto);
         return response.success();
     }
 }

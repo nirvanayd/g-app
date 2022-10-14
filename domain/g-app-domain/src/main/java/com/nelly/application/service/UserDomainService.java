@@ -196,4 +196,20 @@ public class UserDomainService {
     public void updateUserFollowingCount(Long userId, Integer count) {
         userFollowRepository.updateFollowingCount(userId, count);
     }
+
+    public void saveAccountProfile(Users user, String profileTitle, String profileText) {
+        user.setProfileTitle(profileTitle);
+        user.setProfileText(profileText);
+        userRepository.save(user);
+    }
+
+    public void saveAccountProfileImage(Users user, String imageUrl) {
+        user.setProfileImageUrl(imageUrl);
+        userRepository.save(user);
+    }
+
+    public void saveAccountBackgroundImage(Users user, String imageUrl) {
+        user.setBackgroundImageUrl(imageUrl);
+        userRepository.save(user);
+    }
 }

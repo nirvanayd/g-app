@@ -38,7 +38,7 @@ public class GetMyPageResponse {
     private boolean followed;
     private boolean isOwner;
     private List<ContentThumbResponse> contentList;
-    private List<ContentThumbResponse> contentMarkList;
+    private List<MarkContentThumbResponse> contentMarkList;
 
     public GetMyPageResponse toDto(Users u) {
         return GetMyPageResponse.builder().

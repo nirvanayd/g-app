@@ -41,7 +41,7 @@ public class S3Uploader {
                     .withCannedAcl(CannedAccessControlList.PublicRead));
 
         } catch (IOException e) {
-            throw new RuntimeException("upload failed..");
+            throw new RuntimeException("업로드 실패");
         }
         return path;
     }
