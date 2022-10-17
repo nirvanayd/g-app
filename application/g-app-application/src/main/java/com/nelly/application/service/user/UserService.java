@@ -341,9 +341,9 @@ public class UserService {
         GetMyPageResponse getMyPageResponse = new GetMyPageResponse();
         GetMyPageResponse response = getMyPageResponse.toDto(ownerUser);
         int page = 0;
-        int size = 20;
-        Page<Contents> selectContentList = contentDomainService.selectContentList(ownerUser, page, size);
-        Page<ContentMarks> selectMarkList = contentDomainService.selectUserMarkList(ownerUser, page, size);
+        int contentSize = 9;
+        Page<Contents> selectContentList = contentDomainService.selectContentList(ownerUser, page, contentSize);
+        Page<ContentMarks> selectMarkList = contentDomainService.selectUserMarkList(ownerUser, page, contentSize);
         List<ContentThumbResponse> list = new ArrayList<>();
         long totalContentCount = selectContentList.getTotalElements();
         long totalContentMarkCount = selectMarkList.getTotalElements();
@@ -352,7 +352,7 @@ public class UserService {
         List<ContentThumbResponse> contentList =
                 contentThumbResponse.toDtoList(selectContentList.getContent());
         List<MarkContentThumbResponse> markList =
-                markContentThumbResponse.toDtoList(selectContentList.getContent());
+                markContentThumbResponse.toDtoMarkList(selectMarkList.getContent());
 
         response.setContentsCount((int)totalContentCount);
         response.setContentMarkCount((int)totalContentMarkCount);
@@ -364,6 +364,7 @@ public class UserService {
 
     public List<ContentThumbResponse> getUserDetailContentList(Long userDetailId, GetContentListRequest dto) {
         Users detailUser = getUser(userDetailId);
+        dto.setSize(9);
         Page<Contents> selectContentList = contentDomainService.selectContentList(detailUser, dto.getPage(), dto.getSize());
         ContentThumbResponse contentThumbResponse = new ContentThumbResponse();
         if (selectContentList.isEmpty()) throw new NoContentException();
@@ -372,6 +373,7 @@ public class UserService {
 
     public List<MarkContentThumbResponse> getUserDetailMarkContentList(Long userDetailId, GetContentListRequest dto) {
         Users detailUser = getUser(userDetailId);
+        dto.setSize(10);
         Page<ContentMarks> selectMarkList = contentDomainService.selectUserMarkList(detailUser, dto.getPage(), dto.getSize());
         MarkContentThumbResponse contentThumbResponse = new MarkContentThumbResponse();
         if (selectMarkList.isEmpty()) throw new NoContentException();

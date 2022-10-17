@@ -16,7 +16,7 @@ import javax.persistence.*;
 @JsonIdentityInfo(
         generator = ObjectIdGenerators.PropertyGenerator.class,
         property = "id")
-public class ContentMarks extends BaseTime{
+public class ContentMarks extends BaseTime {
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)
     @Column(name = "id")
@@ -30,4 +30,3 @@ public class ContentMarks extends BaseTime{
     @JoinColumn(name = "content_id")
     private Contents content;
 }
-

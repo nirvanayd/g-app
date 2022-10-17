@@ -20,20 +20,8 @@ public class MarkContentThumbResponse {
     private String photo;
     private String markName;
 
-    public List<MarkContentThumbResponse> toDtoList(List<Contents> list) {
-        return list.stream().map(this::toDto).collect(Collectors.toList());
-    }
-
     public List<MarkContentThumbResponse> toDtoMarkList(List<ContentMarks> list) {
         return list.stream().map(this::toDtoByMark).collect(Collectors.toList());
-    }
-
-    public MarkContentThumbResponse toDto(Contents c) {
-        ContentImages contentImage = c.getContentImages().stream().findFirst().orElse(null);
-        return MarkContentThumbResponse.builder().
-                id(c.getId()).
-                photo(contentImage == null ? null : contentImage.getContentImageUrl()).
-                build();
     }
 
     public MarkContentThumbResponse toDtoByMark(ContentMarks m) {

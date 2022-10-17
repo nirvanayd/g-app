@@ -27,6 +27,7 @@ public class GetMyPageResponse {
     private Long id;
     private String nickname;
     private String photoURL;
+    private String backgroundPhotoURL;
     private String profileTitle;
     private String profileText;
     private String status;
@@ -45,6 +46,7 @@ public class GetMyPageResponse {
                 id(u.getId()).
                 nickname(u.getLoginId()).
                 photoURL(u.getProfileImageUrl()).
+                backgroundPhotoURL(u.getBackgroundImageUrl()).
                 profileTitle(u.getProfileTitle()).
                 profileText(u.getProfileText()).
                 status(u.getStatus().toString()).
