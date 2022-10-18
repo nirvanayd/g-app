@@ -269,9 +269,15 @@ public class UserController {
         return response.success();
     }
 
-    @PostMapping("/users/profile")
-    public ResponseEntity<?> saveProfileText(@RequestBody SaveProfileRequest dto) throws IOException {
-        userService.saveUserProfile(dto);
+    @PostMapping("/users/profile-title")
+    public ResponseEntity<?> saveProfileTitle(@RequestBody @Valid SaveProfileTitleRequest dto) {
+        userService.saveUserProfileTitle(dto);
+        return response.success();
+    }
+
+    @PostMapping("/users/profile-text")
+    public ResponseEntity<?> saveProfileText(@RequestBody @Valid SaveProfileTextRequest dto) {
+        userService.saveUserProfileText(dto);
         return response.success();
     }
 

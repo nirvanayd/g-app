@@ -6,12 +6,8 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 @Data
-public class SaveProfileRequest {
+public class SaveProfileTextRequest {
     @NotNull
-    @Size(max = 500)
-    private String profileTitle;
-
-    @NotNull
-    @Size(max = 500)
+    @Size(max = 150, message = "프로필내용은 150자까지 입력 가능합니다.")
     private String profileText;
 }

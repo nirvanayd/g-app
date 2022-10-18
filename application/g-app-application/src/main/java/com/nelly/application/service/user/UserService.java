@@ -25,7 +25,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
-import org.yaml.snakeyaml.error.Mark;
 
 import java.io.IOException;
 import java.util.*;
@@ -404,7 +403,7 @@ public class UserService {
                             getS3ProfilePath() + DIRECTORY_SEPARATOR + user.getId());
         }
 
-        if (imageUrl == null) throw new SystemException("이미지 업로드가 ");
+        if (imageUrl == null) throw new SystemException("이미지 업로드 중 오류가 발생했습니다.");
 
         return ImageResponse.builder()
                 .url(imageUrl)
@@ -415,9 +414,14 @@ public class UserService {
         return awsProperties.getCloudFront().getProfileDir();
     }
 
-    public void saveUserProfile(SaveProfileRequest dto) {
+    public void saveUserProfileTitle(SaveProfileTitleRequest dto) {
         Users user = getUser();
-        userDomainService.saveAccountProfile(user, dto.getProfileTitle(), dto.getProfileText());
+        userDomainService.saveAccountProfileTitle(user, dto.getProfileTitle());
+    }
+
+    public void saveUserProfileText(SaveProfileTextRequest dto) {
+        Users user = getUser();
+        userDomainService.saveAccountProfileText(user, dto.getProfileText());
     }
 
     public void saveUserProfileImage(SaveProfileImageRequest dto) {
