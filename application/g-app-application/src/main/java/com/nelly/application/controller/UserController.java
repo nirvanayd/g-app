@@ -1,6 +1,7 @@
 package com.nelly.application.controller;
 
 import com.nelly.application.domain.UserAgreements;
+import com.nelly.application.domain.UserStyles;
 import com.nelly.application.domain.Users;
 import com.nelly.application.dto.TokenInfoDto;
 import com.nelly.application.dto.request.*;
@@ -85,15 +86,7 @@ public class UserController {
     @GetMapping("/users")
     public ResponseEntity<?> getUser() {
         Users users = userService.getUser();
-        List<UserAgreements> list = userService.getAppUserAgreements(users);
-        UserResponse userResponse = modelMapper.map(users, UserResponse.class);
-
-        List<UserAgreementsResponse> userAgreementList =
-                list.stream().map(l -> modelMapper.map(l, UserAgreementsResponse.class)).collect(Collectors.toList());
-
-        userResponse.setUserAgreements(userAgreementList);
-
-        return response.success(userResponse);
+        return response.success(userService.getUserDetailOwner(users.getId()));
     }
 
     /**
@@ -280,5 +273,23 @@ public class UserController {
     public ResponseEntity<?> saveProfileText(@RequestBody SaveProfileRequest dto) throws IOException {
         userService.saveUserProfile(dto);
         return response.success();
+    }
+
+    @GetMapping("/users/agreement-list")
+    public ResponseEntity<?> getUserAgreementList() {
+        Users users = userService.getUser();
+        List<UserAgreements> list = userService.getAppUserAgreements(users);
+        List<UserAgreementsResponse> userAgreementList =
+                list.stream().map(l -> modelMapper.map(l, UserAgreementsResponse.class)).collect(Collectors.toList());
+        return response.success(userAgreementList);
+    }
+
+    @GetMapping("/users/style-list")
+    public ResponseEntity<?> getUserStyleList() {
+        Users user = userService.getUser();
+        List<UserStyles> list = user.getUserStyles();
+        List<UserStylesResponse> userStyleList =
+                list.stream().map(l -> modelMapper.map(l, UserStylesResponse.class)).collect(Collectors.toList());
+        return response.success(userStyleList);
     }
 }

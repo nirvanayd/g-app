@@ -423,4 +423,8 @@ public class UserService {
         Users user = getUser();
         userDomainService.saveAccountBackgroundImage(user, dto.getImageUrl());
     }
+
+    public void getUserStyleList(Users user) {
+
+    }
 }

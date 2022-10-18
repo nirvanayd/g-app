@@ -63,7 +63,6 @@ app.post('/add-item', async (req, res) => {
     const imageList = await BrandModule.getImageList(page);
 
     // await page.close({});
-
     const obj = {
         'price': price,
         'name': name,
