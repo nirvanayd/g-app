@@ -344,6 +344,10 @@ public class UserService {
         int contentSize = 9;
         Page<Contents> selectContentList = contentDomainService.selectContentList(ownerUser, page, contentSize);
         Page<ContentMarks> selectMarkList = contentDomainService.selectUserMarkList(ownerUser, page, contentSize);
+
+        Long userLikeCount = contentDomainService.countUserLike(ownerUser);
+        Long userMarkCount = contentDomainService.countUserMark(ownerUser);
+
         List<ContentThumbResponse> list = new ArrayList<>();
         long totalContentCount = selectContentList.getTotalElements();
         long totalContentMarkCount = selectMarkList.getTotalElements();
@@ -354,6 +358,8 @@ public class UserService {
         List<MarkContentThumbResponse> markList =
                 markContentThumbResponse.toDtoMarkList(selectMarkList.getContent());
 
+        response.setLikeCount(userLikeCount);
+        response.setMarkCount(userMarkCount);
         response.setContentsCount((int)totalContentCount);
         response.setContentMarkCount((int)totalContentMarkCount);
         response.setContentList(contentList);

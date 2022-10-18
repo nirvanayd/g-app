@@ -32,8 +32,8 @@ public class GetMyPageResponse {
     private String profileText;
     private String status;
     private int followerCount;
-    private int likeCount;
-    private int markCount;
+    private long likeCount;
+    private long markCount;
     private int contentsCount;
     private int contentMarkCount;
     private boolean followed;
