@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.net.MalformedURLException;
+
 @RestController
 @RequiredArgsConstructor
 public class ScraperController {
@@ -23,9 +25,9 @@ public class ScraperController {
     private final ScraperService scraperService;
 
     @PostMapping("/scraper/web-url")
-    public ResponseEntity<?> enterWebviewUrl(@RequestBody WebviewRequest dto) {
+    public ResponseEntity<?> enterWebviewUrl(@RequestBody WebviewRequest dto) throws MalformedURLException {
         Users user = userService.getAppUser().orElse(null);
         scraperService.saveScrapRequest(dto, user);
-        return response.success();
+        return response.success(scraperService.searchScraperBrand(dto));
     }
 }

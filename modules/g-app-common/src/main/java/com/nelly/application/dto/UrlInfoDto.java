@@ -14,5 +14,4 @@ public class UrlInfoDto {
     private String query;
     private String file;
     private String ref;
-
 }
