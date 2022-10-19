@@ -298,4 +298,10 @@ public class UserController {
                 list.stream().map(l -> modelMapper.map(l, UserStylesResponse.class)).collect(Collectors.toList());
         return response.success(userStyleList);
     }
+
+    @GetMapping("/users/follower-list")
+    public ResponseEntity<?> getUserFollowerList() {
+        Users user = userService.getUser();
+        return response.success();
+    }
 }
