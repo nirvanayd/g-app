@@ -2,6 +2,9 @@ package com.nelly.application.repository;
 
 import com.nelly.application.domain.UserFollow;
 import com.nelly.application.domain.Users;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -12,6 +15,8 @@ import java.util.Optional;
 
 public interface UserFollowRepository extends JpaRepository<UserFollow, Long> {
     Optional<UserFollow> findByUserAndFollower(Users user, Users follower);
+    Page<UserFollow> findAllByFollower(Users user, Pageable pageable);
+    Page<UserFollow> findAllByUser(Users user, Pageable pageable);
 
     @Transactional
     @Modifying

@@ -434,7 +434,28 @@ public class UserService {
         userDomainService.saveAccountBackgroundImage(user, dto.getImageUrl());
     }
 
-    public void getUserLikeList(Users user) {
-        userDomainService.selectAccountLikeList(user);
+    public List<GetUserFollowerResponse> getUserFollowerList(Users user, PageRequest dto) {
+        Page<UserFollow> selectFollowerList = userDomainService.selectAccountFollowerList(user, dto.getPage(), dto.getSize());
+        if (selectFollowerList.isEmpty()) throw new NoContentException();
+        GetUserFollowerResponse response = new GetUserFollowerResponse();
+        return response.toDtoList(selectFollowerList.getContent());
+    }
+
+    public List<GetUserFollowingResponse> getUserFollowingList(Users user, PageRequest dto) {
+        Page<UserFollow> selectFollowingList = userDomainService.selectAccountFollowingList(user, dto.getPage(), dto.getSize());
+        if (selectFollowingList.isEmpty()) throw new NoContentException();
+        GetUserFollowingResponse response = new GetUserFollowingResponse();
+        return response.toDtoList(selectFollowingList.getContent());
+    }
+
+    public void removeFollower(Users user, String targetId) {
+        long followingId = Long.parseLong(targetId);
+        Users followingUser = userDomainService.selectAccount(followingId);
+        Optional<UserFollow> selectUserFollow = userDomainService.selectUserFollow(followingUser, user);
+        if (selectUserFollow.isEmpty()) throw new RuntimeException("팔로워 정보를 조회할 수 없습니다.");
+        UserFollow userFollow = selectUserFollow.get();
+        userDomainService.deleteUserFollow(userFollow.getId());
+        cacheTemplate.decrValue(String.valueOf(user.getId()), "follower");
+        cacheTemplate.decrValue(String.valueOf(followingUser.getId()), "following");
     }
 }

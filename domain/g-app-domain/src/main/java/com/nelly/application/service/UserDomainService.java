@@ -217,7 +217,13 @@ public class UserDomainService {
         userRepository.save(user);
     }
 
-    public void selectAccountLikeList(Users user) {
+    public Page<UserFollow> selectAccountFollowerList(Users user, Integer page, Integer size) {
+        PageRequest pageRequest = PageRequest.of(page, size, Sort.by("id").descending());
+        return userFollowRepository.findAllByFollower(user, pageRequest);
+    }
 
+    public Page<UserFollow> selectAccountFollowingList(Users user, Integer page, Integer size) {
+        PageRequest pageRequest = PageRequest.of(page, size, Sort.by("id").descending());
+        return userFollowRepository.findAllByUser(user, pageRequest);
     }
 }

@@ -300,10 +300,24 @@ public class UserController {
     }
 
     @GetMapping("/users/follower-list")
-    public ResponseEntity<?> getUserFollowerList(GetContentListRequest dto) {
+    public ResponseEntity<?> getUserFollowerList(PageRequest dto) {
         Optional<Users> user = userService.getAppUser();
         if (user.isEmpty()) throw new RuntimeException("사용자 정보를 조회할 수 없습니다.");
-//        userService.getUserFollower(user, dto);
+        return response.success(userService.getUserFollowerList(user.get(), dto));
+    }
+
+    @GetMapping("/users/following-list")
+    public ResponseEntity<?> getUserFollowingList(PageRequest dto) {
+        Optional<Users> user = userService.getAppUser();
+        if (user.isEmpty()) throw new RuntimeException("사용자 정보를 조회할 수 없습니다.");
+        return response.success(userService.getUserFollowingList(user.get(), dto));
+    }
+
+    @DeleteMapping("/users/follower/{id}")
+    public ResponseEntity<?> removeUserFollowingList(@PathVariable String id) {
+        Optional<Users> user = userService.getAppUser();
+        if (user.isEmpty()) throw new RuntimeException("사용자 정보를 조회할 수 없습니다.");
+        userService.removeFollower(user.get(), id);
         return response.success();
     }
 }
