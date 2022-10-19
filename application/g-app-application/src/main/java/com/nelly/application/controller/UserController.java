@@ -300,8 +300,10 @@ public class UserController {
     }
 
     @GetMapping("/users/follower-list")
-    public ResponseEntity<?> getUserFollowerList() {
-        Users user = userService.getUser();
+    public ResponseEntity<?> getUserFollowerList(GetContentListRequest dto) {
+        Optional<Users> user = userService.getAppUser();
+        if (user.isEmpty()) throw new RuntimeException("사용자 정보를 조회할 수 없습니다.");
+//        userService.getUserFollower(user, dto);
         return response.success();
     }
 }

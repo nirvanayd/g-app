@@ -13,5 +13,5 @@ public interface ContentMarksRepository extends JpaRepository<ContentMarks, Long
     Page<ContentMarks> findAllByContentId(Long contentId, Pageable pageable);
     Page<ContentMarks> findAllByUserId(Long userId, Pageable pageable);
     Page<ContentMarks> findAllByUser(Users user, Pageable pageable);
-    Page<ContentMarks> findAllByContent_UserAAndContent_DeletedDateNull(Users user, Pageable pageRequest);
+    Page<ContentMarks> findAllByContent_UserAndContent_DeletedDateNull(Users user, Pageable pageRequest);
 }
