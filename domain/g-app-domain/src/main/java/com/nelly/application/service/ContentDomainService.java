@@ -236,7 +236,7 @@ public class ContentDomainService {
 
     public Page<ContentMarks> selectUserMarkList(Users user, Integer page, Integer size) {
         PageRequest pageRequest = PageRequest.of(page, size, Sort.by("id").descending());
-        return contentMarksRepository.findAllByUser(user, pageRequest);
+        return contentMarksRepository.findAllByUserAAndContent_DeletedDateNull(user, pageRequest);
     }
 
     public Page<ContentLikes> selectUserContentLike(Users user, Integer page, Integer size) {
