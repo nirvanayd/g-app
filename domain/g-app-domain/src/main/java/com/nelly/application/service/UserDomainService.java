@@ -216,4 +216,8 @@ public class UserDomainService {
         user.setBackgroundImageUrl(imageUrl);
         userRepository.save(user);
     }
+
+    public void selectAccountLikeList(Users user) {
+
+    }
 }

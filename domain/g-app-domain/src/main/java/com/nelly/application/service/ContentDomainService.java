@@ -241,12 +241,12 @@ public class ContentDomainService {
 
     public Page<ContentLikes> selectUserContentLike(Users user, Integer page, Integer size) {
         PageRequest pageRequest = PageRequest.of(page, size, Sort.by("modifiedDate").descending());
-        return contentLikesRepository.findAllByContent_User(user, pageRequest);
+        return contentLikesRepository.findAllByContent_UserAndContent_DeletedDateNull(user, pageRequest);
     }
 
     public Page<ContentMarks> selectUserContentMark(Users user, Integer page, Integer size) {
         PageRequest pageRequest = PageRequest.of(page, size, Sort.by("modifiedDate").descending());
-        return contentMarksRepository.findAllByContent_User(user, pageRequest);
+        return contentMarksRepository.findAllByContent_UserAAndContent_DeletedDateNull(user, pageRequest);
     }
 
     public Long countUserLike(Users user) {

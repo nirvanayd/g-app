@@ -434,7 +434,7 @@ public class UserService {
         userDomainService.saveAccountBackgroundImage(user, dto.getImageUrl());
     }
 
-    public void getUserStyleList(Users user) {
-
+    public void getUserLikeList(Users user) {
+        userDomainService.selectAccountLikeList(user);
     }
 }
