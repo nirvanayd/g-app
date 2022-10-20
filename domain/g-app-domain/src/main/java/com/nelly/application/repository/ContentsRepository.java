@@ -32,9 +32,9 @@ public interface ContentsRepository extends JpaRepository<Contents, Long> {
 
     Page<Contents> findAllByUser(Users user, Pageable pageable);
 
-    @Query("SELECT SUM(c.likeCount) FROM Contents c WHERE c.deletedDate IS NULL")
-    Long countUserLike(@Param("user") Users user);
+    @Query("SELECT COALESCE(SUM(c.likeCount),0) FROM Contents c WHERE c.deletedDate IS NULL")
+    long countUserLike(@Param("user") Users user);
 
-    @Query("SELECT SUM(c.markCount) FROM Contents c WHERE c.deletedDate IS NULL")
-    Long countUserMark(@Param("detailUser") Users detailUser);
+    @Query("SELECT COALESCE(SUM(c.markCount),0) FROM Contents c WHERE c.deletedDate IS NULL")
+    long countUserMark(@Param("detailUser") Users detailUser);
 }

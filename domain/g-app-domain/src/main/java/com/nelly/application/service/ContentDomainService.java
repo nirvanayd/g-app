@@ -249,11 +249,11 @@ public class ContentDomainService {
         return contentMarksRepository.findAllByContent_UserAndContent_DeletedDateNull(user, pageRequest);
     }
 
-    public Long countUserLike(Users user) {
+    public long countUserLike(Users user) {
         return contentsRepository.countUserLike(user);
     }
 
-    public Long countUserMark(Users user) {
+    public long countUserMark(Users user) {
         return contentsRepository.countUserMark(user);
     }
 }
