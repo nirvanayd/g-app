@@ -226,4 +226,8 @@ public class UserDomainService {
         PageRequest pageRequest = PageRequest.of(page, size, Sort.by("id").descending());
         return userFollowRepository.findAllByUser(user, pageRequest);
     }
+
+    public void deleteUserFcmToken(UserNotificationTokens fcmToken) {
+        userNotificationTokensRepository.delete(fcmToken);
+    }
 }

@@ -11,6 +11,7 @@ import com.nelly.application.enums.YesOrNoType;
 import com.nelly.application.exception.NoContentException;
 import com.nelly.application.exception.SystemException;
 import com.nelly.application.mail.MailSender;
+import com.nelly.application.repository.UserNotificationTokensRepository;
 import com.nelly.application.service.ContentDomainService;
 import com.nelly.application.service.UserDomainService;
 import com.nelly.application.service.AuthService;
@@ -110,7 +111,9 @@ public class UserService {
         return null;
     }
 
-    public void logout(String token) {
+    public void logout(Users user, String token) {
+        // fcm 토큰 삭제처리
+        removeUserFcmToken(user);
         TokenInfoDto tokenInfoDto = authService.getAppAuthentication(token);
         if (cacheTemplate.getValue(String.valueOf(tokenInfoDto.getAuthId()), "token") != null) {
             cacheTemplate.deleteCache(String.valueOf(tokenInfoDto.getAuthId()), "token");
@@ -255,6 +258,12 @@ public class UserService {
             return userDomainService.saveUserToken(userTokens.get(), fcmToken);
         }
         return userDomainService.saveUserToken(user, fcmToken);
+    }
+
+    public void removeUserFcmToken(Users user) {
+        Optional<UserNotificationTokens> userTokens = userDomainService.existFcmToken(user);
+        if (userTokens.isEmpty()) return;
+        userDomainService.deleteUserFcmToken(userTokens.get());
     }
 
     public void updateUserStyle(Users user, UpdateUserStyleRequest dto) {

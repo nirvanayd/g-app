@@ -74,7 +74,12 @@ public class UserController {
     @GetMapping("/users/logout")
     public ResponseEntity<?> logout(@RequestHeader("Authorization") String bearerToken ) {
         String token = userService.getToken(bearerToken);
-        userService.logout(token);
+        Optional<Users> user = userService.getAppUser();
+        if (user.isEmpty()) {
+            // user 정보 조회되지 않으면 진행하지 않음.
+            return response.success();
+        }
+        userService.logout(user.get(), token);
         return response.success();
     }
 
