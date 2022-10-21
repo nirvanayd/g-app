@@ -444,7 +444,7 @@ public class UserService {
     }
 
     public List<GetUserFollowerResponse> getUserFollowerList(Users user, GetFollowerListRequest dto) {
-        if (!dto.getKeyword().isEmpty()) {
+        if (dto.getKeyword() != null) {
             Page<UserFollow> selectFollowerList = userDomainService.selectAccountFollowerList(user, dto.getKeyword(), dto.getPage(), dto.getSize());
             if (selectFollowerList.isEmpty()) throw new NoContentException();
             GetUserFollowerResponse response = new GetUserFollowerResponse();
@@ -457,7 +457,7 @@ public class UserService {
     }
 
     public List<GetUserFollowingResponse> getUserFollowingList(Users user, GetFollowingListRequest dto) {
-        if (!dto.getKeyword().isEmpty()) {
+        if (dto.getKeyword() != null) {
             Page<UserFollow> selectFollowingList = userDomainService.selectAccountFollowingList(user, dto.getKeyword(), dto.getPage(), dto.getSize());
             if (selectFollowingList.isEmpty()) throw new NoContentException();
             GetUserFollowingResponse response = new GetUserFollowingResponse();

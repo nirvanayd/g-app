@@ -52,4 +52,8 @@ public class AppService {
         return response;
     }
 
+    public List<Agreements> getAppAgreementList(String version) {
+        return appDomainService.selectAgreements(version);
+    }
+
 }

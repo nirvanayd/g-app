@@ -1,5 +1,6 @@
 package com.nelly.application.controller;
 
+import com.nelly.application.domain.Agreements;
 import com.nelly.application.domain.UserAgreements;
 import com.nelly.application.domain.UserStyles;
 import com.nelly.application.domain.Users;
@@ -9,6 +10,7 @@ import com.nelly.application.dto.Response;
 import com.nelly.application.dto.response.*;
 import com.nelly.application.enums.StyleType;
 import com.nelly.application.mail.MailSender;
+import com.nelly.application.service.app.AppService;
 import com.nelly.application.service.content.ContentService;
 import com.nelly.application.service.user.UserService;
 import lombok.AllArgsConstructor;
@@ -34,6 +36,7 @@ public class UserController {
 
     private final UserService userService;
     private final ContentService contentService;
+    private final AppService appService;
     private final Response response;
     private final ModelMapper modelMapper;
     private final MailSender mailSender;
@@ -289,6 +292,7 @@ public class UserController {
     @GetMapping("/users/agreement-list")
     public ResponseEntity<?> getUserAgreementList() {
         Users users = userService.getUser();
+        List<Agreements> appAgreementList = appService.getAppAgreementList("1.0.0");
         List<UserAgreements> list = userService.getAppUserAgreements(users);
         List<UserAgreementsResponse> userAgreementList =
                 list.stream().map(l -> modelMapper.map(l, UserAgreementsResponse.class)).collect(Collectors.toList());
