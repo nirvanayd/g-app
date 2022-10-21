@@ -443,14 +443,26 @@ public class UserService {
         userDomainService.saveAccountBackgroundImage(user, dto.getImageUrl());
     }
 
-    public List<GetUserFollowerResponse> getUserFollowerList(Users user, PageRequest dto) {
+    public List<GetUserFollowerResponse> getUserFollowerList(Users user, GetFollowerListRequest dto) {
+        if (!dto.getKeyword().isEmpty()) {
+            Page<UserFollow> selectFollowerList = userDomainService.selectAccountFollowerList(user, dto.getKeyword(), dto.getPage(), dto.getSize());
+            if (selectFollowerList.isEmpty()) throw new NoContentException();
+            GetUserFollowerResponse response = new GetUserFollowerResponse();
+            return response.toDtoList(selectFollowerList.getContent());
+        }
         Page<UserFollow> selectFollowerList = userDomainService.selectAccountFollowerList(user, dto.getPage(), dto.getSize());
         if (selectFollowerList.isEmpty()) throw new NoContentException();
         GetUserFollowerResponse response = new GetUserFollowerResponse();
         return response.toDtoList(selectFollowerList.getContent());
     }
 
-    public List<GetUserFollowingResponse> getUserFollowingList(Users user, PageRequest dto) {
+    public List<GetUserFollowingResponse> getUserFollowingList(Users user, GetFollowingListRequest dto) {
+        if (!dto.getKeyword().isEmpty()) {
+            Page<UserFollow> selectFollowingList = userDomainService.selectAccountFollowingList(user, dto.getKeyword(), dto.getPage(), dto.getSize());
+            if (selectFollowingList.isEmpty()) throw new NoContentException();
+            GetUserFollowingResponse response = new GetUserFollowingResponse();
+            return response.toDtoList(selectFollowingList.getContent());
+        }
         Page<UserFollow> selectFollowingList = userDomainService.selectAccountFollowingList(user, dto.getPage(), dto.getSize());
         if (selectFollowingList.isEmpty()) throw new NoContentException();
         GetUserFollowingResponse response = new GetUserFollowingResponse();

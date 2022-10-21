@@ -16,7 +16,9 @@ import java.util.Optional;
 public interface UserFollowRepository extends JpaRepository<UserFollow, Long> {
     Optional<UserFollow> findByUserAndFollower(Users user, Users follower);
     Page<UserFollow> findAllByFollower(Users user, Pageable pageable);
+    Page<UserFollow> findAllByFollowerAndUser_LoginIdContains(Users user, String keyword, Pageable pageable);
     Page<UserFollow> findAllByUser(Users user, Pageable pageable);
+    Page<UserFollow> findAllByUserAndFollower_LoginIdContains(Users user, String keyword, Pageable pageable);
 
     @Transactional
     @Modifying

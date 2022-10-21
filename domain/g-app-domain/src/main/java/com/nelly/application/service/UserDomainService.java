@@ -56,7 +56,6 @@ public class UserDomainService {
         }
     }
 
-
     public Users getUsers(long authId) {
         Users user = userRepository.findByAuthId(authId).orElse(null);
         if (user == null) throw new RuntimeException("사용자를 찾을 수 없습니다.");
@@ -222,9 +221,19 @@ public class UserDomainService {
         return userFollowRepository.findAllByFollower(user, pageRequest);
     }
 
+    public Page<UserFollow> selectAccountFollowerList(Users user, String keyword, Integer page, Integer size) {
+        PageRequest pageRequest = PageRequest.of(page, size, Sort.by("id").descending());
+        return userFollowRepository.findAllByFollowerAndUser_LoginIdContains(user, keyword, pageRequest);
+    }
+
     public Page<UserFollow> selectAccountFollowingList(Users user, Integer page, Integer size) {
         PageRequest pageRequest = PageRequest.of(page, size, Sort.by("id").descending());
         return userFollowRepository.findAllByUser(user, pageRequest);
+    }
+
+    public Page<UserFollow> selectAccountFollowingList(Users user, String keyword, Integer page, Integer size) {
+        PageRequest pageRequest = PageRequest.of(page, size, Sort.by("id").descending());
+        return userFollowRepository.findAllByUserAndFollower_LoginIdContains(user, keyword, pageRequest);
     }
 
     public void deleteUserFcmToken(UserNotificationTokens fcmToken) {
