@@ -192,7 +192,7 @@ public class ContentService {
         // get user id
         Users user = userService.getUser();
         for (MultipartFile file: images) {
-            String a = awsProperties.getS3().getBucket();
+            if (file.getOriginalFilename() == null || file.getOriginalFilename().isEmpty()) continue;
             imageUrlList.add(awsProperties.getCloudFront().getUrl() +
                     s3Uploader.upload(
                             awsProperties.getS3().getBucket(),
