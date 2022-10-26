@@ -1,5 +1,6 @@
 package com.nelly.application.controller;
 
+import com.google.gson.Gson;
 import com.nelly.application.domain.Comments;
 import com.nelly.application.domain.Contents;
 import com.nelly.application.dto.Response;
@@ -7,6 +8,7 @@ import com.nelly.application.dto.request.*;
 import com.nelly.application.dto.response.*;
 import com.nelly.application.service.content.ContentService;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -19,6 +21,7 @@ import java.util.List;
 
 @RestController
 @AllArgsConstructor
+@Slf4j
 public class ContentController {
 
     private final ContentService contentService;
@@ -62,6 +65,9 @@ public class ContentController {
 
     @PostMapping("/contents/save-images")
     public ResponseEntity<?> saveContentImages(@NotNull @RequestParam("images") List<MultipartFile> images) throws IOException {
+        log.info("save image log");
+        Gson gson = new Gson();
+        log.info(gson.toJson(images));
         AddContentImageResponse addContentImageResponse = contentService.saveImages(images);
         return response.success(addContentImageResponse);
     }
