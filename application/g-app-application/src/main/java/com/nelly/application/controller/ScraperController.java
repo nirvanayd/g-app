@@ -30,4 +30,11 @@ public class ScraperController {
         scraperService.saveScrapRequest(dto, user);
         return response.success(scraperService.searchScraperBrand(dto));
     }
+
+    @PostMapping("/scraper/add-cart")
+    public ResponseEntity<?> addCart(@RequestBody WebviewRequest dto) throws MalformedURLException {
+        Users user = userService.getAppUser().orElse(null);
+        scraperService.saveScrapRequest(dto, user);
+        return response.success(scraperService.searchScraperBrand(dto));
+    }
 }
