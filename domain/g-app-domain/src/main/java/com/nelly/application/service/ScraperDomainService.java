@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @RequiredArgsConstructor
 @Service
@@ -72,7 +73,6 @@ public class ScraperDomainService {
                 .userId(userId)
                 .resultCode(ScraperLogResult.INIT.getCode())
                 .build();
-
         return scraperLogRepository.save(log);
     }
 
@@ -83,7 +83,6 @@ public class ScraperDomainService {
         log.setImageList(gson.toJson(imageList));
         log.setPrice(price);
         log.setResultCode(resultCode);
-
         scraperLogRepository.save(log);
     }
 
@@ -97,5 +96,10 @@ public class ScraperDomainService {
 
     public List<ScraperBrands> selectScraperBrand(String host) {
         return scraperBrandsRepository.findByStoreUrlContains(host);
+    }
+
+    public Long selectScrapItem(String url) {
+        Optional<ScrapItems> scrapItem = scrapItemsRepository.findByUrl(url);
+        return scrapItem.map(ScrapItems::getId).orElse(null);
     }
 }

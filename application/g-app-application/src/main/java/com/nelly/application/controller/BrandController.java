@@ -25,12 +25,6 @@ public class BrandController {
     private final ModelMapper modelMapper;
     private final UserService userService;
 
-
-    @PostMapping("/brands/add-item")
-    public void addCurrentItem(@RequestBody AddCurrentItemRequest dto) {
-        brandService.addCurrentItem(dto);
-    }
-
     @GetMapping("/brands/download-image")
     public void downloadImage() {
         brandService.downloadImage();

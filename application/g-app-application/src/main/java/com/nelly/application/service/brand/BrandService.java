@@ -69,26 +69,6 @@ public class BrandService {
         return brandIntroResponse;
     }
 
-    public void addCurrentItem(AddCurrentItemRequest dto) {
-        try {
-            Users user = userService.getUser();
-            UrlInfoDto urlInfoDto = UrlUtil.parseUrl(dto.getUrl());
-            ScraperBrandDetails detail = scraperService.getScraperBrand(urlInfoDto);
-            String moduleName = detail.getScraperBrand().getModuleName();
-            ItemScrapDto itemScrapDto = scraperManager.addCurrentItem(dto.getUrl(), moduleName);
-
-            // response check
-
-            // create scrap log
-
-            // image s3 upload
-
-
-        } catch (MalformedURLException me) {
-
-        }
-    }
-
     public void downloadImage() {
         String url = "https://assets.adidas.com/images/h_840,f_auto,q_auto,fl_lossy,c_fill,g_auto/40b32ba35f6b41dc801dadcb0119de47_9366/Black_GZ3901_01_standard.jpg";
     }

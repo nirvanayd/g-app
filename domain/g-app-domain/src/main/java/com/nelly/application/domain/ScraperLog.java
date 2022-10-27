@@ -22,7 +22,7 @@ public class ScraperLog extends BaseTime {
     @Column(name = "id")
     private Long id;
 
-    @Column(name="user_id", nullable = false)
+    @Column(name="user_id", nullable = true)
     private Long userId;
 
     @Column(name="scraper_brand_id", nullable = false)
@@ -40,6 +40,7 @@ public class ScraperLog extends BaseTime {
     @Column(name="name", nullable = true)
     private String name;
 
+    @Lob
     @Column(name="imageList", nullable = true)
     private String imageList;
 }

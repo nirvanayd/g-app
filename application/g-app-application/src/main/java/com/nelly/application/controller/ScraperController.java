@@ -1,5 +1,6 @@
 package com.nelly.application.controller;
 
+import com.nelly.application.domain.ScraperBrands;
 import com.nelly.application.domain.Users;
 import com.nelly.application.dto.Response;
 import com.nelly.application.dto.request.SignupDataRequest;
@@ -28,7 +29,9 @@ public class ScraperController {
     public ResponseEntity<?> enterWebviewUrl(@RequestBody WebviewRequest dto) throws MalformedURLException {
         Users user = userService.getAppUser().orElse(null);
         scraperService.saveScrapRequest(dto, user);
-        return response.success(scraperService.searchScraperBrand(dto));
+        ScraperBrands brand = scraperService.searchScraperBrand(dto);
+        scraperService.saveHistory(user, brand, dto.getUrl());
+        return response.success(brand.getId());
     }
 
     @PostMapping("/scraper/add-cart")

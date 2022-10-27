@@ -22,8 +22,8 @@ public class ScraperBrandDetails extends BaseTime {
     @Column(name = "id")
     private Long id;
 
-    @Column(name="is_https", nullable = true)
-    private boolean isHttps;
+//    @Column(name="is_https", nullable = true)
+//    private boolean isHttps;
 
     @Column(name="host", nullable = true)
     private String host;
@@ -33,6 +33,9 @@ public class ScraperBrandDetails extends BaseTime {
 
     @Column(name="item_path", nullable = true)
     private String itemPath;
+
+    @Column(name="query", nullable = true)
+    private String query;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "scraper_brand_id")
