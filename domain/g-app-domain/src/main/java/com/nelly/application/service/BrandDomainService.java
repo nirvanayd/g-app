@@ -25,10 +25,11 @@ public class BrandDomainService {
     private final BrandRankRepository brandRankRepository;
     private final UserBrandsRepository userBrandsRepository;
 
-    public Brands createBrands(String name, String logoImageUrl, String description, BrandStatus status,
+    public Brands createBrands(String name, String nameKr, String logoImageUrl, String description, BrandStatus status,
                                DisplayType isDisplay, String homepage, String introduceImageUrl) {
         Brands brands = Brands.builder()
                 .name(name)
+                .nameKr(nameKr)
                 .logoImageUrl(logoImageUrl)
                 .description(description)
                 .status(status)
@@ -99,11 +100,12 @@ public class BrandDomainService {
         return brandsRepository.findById(brandId).orElseThrow(() -> new RuntimeException("브랜드를 조회할 수 없습니다."));
     }
 
-    public Brands updateBrand(long brandId, String name, String logoImageUrl, String description, BrandStatus status,
+    public Brands updateBrand(long brandId, String name, String nameKr, String logoImageUrl, String description, BrandStatus status,
                               DisplayType isDisplay, String homepage, String introduceImageUrl) {
         Brands brands = brandsRepository.findById(brandId).orElseThrow(() -> new RuntimeException("브랜드를 조회할 수 없습니다."));
 
         brands.setName(name);
+        brands.setNameKr(nameKr);
         brands.setLogoImageUrl(logoImageUrl);
         brands.setDescription(description);
         brands.setStatus(status);

@@ -1,17 +1,14 @@
 package com.nelly.application.controller;
 
+import com.google.gson.Gson;
 import com.nelly.application.domain.Comments;
 import com.nelly.application.domain.Contents;
 import com.nelly.application.dto.Response;
 import com.nelly.application.dto.request.*;
-import com.nelly.application.dto.response.AddContentImageResponse;
-import com.nelly.application.dto.response.CommentResponse;
-import com.nelly.application.dto.response.ContentResponse;
-import com.nelly.application.dto.response.GetContentListResponse;
+import com.nelly.application.dto.response.*;
 import com.nelly.application.service.content.ContentService;
 import lombok.AllArgsConstructor;
-import org.modelmapper.ModelMapper;
-import org.springframework.data.domain.Page;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -24,11 +21,11 @@ import java.util.List;
 
 @RestController
 @AllArgsConstructor
+@Slf4j
 public class ContentController {
 
     private final ContentService contentService;
     private final Response response;
-    private final ModelMapper modelMapper;
 
     @GetMapping("/contents")
     public ResponseEntity<?> getContentList(GetContentListRequest dto) {
@@ -36,10 +33,18 @@ public class ContentController {
         return response.success(list);
     }
 
+    @GetMapping("/contents/{id}")
+    public ResponseEntity<?> getContentList(@NotBlank @PathVariable("id") String id) {
+        Long contentId = Long.parseLong(id);
+        ContentResponse contentResponse = contentService.getContent(contentId);
+        return response.success(contentResponse);
+    }
+
     @PostMapping("/contents")
     public ResponseEntity<?> addContent(@RequestBody AddContentRequest dto) {
-        contentService.addContent(dto);
-        return response.success();
+        Contents content = contentService.addContent(dto);
+        ContentResponse createdContent = contentService.getContent(content.getId());
+        return response.success(createdContent);
     }
 
     @PutMapping("/contents/{id}")
@@ -60,8 +65,25 @@ public class ContentController {
 
     @PostMapping("/contents/save-images")
     public ResponseEntity<?> saveContentImages(@NotNull @RequestParam("images") List<MultipartFile> images) throws IOException {
+        log.info("save image log");
+        Gson gson = new Gson();
+        log.info(gson.toJson(images));
         AddContentImageResponse addContentImageResponse = contentService.saveImages(images);
         return response.success(addContentImageResponse);
+    }
+
+    @GetMapping("/contents/like/{id}")
+    public ResponseEntity<?> getContentLike(@NotBlank @PathVariable("id") String id,
+                                            GetContentLikeRequest dto) {
+        Long contentId = Long.parseLong(id);
+        return response.success(contentService.getContentLike(contentId, dto));
+    }
+
+    @GetMapping("/contents/mark/{id}")
+    public ResponseEntity<?> getContentMark(@NotBlank @PathVariable("id") String id,
+                                            GetContentMarkRequest dto) {
+        Long contentId = Long.parseLong(id);
+        return response.success(contentService.getContentMark(contentId, dto));
     }
 
     @PostMapping("/contents/like")
@@ -78,8 +100,8 @@ public class ContentController {
 
     @PostMapping("/comments")
     public ResponseEntity<?> addComment(@RequestBody AddCommentRequest dto) {
-        contentService.addComment(dto);
-        return response.success();
+        CommentResponse commentResponse = contentService.addComment(dto);
+        return response.success(commentResponse);
     }
 
     @PutMapping("/comments/{id}")
@@ -90,12 +112,27 @@ public class ContentController {
         return response.success();
     }
 
+    @DeleteMapping("/comments/{id}")
+    public ResponseEntity<?> removeComment(@NotBlank @PathVariable("id") String id) {
+        Long commentId = Long.parseLong(id);
+        String returnStatus = contentService.removeComment(commentId);
+        Integer returnStatusNumber = returnStatus == null ? null : Integer.parseInt(returnStatus);
+        return response.success(returnStatusNumber);
+    }
+
     @GetMapping("/comments/{contentId}")
     public ResponseEntity<?> getContentCommentList(@NotBlank @PathVariable("contentId") String id,
-                                           GetCommentListRequest dto
+                                                   GetCommentListRequest dto
                                            ) {
         Long contentId = Long.parseLong(id);
-        List<CommentResponse> commentList = contentService.getCommentList(contentId, dto);
-        return response.success(commentList);
+        return response.success(contentService.getCommentList(contentId, dto));
+    }
+
+    @GetMapping("/comments/child/{commentId}")
+    public ResponseEntity<?> getChildCommentList(@NotBlank @PathVariable("commentId") String id,
+                                                 GetCommentListRequest dto
+    ) {
+        Long parentId = Long.parseLong(id);
+        return response.success(contentService.getChildCommentList(parentId, dto));
     }
 }

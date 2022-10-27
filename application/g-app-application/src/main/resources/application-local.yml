@@ -54,6 +54,7 @@ cloud:
       brand-dir: 'local/brand'
       default-image-url: 'https://d3b7cshusafhca.cloudfront.net/local/default/logo-default.png'
       content-dir: 'local/content'
+      profile-dir: 'local/profile'
     region:
       static: ap-northeast-2
     stack:
@@ -72,4 +73,3 @@ mail:
   protocol: smtp
   debug: true
   encoding: UTF-8
-

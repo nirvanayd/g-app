@@ -5,12 +5,14 @@ import com.nelly.application.domain.*;
 import com.nelly.application.dto.BrandTagDto;
 import com.nelly.application.dto.UserTagDto;
 import com.nelly.application.dto.request.*;
-import com.nelly.application.dto.response.AddContentImageResponse;
-import com.nelly.application.dto.response.CommentResponse;
-import com.nelly.application.dto.response.ContentResponse;
+import com.nelly.application.dto.response.*;
+import com.nelly.application.enums.DeleteStatus;
+import com.nelly.application.enums.RoleType;
 import com.nelly.application.enums.YesOrNoType;
+import com.nelly.application.exception.NoContentException;
 import com.nelly.application.exception.SystemException;
 import com.nelly.application.service.ContentDomainService;
+import com.nelly.application.service.UserDomainService;
 import com.nelly.application.service.brand.BrandService;
 import com.nelly.application.service.user.UserService;
 import com.nelly.application.util.CacheTemplate;
@@ -22,12 +24,16 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.persistence.EntityManager;
+import javax.swing.text.html.Option;
 import java.io.IOException;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.IntStream;
 
 @RequiredArgsConstructor
 @Service
@@ -39,10 +45,12 @@ public class ContentService {
     private final UserService userService;
     private final BrandService brandService;
     private final ContentDomainService contentDomainService;
+    private final UserDomainService userDomainService;
+    private final EntityManager entityManager;
     private static final String DIRECTORY_SEPARATOR = "/";
 
     @Transactional
-    public void addContent(AddContentRequest dto) {
+    public Contents addContent(AddContentRequest dto) {
         Users user = userService.getUser();
 
         Contents content = contentDomainService.createContent(user, dto.getText());
@@ -86,6 +94,8 @@ public class ContentService {
             }
             contentDomainService.createContentHashTag(content, appTag, s);
         }
+        contentDomainService.saveContent(content);
+        return content;
     }
 
     /**
@@ -166,14 +176,23 @@ public class ContentService {
         contentDomainService.removeContent(contentId);
     }
 
+    public ContentResponse getContent(Long id) {
+        entityManager.clear();
+        Optional<Contents> selectContent = contentDomainService.selectContent(id);
+        if (selectContent.isEmpty()) throw new SystemException("게시글이 정상적으로 등록되지 않았습니다.");
+        Contents content = selectContent.get();
+
+        ContentResponse response = new ContentResponse();
+        return response.toDto(content);
+    }
+
     @Transactional
     public AddContentImageResponse saveImages(List<MultipartFile> images) throws IOException {
         ArrayList<String> imageUrlList = new ArrayList<>();
         // get user id
         Users user = userService.getUser();
         for (MultipartFile file: images) {
-            String a = awsProperties.getS3().getBucket();
-
+            if (file.getOriginalFilename() == null || file.getOriginalFilename().isEmpty()) continue;
             imageUrlList.add(awsProperties.getCloudFront().getUrl() +
                     s3Uploader.upload(
                             awsProperties.getS3().getBucket(),
@@ -183,6 +202,54 @@ public class ContentService {
         return AddContentImageResponse.builder()
                 .imageUrlList(imageUrlList)
                 .build();
+    }
+
+    public List<GetContentLikeResponse> getContentLike(Long contentId, GetContentLikeRequest dto) {
+
+        Optional<Users> user = userService.getAppUser();
+        Page<ContentLikes> selectLikeList =
+                contentDomainService.selectContentLikeList(contentId, dto.getPage(), dto.getSize());
+        if (selectLikeList.isEmpty()) {
+            throw new NoContentException();
+        }
+
+        List<ContentLikes> likeList = selectLikeList.getContent();
+        GetContentLikeResponse responseDto = new GetContentLikeResponse();
+
+        List<GetContentLikeResponse> responseDtoList = responseDto.toDtoList(likeList);
+
+        user.ifPresent(users -> IntStream.range(0, likeList.size()).forEach(idx -> {
+            Users contentUser = likeList.get(idx).getUser();
+            Optional<UserFollow> selectFollow = userDomainService.selectUserFollow(users, contentUser);
+            if (selectFollow.isPresent()) {
+                responseDtoList.get(idx).setFollow(true);
+            }
+        }));
+        return responseDtoList;
+    }
+
+    public List<GetContentMarkResponse> getContentMark(Long contentId, GetContentMarkRequest dto) {
+
+        Optional<Users> user = userService.getAppUser();
+        Page<ContentMarks> selectMarkList =
+                contentDomainService.selectContentMarkList(contentId, dto.getPage(), dto.getSize());
+        if (selectMarkList.isEmpty()) {
+            throw new NoContentException();
+        }
+
+        List<ContentMarks> markList = selectMarkList.getContent();
+        GetContentMarkResponse responseDto = new GetContentMarkResponse();
+        List<GetContentMarkResponse> responseDtoList = responseDto.toDtoList(markList);
+
+        user.ifPresent(users -> IntStream.range(0, markList.size()).forEach(idx -> {
+            Users contentUser = markList.get(idx).getUser();
+            Optional<UserFollow> selectFollow = userDomainService.selectUserFollow(users, contentUser);
+            if (selectFollow.isPresent()) {
+                responseDtoList.get(idx).setFollow(true);
+            }
+        }));
+
+        return responseDtoList;
     }
 
     public void saveContentLike(SaveLikeRequest dto) {
@@ -195,12 +262,15 @@ public class ContentService {
         if (contents.getUser().getId().equals(user.getId())) {
             throw new RuntimeException("작성자가 본인입니다.");
         }
+        ContentLikes contentLike =
+                contentDomainService.selectContentLike(dto.getContentId(), user.getId()).orElse(null);
 
         if (YesOrNoType.YES.getCode().equals(dto.getLikeYn())) {
-            contentDomainService.createContentLike(dto.getContentId(), user.getId());
-            cacheTemplate.incrValue(String.valueOf(dto.getContentId()), "like");
+            if (contentLike == null){
+                contentDomainService.createContentLike(contents, user);
+                cacheTemplate.incrValue(String.valueOf(dto.getContentId()), "like");
+            }
         } else if (YesOrNoType.NO.getCode().equals(dto.getLikeYn())) {
-            ContentLikes contentLike = contentDomainService.selectContentLike(dto.getContentId(), user.getId()).orElse(null);
             if (contentLike != null) {
                 contentDomainService.deleteContentLike(contentLike.getId());
                 cacheTemplate.decrValue(String.valueOf(dto.getContentId()), "like");
@@ -211,19 +281,21 @@ public class ContentService {
     public void saveContentMark(SaveMarkRequest dto) {
         // get user id
         Users user = userService.getUser();
-
         Contents contents = contentDomainService.selectContent(dto.getContentId())
                 .orElseThrow(() -> new RuntimeException("컨텐츠를 조회할 수 없습니다."));
 
         if (contents.getUser().getId().equals(user.getId())) {
             throw new RuntimeException("작성자가 본인입니다.");
         }
+        ContentMarks contentMark =
+                contentDomainService.selectContentMark(dto.getContentId(), user.getId()).orElse(null);
 
         if (YesOrNoType.YES.getCode().equals(dto.getMarkYn())) {
-            contentDomainService.createContentMark(dto.getContentId(), user.getId());
-            cacheTemplate.incrValue(String.valueOf(dto.getContentId()), "mark");
+            if (contentMark == null) {
+                contentDomainService.createContentMark(contents, user);
+                cacheTemplate.incrValue(String.valueOf(dto.getContentId()), "mark");
+            }
         } else if (YesOrNoType.NO.getCode().equals(dto.getMarkYn())) {
-            ContentMarks contentMark = contentDomainService.selectContentMark(dto.getContentId(), user.getId()).orElse(null);
             if (contentMark != null) {
                 contentDomainService.deleteContentMark(contentMark.getId());
                 cacheTemplate.decrValue(String.valueOf(dto.getContentId()), "mark");
@@ -241,7 +313,6 @@ public class ContentService {
         for (String key : keys) {
             int value = Integer.parseInt(cacheTemplate.getValue(key));
             Long contentId = Long.parseLong(cacheTemplate.parseCashNameKey(key).get("key"));
-            System.out.println("content ID : " + contentId + " , value : " + value);
             contentDomainService.updateContentLike(contentId, value);
             cacheTemplate.deleteCache(key);
         }
@@ -260,16 +331,28 @@ public class ContentService {
 
     public List<ContentResponse> getContentList(GetContentListRequest dto) {
         Page<Contents> contentList = contentDomainService.selectContentList(dto.getPage(), dto.getSize());
-        Optional<Users> users = userService.getAppUser();
-        if (!users.isEmpty()) {
-            // 좋아요, 마크 여부
+        Optional<Users> selectUser = userService.getAppUser();
+        if (contentList.isEmpty()) {
+            throw new NoContentException();
         }
 
         ContentResponse response = new ContentResponse();
-        return response.toDtoList(contentList.getContent());
+        List<ContentResponse> list = response.toDtoList(contentList.getContent());
+
+        if (selectUser.isPresent()) {
+            Users user = selectUser.get();
+            // 좋아요, 마크 여부
+            list.forEach(l -> {
+                boolean liked = contentDomainService.selectContentLike(l.getId(), user.getId()).isPresent();
+                boolean marked = contentDomainService.selectContentMark(l.getId(), user.getId()).isPresent();
+                l.setLiked(liked);
+                l.setMarked(marked);
+            });
+        }
+        return list;
     }
 
-    public void addComment(AddCommentRequest dto) {
+    public CommentResponse addComment(AddCommentRequest dto) {
         Optional<Users> selectUsers = userService.getAppUser();
         if (selectUsers.isEmpty()) throw new SystemException("사용자 정보를 조회할 수 없습니다.");
         Users user = selectUsers.get();
@@ -286,7 +369,12 @@ public class ContentService {
             parentComment = selectComment.get();
         }
 
-        contentDomainService.createComment(content, user, parentComment, dto.getComment());
+        Comments savedComment =
+                contentDomainService.createComment(content, user, parentComment, dto.getComment());
+        cacheTemplate.incrValue(String.valueOf(dto.getContentId()), "reply");
+
+        CommentResponse commentResponse = new CommentResponse();
+        return commentResponse.toDto(savedComment);
     }
 
     public void updateComment(Long id, UpdateCommentRequest dto) {
@@ -298,6 +386,31 @@ public class ContentService {
         contentDomainService.saveComment(existComment, dto.getComment());
     }
 
+    public String removeComment(Long id) {
+        Users user = userService.getUser();
+        Optional<Comments> selectComment = contentDomainService.selectComment(id);
+        // 관리자, 원글 작성자, 댓글 작성자 삭제 가능
+        if (selectComment.isEmpty()) {
+            throw new SystemException("댓글 정보를 조회활 수 없습니다.");
+        }
+        Comments comment = selectComment.get();
+        Contents content = comment.getContent();
+
+        DeleteStatus returnStatus = null;
+
+        if (comment.getUser().equals(user)) {
+            contentDomainService.saveCommentDelete(DeleteStatus.WRITER, comment);
+            returnStatus = DeleteStatus.WRITER;
+        } else if (content.getUser().equals(user)) {
+            contentDomainService.saveCommentDelete(DeleteStatus.CONTENT_WRITER, comment);
+            returnStatus = DeleteStatus.CONTENT_WRITER;
+        } else {
+            throw new SystemException("삭제 권한이 없습니다.");
+        }
+        cacheTemplate.decrValue(String.valueOf(content.getId()), "reply");
+        return returnStatus.getCode();
+    }
+
     public List<CommentResponse> getCommentList(Long contentId, GetCommentListRequest dto) {
         Optional<Contents> selectContent = contentDomainService.selectContent(contentId);
         if (selectContent.isEmpty()) throw new SystemException("컨텐츠 정보를 조회할 수 없습니다.");
@@ -305,9 +418,63 @@ public class ContentService {
         Page<Comments> selectComments = contentDomainService.selectCommentList(content, dto.getPage(), dto.getSize());
 
         List<CommentResponse> list = new ArrayList<>();
-        if (selectComments.isEmpty()) return list;
+        if (selectComments.isEmpty()) {
+            throw new NoContentException();
+        }
         List<Comments> commentList = selectComments.getContent();
         CommentResponse commentResponse = new CommentResponse();
         return commentResponse.toDtoList(commentList);
+    }
+
+    public List<ChildCommentResponse> getChildCommentList(Long parentId, GetCommentListRequest dto) {
+        Optional<Comments> selectComment = contentDomainService.selectComment(parentId);
+        if (selectComment.isEmpty()) throw new SystemException("댓글 정보를 조회할 수 없습니다.");
+        Comments parent = selectComment.get();
+        Page<Comments> childCommentList =
+                contentDomainService.selectChildCommentList(parent, dto.getPage(), dto.getSize());
+
+        List<Comments> commentList = childCommentList.getContent();
+        ChildCommentResponse childCommentResponse = new ChildCommentResponse();
+
+        if (dto.getPage() == 0) {
+            commentList = commentList.subList(2, commentList.size());
+        }
+        return childCommentResponse.toDtoList(commentList);
+    }
+
+    @Transactional
+    public void scheduleContentReply() {
+        Set<String> keys = cacheTemplate.getKeys("reply");
+        for (String key : keys) {
+            int value = Integer.parseInt(cacheTemplate.getValue(key));
+            Long contentId = Long.parseLong(cacheTemplate.parseCashNameKey(key).get("key"));
+            System.out.println("content ID : " + contentId + " , value : " + value);
+            contentDomainService.updateContentReply(contentId, value);
+            cacheTemplate.deleteCache(key);
+        }
+    }
+
+    public List<GetUserLikeResponse> getUserLikeList(Users user, GetUserLikeRequest dto) {
+        Page<ContentLikes> selectLikeList = contentDomainService.selectUserContentLike(user, dto.getPage(), dto.getSize());
+        if (selectLikeList.isEmpty()) {
+            throw new NoContentException();
+        }
+        List<ContentLikes> likeList = selectLikeList.getContent();
+        GetUserLikeResponse getUserLikeResponse = new GetUserLikeResponse();
+        return getUserLikeResponse.toDtoList(likeList);
+    }
+
+    public List<GetUserMarkResponse> getUserMarkList(Users user, GetUserLikeRequest dto) {
+        Page<ContentMarks> selectMarkList = contentDomainService.selectUserContentMark(user, dto.getPage(), dto.getSize());
+        if (selectMarkList.isEmpty()) {
+            throw new NoContentException();
+        }
+        List<ContentMarks> markList = selectMarkList.getContent();
+        GetUserMarkResponse getUserMarkResponse = new GetUserMarkResponse();
+        return getUserMarkResponse.toDtoList(markList);
+    }
+
+    public void getUserDetail(Users user, Long detailUserId) {
+
     }
 }

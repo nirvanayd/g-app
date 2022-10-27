@@ -28,3 +28,10 @@ class Scraper {
 }
 
 module.exports = new Scraper();
+
+
+<html>
+<div id='image'>
+
+</div>
+</html>

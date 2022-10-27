@@ -1,6 +1,7 @@
 package com.nelly.application.service;
 
 import com.nelly.application.domain.*;
+import com.nelly.application.enums.DeleteStatus;
 import com.nelly.application.enums.YesOrNoType;
 import com.nelly.application.repository.*;
 import lombok.RequiredArgsConstructor;
@@ -9,6 +10,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -85,14 +87,18 @@ public class ContentDomainService {
         return contentsRepository.findById(id);
     }
 
+    public Optional<Contents> selectContent(Long id, boolean flush) {
+        return contentsRepository.findById(id);
+    }
+
     public void removeContent(Long contentId) {
         contentsRepository.deleteById(contentId);
     }
 
-    public void createContentLike(Long contentId, Long UserId) {
+    public void createContentLike(Contents content, Users user) {
         ContentLikes contentLikes = ContentLikes.builder()
-                .contentId(contentId)
-                .userId(UserId)
+                .content(content)
+                .user(user)
                 .build();
         contentLikesRepository.save(contentLikes);
     }
@@ -105,10 +111,10 @@ public class ContentDomainService {
         return contentLikesRepository.findByContentIdAndAndUserId(contentId, userId);
     }
 
-    public void createContentMark(Long contentId, Long UserId) {
+    public void createContentMark(Contents content, Users user) {
         ContentMarks contentMarks = ContentMarks.builder()
-                .contentId(contentId)
-                .userId(UserId)
+                .content(content)
+                .user(user)
                 .build();
         contentMarksRepository.save(contentMarks);
     }
@@ -123,6 +129,10 @@ public class ContentDomainService {
 
     public void updateContentLike(Long contentId, int value) {
         contentsRepository.updateLikeCount(contentId, value);
+    }
+
+    public void updateContentReply(Long contentId, int value) {
+        contentsRepository.updateContentReply(contentId, value);
     }
 
     public void updateContentMark(Long contentId, int value) {
@@ -169,6 +179,11 @@ public class ContentDomainService {
         return contentsRepository.findAll(pageRequest);
     }
 
+    public Page<Contents> selectContentList(Users user, Integer page, Integer size) {
+        PageRequest pageRequest = PageRequest.of(page, size, Sort.by("id").descending());
+        return contentsRepository.findAllByUser(user, pageRequest);
+    }
+
     public Optional<Comments> selectComment(Long commentId) {
         if (commentId == null) return null;
         return commentsRepository.findById(commentId);
@@ -178,13 +193,14 @@ public class ContentDomainService {
          return commentsRepository.findByIdAndUser(commentId, user);
     }
 
-    public void createComment(Contents content, Users user, Comments parentComment, String text) {
+    public Comments createComment(Contents content, Users user, Comments parentComment, String text) {
         Comments comment = Comments.builder().
                 content(content).
                 user(user).
                 comment(text).
+                status(DeleteStatus.NORMAL).
                 parent(parentComment).build();
-        commentsRepository.save(comment);
+        return commentsRepository.save(comment);
     }
 
     public void saveComment(Comments comments, String comment) {
@@ -195,5 +211,49 @@ public class ContentDomainService {
     public Page<Comments> selectCommentList(Contents content, Integer page, Integer size) {
         PageRequest pageRequest = PageRequest.of(page, size, Sort.by("id").descending());
         return commentsRepository.findAllByContentAndParentNull(content, pageRequest);
+    }
+
+    public Page<Comments> selectChildCommentList(Comments parent, Integer page, Integer size) {
+        PageRequest pageRequest = PageRequest.of(page, size, Sort.by("id").ascending());
+        return commentsRepository.findAllByParent(parent, pageRequest);
+    }
+
+    public void saveCommentDelete(DeleteStatus status, Comments comment) {
+        comment.setStatus(status);
+        comment.setDeletedDate(LocalDateTime.now());
+        commentsRepository.save(comment);
+    }
+
+    public Page<ContentLikes> selectContentLikeList(Long contentId, Integer page, Integer size) {
+        PageRequest pageRequest = PageRequest.of(page, size, Sort.by("id").descending());
+        return contentLikesRepository.findAllByContentId(contentId, pageRequest);
+    }
+
+    public Page<ContentMarks> selectContentMarkList(Long contentId, Integer page, Integer size) {
+        PageRequest pageRequest = PageRequest.of(page, size, Sort.by("id").descending());
+        return contentMarksRepository.findAllByContentId(contentId, pageRequest);
+    }
+
+    public Page<ContentMarks> selectUserMarkList(Users user, Integer page, Integer size) {
+        PageRequest pageRequest = PageRequest.of(page, size, Sort.by("id").descending());
+        return contentMarksRepository.findAllByUserAndContent_DeletedDateNull(user, pageRequest);
+    }
+
+    public Page<ContentLikes> selectUserContentLike(Users user, Integer page, Integer size) {
+        PageRequest pageRequest = PageRequest.of(page, size, Sort.by("modifiedDate").descending());
+        return contentLikesRepository.findAllByContent_UserAndContent_DeletedDateNull(user, pageRequest);
+    }
+
+    public Page<ContentMarks> selectUserContentMark(Users user, Integer page, Integer size) {
+        PageRequest pageRequest = PageRequest.of(page, size, Sort.by("modifiedDate").descending());
+        return contentMarksRepository.findAllByContent_UserAndContent_DeletedDateNull(user, pageRequest);
+    }
+
+    public long countUserLike(Users user) {
+        return contentsRepository.countUserLike(user);
+    }
+
+    public long countUserMark(Users user) {
+        return contentsRepository.countUserMark(user);
     }
 }

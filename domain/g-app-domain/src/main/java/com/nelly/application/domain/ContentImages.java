@@ -33,6 +33,7 @@ public class ContentImages extends BaseTime {
     @JoinColumn(name = "content_id")
     private Contents content;
 
+
     @OneToMany(mappedBy = "contentImage")
     private List<BrandTags> tagsList;
 }

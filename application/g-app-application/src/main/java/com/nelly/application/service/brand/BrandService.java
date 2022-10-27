@@ -11,6 +11,7 @@ import com.nelly.application.enums.StyleType;
 import com.nelly.application.enums.YesOrNoType;
 import com.nelly.application.exception.SystemException;
 import com.nelly.application.service.BrandDomainService;
+import com.nelly.application.service.ContentDomainService;
 import com.nelly.application.service.ScraperDomainService;
 import com.nelly.application.service.scraper.ScraperService;
 import com.nelly.application.service.user.UserService;
@@ -44,6 +45,7 @@ public class BrandService {
     private final ScraperDomainService scraperDomainService;
     private final ModelMapper modelMapper;
     private final CacheTemplate cacheTemplate;
+    private final ContentDomainService contentDomainService;
 
     public Brands getBrand(Long brandId) {
         return brandDomainService.selectBrand(brandId);
@@ -129,11 +131,14 @@ public class BrandService {
         Optional<Users> user = userService.getAppUser();
         long totalCount = rankPage.getTotalElements();
         long totalPage = rankPage.getTotalPages();
+        long contentSize = rankPage.getContent().size();
         List<BrandRank> rankList = rankPage.getContent();
 
         if (totalPage == 0) {
             isEnded = true;
-        } else if (totalPage < getRankRequest.getPage() + 1) {
+        }
+
+        if (contentSize == 0) {
             isEnded = true;
         }
 
@@ -187,10 +192,12 @@ public class BrandService {
 
         long totalCount = userBrandsPage.getTotalElements();
         long totalPage = userBrandsPage.getTotalPages();
+        long contentSize = userBrandsPage.getContent().size();
 
         if (totalPage == 0) {
             isEnded = true;
-        } else if (totalPage < getUserBrandsRequest.getPage() + 1) {
+        }
+        if (contentSize == 0) {
             isEnded = true;
         }
 
@@ -237,7 +244,7 @@ public class BrandService {
     }
 
 
-    public void brandBrandList(SearchBrandRequest dto) {
+    public void getBrandTagList() {
 
     }
 

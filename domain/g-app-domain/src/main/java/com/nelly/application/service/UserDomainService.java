@@ -4,6 +4,7 @@ import com.nelly.application.domain.*;
 import com.nelly.application.enums.*;
 import com.nelly.application.repository.*;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -16,6 +17,7 @@ import java.util.Optional;
 
 @RequiredArgsConstructor
 @Service
+@Slf4j
 public class UserDomainService {
 
     private final AppUserRepository userRepository;
@@ -23,6 +25,7 @@ public class UserDomainService {
     private final UserMarketingTypeRepository userMarketingTypeRepository;
     private final UserAgreementsRepository userAgreementsRepository;
     private final UserNotificationTokensRepository userNotificationTokensRepository;
+    private final UserFollowRepository userFollowRepository;
 
     public Users addUser(Long authId, String loginId, String email, String birth, Authority authority) {
         Users user = Users.builder().authId(authId)
@@ -52,7 +55,6 @@ public class UserDomainService {
             userMarketingTypeRepository.save(userMarketing);
         }
     }
-
 
     public Users getUsers(long authId) {
         Users user = userRepository.findByAuthId(authId).orElse(null);
@@ -168,5 +170,73 @@ public class UserDomainService {
             UserStyles userStyles = UserStyles.builder().styleType(StyleType.getStyleType(code)).user(user).build();
             userStylesRepository.save(userStyles);
         }
+    }
+
+    public Optional<UserFollow> selectUserFollow(Users user, Users followingUser) {
+        return userFollowRepository.findByUserAndFollower(user, followingUser);
+    }
+
+    public void saveUserFollow(Users user, Users follower) {
+        UserFollow userFollow = UserFollow.builder().
+                user(user).
+                follower(follower).
+                build();
+        userFollowRepository.save(userFollow);
+    }
+
+    public void deleteUserFollow(long id) {
+        userFollowRepository.deleteById(id);
+    }
+
+    public void updateUserFollowerCount(Long userId, Integer count) {
+        userFollowRepository.updateFollowerCount(userId, count);
+    }
+
+    public void updateUserFollowingCount(Long userId, Integer count) {
+        userFollowRepository.updateFollowingCount(userId, count);
+    }
+
+    public void saveAccountProfileTitle(Users user, String profileTitle) {
+        user.setProfileTitle(profileTitle);
+        userRepository.save(user);
+    }
+
+    public void saveAccountProfileText(Users user, String profileText) {
+        user.setProfileText(profileText);
+        userRepository.save(user);
+    }
+
+    public void saveAccountProfileImage(Users user, String imageUrl) {
+        user.setProfileImageUrl(imageUrl);
+        userRepository.save(user);
+    }
+
+    public void saveAccountBackgroundImage(Users user, String imageUrl) {
+        user.setBackgroundImageUrl(imageUrl);
+        userRepository.save(user);
+    }
+
+    public Page<UserFollow> selectAccountFollowerList(Users user, Integer page, Integer size) {
+        PageRequest pageRequest = PageRequest.of(page, size, Sort.by("id").descending());
+        return userFollowRepository.findAllByFollower(user, pageRequest);
+    }
+
+    public Page<UserFollow> selectAccountFollowerList(Users user, String keyword, Integer page, Integer size) {
+        PageRequest pageRequest = PageRequest.of(page, size, Sort.by("id").descending());
+        return userFollowRepository.findAllByFollowerAndUser_LoginIdContains(user, keyword, pageRequest);
+    }
+
+    public Page<UserFollow> selectAccountFollowingList(Users user, Integer page, Integer size) {
+        PageRequest pageRequest = PageRequest.of(page, size, Sort.by("id").descending());
+        return userFollowRepository.findAllByUser(user, pageRequest);
+    }
+
+    public Page<UserFollow> selectAccountFollowingList(Users user, String keyword, Integer page, Integer size) {
+        PageRequest pageRequest = PageRequest.of(page, size, Sort.by("id").descending());
+        return userFollowRepository.findAllByUserAndFollower_LoginIdContains(user, keyword, pageRequest);
+    }
+
+    public void deleteUserFcmToken(UserNotificationTokens fcmToken) {
+        userNotificationTokensRepository.delete(fcmToken);
     }
 }

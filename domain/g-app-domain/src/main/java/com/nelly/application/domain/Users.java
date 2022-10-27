@@ -41,6 +41,9 @@ public class Users extends BaseTime{
     @Column(name = "profile_image_url", nullable = true, length = 500)
     private String profileImageUrl;
 
+    @Column(name = "background_image_url", nullable = true, length = 500)
+    private String backgroundImageUrl;
+
     @Column(name = "profile_title", nullable = true, length = 500)
     private String profileTitle;
     @Column(name = "profile_text", nullable = true, columnDefinition = "TEXT")

@@ -41,7 +41,7 @@ public class BrandService {
 
     public void addBrand(AddBrandRequest requestDto) {
         // set initial value
-        Brands brands = brandDomainService.createBrands(requestDto.getName(), requestDto.getLogoImageUrl(), requestDto.getDescription(),
+        Brands brands = brandDomainService.createBrands(requestDto.getName(), requestDto.getNamekr(), requestDto.getLogoImageUrl(), requestDto.getDescription(),
                 (requestDto.getStatus() == null) ? BrandStatus.NORMAL : BrandStatus.getBrandStatus(requestDto.getStatus()),
                 (requestDto.getIsDisplay() == null) ? DisplayType.NONE_DISPLAY : DisplayType.getDisplayType(requestDto.getIsDisplay()),
                 requestDto.getHomepage(),
@@ -112,7 +112,7 @@ public class BrandService {
     @Transactional
     public void updateBrand(long brandId, AddBrandRequest requestDto) {
 
-        Brands brands = brandDomainService.updateBrand(brandId, requestDto.getName(),
+        Brands brands = brandDomainService.updateBrand(brandId, requestDto.getName(), requestDto.getNamekr(),
                 requestDto.getLogoImageUrl(), requestDto.getDescription(),
                 (requestDto.getStatus() == null) ? BrandStatus.NORMAL : BrandStatus.getBrandStatus(requestDto.getStatus()),
                 (requestDto.getIsDisplay() == null) ? DisplayType.NONE_DISPLAY : DisplayType.getDisplayType(requestDto.getIsDisplay()),

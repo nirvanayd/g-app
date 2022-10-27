@@ -2,14 +2,9 @@ package com.nelly.application.domain;
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
-import com.nelly.application.converter.BrandStatusConverter;
-import com.nelly.application.converter.DisplayTypeConverter;
-import com.nelly.application.enums.BrandStatus;
-import com.nelly.application.enums.DisplayType;
 import lombok.*;
 
 import javax.persistence.*;
-import java.util.List;
 
 @Entity
 @Builder
@@ -27,10 +22,12 @@ public class ContentLikes extends BaseTime{
     @Column(name = "id")
     private Long id;
 
-    @Column(name = "user_id")
-    private Long userId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private Users user;
 
-    @Column(name = "content_id")
-    private Long contentId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "content_id")
+    private Contents content;
 }
 

@@ -49,4 +49,10 @@ public class ScraperBrands extends BaseTime {
 
     @OneToMany(mappedBy = "scraperBrand")
     private List<ScraperBrandDetails> scraperBrandDetails;
+
+    @Column(name="brand_url", nullable = true)
+    private String brand_url;
+
+    @Column(name="store_url", nullable = true)
+    private String storeUrl;
 }

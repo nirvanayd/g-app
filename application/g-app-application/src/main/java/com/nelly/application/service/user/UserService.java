@@ -1,27 +1,34 @@
 package com.nelly.application.service.user;
 
-import com.nelly.application.domain.UserAgreements;
-import com.nelly.application.domain.UserNotificationTokens;
-import com.nelly.application.domain.UserStyles;
-import com.nelly.application.domain.Users;
+import com.nelly.application.config.AwsProperties;
+import com.nelly.application.domain.*;
 import com.nelly.application.dto.request.*;
 import com.nelly.application.dto.TokenInfoDto;
+import com.nelly.application.dto.response.*;
 import com.nelly.application.enums.Authority;
 import com.nelly.application.enums.RoleType;
+import com.nelly.application.enums.YesOrNoType;
+import com.nelly.application.exception.NoContentException;
+import com.nelly.application.exception.SystemException;
 import com.nelly.application.mail.MailSender;
+import com.nelly.application.repository.UserNotificationTokensRepository;
+import com.nelly.application.service.ContentDomainService;
 import com.nelly.application.service.UserDomainService;
 import com.nelly.application.service.AuthService;
+import com.nelly.application.util.AgeUtil;
 import com.nelly.application.util.CacheTemplate;
 import com.nelly.application.util.EncryptUtils;
+import com.nelly.application.util.S3Uploader;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.Random;
+import java.io.IOException;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 @RequiredArgsConstructor
@@ -30,17 +37,26 @@ public class UserService {
 
     private final AuthService authService;
     private final UserDomainService userDomainService;
+    private final ContentDomainService contentDomainService;
     private final EncryptUtils encryptUtils;
     private final CacheTemplate cacheTemplate;
     private final MailSender mailSender;
+    private final AwsProperties awsProperties;
+    private final S3Uploader s3Uploader;
 
     private static final String BEARER_TYPE = "Bearer";
-
+    private static final String DIRECTORY_SEPARATOR = "/";
 
     @Transactional
     public void signUp(SignUpRequest dto) {
         if (authService.findByLoginId(dto.getLoginId()) != null) throw new RuntimeException("사용 중인 아이디입니다.");
         if (userDomainService.existEmail(dto.getEmail())) throw new RuntimeException("사용 중인 이메일입니다.");
+        // 14세 확인
+        int age = AgeUtil.getAge(AgeUtil.getYear(dto.getBirth()), AgeUtil.getMonth(dto.getBirth()),
+                AgeUtil.getDate(dto.getBirth()));
+        if (age < 14) {
+            throw new SystemException("만 14세 미만은 가입할 수 없습니다.");
+        }
         // 비밀번호 암호화
         String encryptPassword = encryptUtils.encrypt(dto.getPassword());
         // 마케팅 수신동의
@@ -95,9 +111,10 @@ public class UserService {
         return null;
     }
 
-    public void logout(String token) {
+    public void logout(Users user, String token) {
+        // fcm 토큰 삭제처리
+        removeUserFcmToken(user);
         TokenInfoDto tokenInfoDto = authService.getAppAuthentication(token);
-
         if (cacheTemplate.getValue(String.valueOf(tokenInfoDto.getAuthId()), "token") != null) {
             cacheTemplate.deleteCache(String.valueOf(tokenInfoDto.getAuthId()), "token");
         }
@@ -107,7 +124,6 @@ public class UserService {
     public Users userTest(String token) {
         TokenInfoDto tokenInfoDto = authService.getAppAuthentication(token);
         long authId = tokenInfoDto.getAuthId();
-
         return userDomainService.getUsers(authId);
     }
 
@@ -244,8 +260,223 @@ public class UserService {
         return userDomainService.saveUserToken(user, fcmToken);
     }
 
+    public void removeUserFcmToken(Users user) {
+        Optional<UserNotificationTokens> userTokens = userDomainService.existFcmToken(user);
+        if (userTokens.isEmpty()) return;
+        userDomainService.deleteUserFcmToken(userTokens.get());
+    }
+
     public void updateUserStyle(Users user, UpdateUserStyleRequest dto) {
         List<String> userStyleList = dto.getUserStyle();
         userDomainService.saveUserStyles(user, userStyleList);
+    }
+
+
+    public void saveUserFollow(Users user, SaveFollowRequest dto) {
+        Long followingId = Long.parseLong(dto.getUserId());
+        Users followingUser = userDomainService.selectAccount(followingId);
+
+        Optional<UserFollow> selectUserFollow = userDomainService.selectUserFollow(user, followingUser);
+
+        if (dto.getFollowYn().equals(YesOrNoType.YES.getCode())) {
+            if (selectUserFollow.isEmpty()) {
+                userDomainService.saveUserFollow(user, followingUser);
+                cacheTemplate.incrValue(String.valueOf(user.getId()), "follower");
+                cacheTemplate.incrValue(String.valueOf(followingUser.getId()), "following");
+            }
+        } else if (dto.getFollowYn().equals(YesOrNoType.NO.getCode())) {
+            if (selectUserFollow.isPresent()) {
+                UserFollow userFollow = selectUserFollow.get();
+                userDomainService.deleteUserFollow(userFollow.getId());
+                cacheTemplate.decrValue(String.valueOf(user.getId()), "follower");
+                cacheTemplate.decrValue(String.valueOf(followingUser.getId()), "following");
+            }
+        }
+    }
+
+    public void scheduleFollow() {
+        Set<String> followerKeys = cacheTemplate.getKeys("follower");
+        for (String key : followerKeys) {
+            int value = Integer.parseInt(cacheTemplate.getValue(key));
+            Long userId = Long.parseLong(cacheTemplate.parseCashNameKey(key).get("key"));
+            userDomainService.updateUserFollowerCount(userId, value);
+            cacheTemplate.deleteCache(key);
+        }
+
+        Set<String> followingKeys = cacheTemplate.getKeys("following");
+        for (String key : followingKeys) {
+            int value = Integer.parseInt(cacheTemplate.getValue(key));
+            Long userId = Long.parseLong(cacheTemplate.parseCashNameKey(key).get("key"));
+            userDomainService.updateUserFollowingCount(userId, value);
+            cacheTemplate.deleteCache(key);
+        }
+    }
+
+    public GetUserDetailResponse getUserDetail(Long userDetailId, Optional<Users> user) {
+        Users detailUser = getUser(userDetailId);
+        GetUserDetailResponse getUserDetailResponse = new GetUserDetailResponse();
+        GetUserDetailResponse response = getUserDetailResponse.toDto(detailUser);
+        int page = 0;
+        int size = 20;
+        Page<Contents> selectContentList = contentDomainService.selectContentList(detailUser, page, size);
+
+        Long userLikeCount = contentDomainService.countUserLike(detailUser);
+        Long userMarkCount = contentDomainService.countUserMark(detailUser);
+
+        List<ContentThumbResponse> list = new ArrayList<>();
+        long totalContentCount = selectContentList.getTotalElements();
+        ContentThumbResponse contentThumbResponse = new ContentThumbResponse();
+        List<ContentThumbResponse> contentList =
+                contentThumbResponse.toDtoList(selectContentList.getContent());
+
+        // 팔로우 유무
+        if (user.isPresent()) {
+            Optional<UserFollow> selectUserFollow = userDomainService.selectUserFollow(user.get(), detailUser);
+            if (selectUserFollow.isPresent()) {
+                response.setFollowed(true);
+            }
+        }
+
+        response.setContentsCount((int)totalContentCount);
+        response.setLikeCount(userLikeCount);
+        response.setMarkCount(userMarkCount);
+        response.setContentList(contentList);
+        return response;
+    }
+
+    public GetMyPageResponse getUserDetailOwner(Long userDetailId) {
+        Users ownerUser = getUser(userDetailId);
+        GetMyPageResponse getMyPageResponse = new GetMyPageResponse();
+        GetMyPageResponse response = getMyPageResponse.toDto(ownerUser);
+        int page = 0;
+        int contentSize = 9;
+        Page<Contents> selectContentList = contentDomainService.selectContentList(ownerUser, page, contentSize);
+        Page<ContentMarks> selectMarkList = contentDomainService.selectUserMarkList(ownerUser, page, contentSize);
+
+        Long userLikeCount = contentDomainService.countUserLike(ownerUser);
+        Long userMarkCount = contentDomainService.countUserMark(ownerUser);
+
+        List<ContentThumbResponse> list = new ArrayList<>();
+        long totalContentCount = selectContentList.getTotalElements();
+        long totalContentMarkCount = selectMarkList.getTotalElements();
+        ContentThumbResponse contentThumbResponse = new ContentThumbResponse();
+        MarkContentThumbResponse markContentThumbResponse = new MarkContentThumbResponse();
+        List<ContentThumbResponse> contentList =
+                contentThumbResponse.toDtoList(selectContentList.getContent());
+        List<MarkContentThumbResponse> markList =
+                markContentThumbResponse.toDtoMarkList(selectMarkList.getContent());
+
+        response.setLikeCount(userLikeCount);
+        response.setMarkCount(userMarkCount);
+        response.setContentsCount((int)totalContentCount);
+        response.setContentMarkCount((int)totalContentMarkCount);
+        response.setContentList(contentList);
+        response.setContentMarkList(markList);
+        response.setOwner(true);
+        return response;
+    }
+
+    public List<ContentThumbResponse> getUserDetailContentList(Long userDetailId, GetContentListRequest dto) {
+        Users detailUser = getUser(userDetailId);
+        dto.setSize(9);
+        Page<Contents> selectContentList = contentDomainService.selectContentList(detailUser, dto.getPage(), dto.getSize());
+        ContentThumbResponse contentThumbResponse = new ContentThumbResponse();
+        if (selectContentList.isEmpty()) throw new NoContentException();
+        return contentThumbResponse.toDtoList(selectContentList.getContent());
+    }
+
+    public List<MarkContentThumbResponse> getUserDetailMarkContentList(Long userDetailId, GetContentListRequest dto) {
+        Users detailUser = getUser(userDetailId);
+        dto.setSize(10);
+        Page<ContentMarks> selectMarkList = contentDomainService.selectUserMarkList(detailUser, dto.getPage(), dto.getSize());
+        MarkContentThumbResponse contentThumbResponse = new MarkContentThumbResponse();
+        if (selectMarkList.isEmpty()) throw new NoContentException();
+        return contentThumbResponse.toDtoMarkList(selectMarkList.getContent());
+    }
+
+    public void getMyPageCartList() {
+
+    }
+
+    @Transactional
+    public ImageResponse uploadUserProfileImage(List<MultipartFile> images) throws IOException {
+        if (images.size() != 1 ) throw new SystemException("첨부파일 양식이 올바르지 않습니다.");
+        // get user id
+        Users user = getUser();
+        String imageUrl = null;
+        for (MultipartFile file: images) {
+            imageUrl = awsProperties.getCloudFront().getUrl() +
+                    s3Uploader.upload(
+                            awsProperties.getS3().getBucket(),
+                            file,
+                            getS3ProfilePath() + DIRECTORY_SEPARATOR + user.getId());
+        }
+
+        if (imageUrl == null) throw new SystemException("이미지 업로드 중 오류가 발생했습니다.");
+
+        return ImageResponse.builder()
+                .url(imageUrl)
+                .build();
+    }
+
+    public String getS3ProfilePath() {
+        return awsProperties.getCloudFront().getProfileDir();
+    }
+
+    public void saveUserProfileTitle(SaveProfileTitleRequest dto) {
+        Users user = getUser();
+        userDomainService.saveAccountProfileTitle(user, dto.getProfileTitle());
+    }
+
+    public void saveUserProfileText(SaveProfileTextRequest dto) {
+        Users user = getUser();
+        userDomainService.saveAccountProfileText(user, dto.getProfileText());
+    }
+
+    public void saveUserProfileImage(SaveProfileImageRequest dto) {
+        Users user = getUser();
+        userDomainService.saveAccountProfileImage(user, dto.getImageUrl());
+    }
+
+    public void saveUserBackgroundImage(SaveBackgroundImageRequest dto) {
+        Users user = getUser();
+        userDomainService.saveAccountBackgroundImage(user, dto.getImageUrl());
+    }
+
+    public List<GetUserFollowerResponse> getUserFollowerList(Users user, GetFollowerListRequest dto) {
+        if (dto.getKeyword() != null) {
+            Page<UserFollow> selectFollowerList = userDomainService.selectAccountFollowerList(user, dto.getKeyword(), dto.getPage(), dto.getSize());
+            if (selectFollowerList.isEmpty()) throw new NoContentException();
+            GetUserFollowerResponse response = new GetUserFollowerResponse();
+            return response.toDtoList(selectFollowerList.getContent());
+        }
+        Page<UserFollow> selectFollowerList = userDomainService.selectAccountFollowerList(user, dto.getPage(), dto.getSize());
+        if (selectFollowerList.isEmpty()) throw new NoContentException();
+        GetUserFollowerResponse response = new GetUserFollowerResponse();
+        return response.toDtoList(selectFollowerList.getContent());
+    }
+
+    public List<GetUserFollowingResponse> getUserFollowingList(Users user, GetFollowingListRequest dto) {
+        if (dto.getKeyword() != null) {
+            Page<UserFollow> selectFollowingList = userDomainService.selectAccountFollowingList(user, dto.getKeyword(), dto.getPage(), dto.getSize());
+            if (selectFollowingList.isEmpty()) throw new NoContentException();
+            GetUserFollowingResponse response = new GetUserFollowingResponse();
+            return response.toDtoList(selectFollowingList.getContent());
+        }
+        Page<UserFollow> selectFollowingList = userDomainService.selectAccountFollowingList(user, dto.getPage(), dto.getSize());
+        if (selectFollowingList.isEmpty()) throw new NoContentException();
+        GetUserFollowingResponse response = new GetUserFollowingResponse();
+        return response.toDtoList(selectFollowingList.getContent());
+    }
+
+    public void removeFollower(Users user, String targetId) {
+        long followingId = Long.parseLong(targetId);
+        Users followingUser = userDomainService.selectAccount(followingId);
+        Optional<UserFollow> selectUserFollow = userDomainService.selectUserFollow(followingUser, user);
+        if (selectUserFollow.isEmpty()) throw new RuntimeException("팔로워 정보를 조회할 수 없습니다.");
+        UserFollow userFollow = selectUserFollow.get();
+        userDomainService.deleteUserFollow(userFollow.getId());
+        cacheTemplate.decrValue(String.valueOf(user.getId()), "follower");
+        cacheTemplate.decrValue(String.valueOf(followingUser.getId()), "following");
     }
 }

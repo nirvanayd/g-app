@@ -1,32 +1,42 @@
 package com.nelly.application.controller;
 
+import com.nelly.application.domain.Agreements;
 import com.nelly.application.domain.UserAgreements;
+import com.nelly.application.domain.UserStyles;
 import com.nelly.application.domain.Users;
 import com.nelly.application.dto.TokenInfoDto;
 import com.nelly.application.dto.request.*;
 import com.nelly.application.dto.Response;
-import com.nelly.application.dto.response.LoginResponse;
-import com.nelly.application.dto.response.UserAgreementsResponse;
-import com.nelly.application.dto.response.UserResponse;
+import com.nelly.application.dto.response.*;
 import com.nelly.application.enums.StyleType;
 import com.nelly.application.mail.MailSender;
+import com.nelly.application.service.app.AppService;
+import com.nelly.application.service.content.ContentService;
 import com.nelly.application.service.user.UserService;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
+import java.io.IOException;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 
 @RestController
 @AllArgsConstructor
+@Slf4j
 public class UserController {
 
     private final UserService userService;
+    private final ContentService contentService;
+    private final AppService appService;
     private final Response response;
     private final ModelMapper modelMapper;
     private final MailSender mailSender;
@@ -41,6 +51,9 @@ public class UserController {
     public ResponseEntity<?> login(@RequestBody @Valid LoginRequest dto) {
         TokenInfoDto tokenInfoDto = userService.login(dto);
 
+        log.info("access token --> " + tokenInfoDto.getAccessToken());
+        log.info("refresh token --> " + tokenInfoDto.getRefreshToken());
+
         LoginResponse data = LoginResponse.builder().accessToken(tokenInfoDto.getAccessToken())
                 .refreshToken(tokenInfoDto.getRefreshToken()).build();
         return response.success(data);
@@ -48,18 +61,28 @@ public class UserController {
 
     @PostMapping("/reissue")
     public ResponseEntity<?> userTest(@RequestBody ReissueRequest requestDto) {
+        log.info("reissue/access token --> " + requestDto.getAccessToken());
+        log.info("reissue/refresh token --> " + requestDto.getRefreshToken());
         TokenInfoDto tokenInfoDto = userService.reissue(requestDto);
         LoginResponse data = LoginResponse.builder()
                 .accessToken(tokenInfoDto.getAccessToken())
                 .refreshToken(tokenInfoDto.getRefreshToken())
                 .build();
+
+        log.info("reissue/response access token --> " + tokenInfoDto.getAccessToken());
+        log.info("reissue/response refresh token --> " + tokenInfoDto.getRefreshToken());
         return response.success(data);
     }
 
     @GetMapping("/users/logout")
     public ResponseEntity<?> logout(@RequestHeader("Authorization") String bearerToken ) {
         String token = userService.getToken(bearerToken);
-        userService.logout(token);
+        Optional<Users> user = userService.getAppUser();
+        if (user.isEmpty()) {
+            // user 정보 조회되지 않으면 진행하지 않음.
+            return response.success();
+        }
+        userService.logout(user.get(), token);
         return response.success();
     }
 
@@ -71,15 +94,7 @@ public class UserController {
     @GetMapping("/users")
     public ResponseEntity<?> getUser() {
         Users users = userService.getUser();
-        List<UserAgreements> list = userService.getAppUserAgreements(users);
-        UserResponse userResponse = modelMapper.map(users, UserResponse.class);
-
-        List<UserAgreementsResponse> userAgreementList =
-                list.stream().map(l -> modelMapper.map(l, UserAgreementsResponse.class)).collect(Collectors.toList());
-
-        userResponse.setUserAgreements(userAgreementList);
-
-        return response.success(userResponse);
+        return response.success(userService.getUserDetailOwner(users.getId()));
     }
 
     /**
@@ -177,6 +192,141 @@ public class UserController {
         Optional<Users> user = userService.getAppUser();
         if (user.isEmpty()) throw new RuntimeException("사용자 정보를 조회할 수 없습니다.");
         userService.updateUserStyle(user.get(), dto);
+        return response.success();
+    }
+
+    @PostMapping("/users/follow")
+    public ResponseEntity<?> saveFollow(@RequestBody @Valid SaveFollowRequest dto) {
+        Optional<Users> user = userService.getAppUser();
+        if (user.isEmpty()) throw new RuntimeException("사용자 정보를 조회할 수 없습니다.");
+        userService.saveUserFollow(user.get(), dto);
+        return response.success();
+    }
+
+    @GetMapping("/users/like")
+    public ResponseEntity<?> getUserLike(GetUserLikeRequest dto) {
+        Optional<Users> user = userService.getAppUser();
+        if (user.isEmpty()) throw new RuntimeException("사용자 정보를 조회할 수 없습니다.");
+        Users appUser = user.get();
+        return response.success(contentService.getUserLikeList(appUser, dto));
+    }
+
+    @GetMapping("/users/mark")
+    public ResponseEntity<?> getUserMark(GetUserLikeRequest dto) {
+        Optional<Users> user = userService.getAppUser();
+        if (user.isEmpty()) throw new RuntimeException("사용자 정보를 조회할 수 없습니다.");
+        Users appUser = user.get();
+        return response.success(contentService.getUserMarkList(appUser, dto));
+    }
+
+    @GetMapping("/users/detail/{id}")
+    public ResponseEntity<?> getUserDetailById(@PathVariable String id) {
+        Long userDetailId = Long.parseLong(id);
+        Optional<Users> user = userService.getAppUser();
+
+        if (user.isPresent()) {
+            // 토큰이 없을 때는 다른 사람 페이지
+            // 토큰이 있을 때 user.id === userDetailId --> 본인 마이페이지
+            // 토큰이 있을 때 user.id !== userDetailId --> 다른 사람 페이지
+            if (Objects.equals(user.get().getId(), userDetailId)) {
+                return response.success(userService.getUserDetailOwner(userDetailId));
+            }
+            return response.success(userService.getUserDetail(userDetailId, user));
+        } else {
+            return response.success(userService.getUserDetail(userDetailId, user));
+        }
+    }
+
+    @GetMapping("/user/detail/content/{id}")
+    public ResponseEntity<?> getUserDetailContentList(@PathVariable String id,
+                                                      GetContentListRequest dto) {
+        Long userDetailId = Long.parseLong(id);
+        Optional<Users> user = userService.getAppUser();
+        return response.success(userService.getUserDetailContentList(userDetailId, dto));
+    }
+
+    @GetMapping("/user/detail/mark/{id}")
+    public ResponseEntity<?> getUserDetailMarkContentList(@PathVariable String id,
+                                                      GetContentListRequest dto) {
+        Long userDetailId = Long.parseLong(id);
+        Optional<Users> user = userService.getAppUser();
+        return response.success(userService.getUserDetailMarkContentList(userDetailId, dto));
+    }
+
+    @PostMapping("/users/upload-profile")
+    public ResponseEntity<?> uploadProfileImage(@NotNull @RequestParam("images") List<MultipartFile> images) throws IOException {
+        ImageResponse imageResponse = userService.uploadUserProfileImage(images);
+        return response.success(imageResponse);
+    }
+
+    @PostMapping("/users/upload-background")
+    public ResponseEntity<?> uploadBackgroundImage(@NotNull @RequestParam("images") List<MultipartFile> images) throws IOException {
+        ImageResponse imageResponse = userService.uploadUserProfileImage(images);
+        return response.success(imageResponse);
+    }
+
+    @PostMapping("/users/profile-image")
+    public ResponseEntity<?> saveProfileImage(@RequestBody SaveProfileImageRequest dto){
+        userService.saveUserProfileImage(dto);
+        return response.success();
+    }
+
+    @PostMapping("/users/background-image")
+    public ResponseEntity<?> saveBackgroundImage(@RequestBody SaveBackgroundImageRequest dto) throws IOException {
+        userService.saveUserBackgroundImage(dto);
+        return response.success();
+    }
+
+    @PostMapping("/users/profile-title")
+    public ResponseEntity<?> saveProfileTitle(@RequestBody @Valid SaveProfileTitleRequest dto) {
+        userService.saveUserProfileTitle(dto);
+        return response.success();
+    }
+
+    @PostMapping("/users/profile-text")
+    public ResponseEntity<?> saveProfileText(@RequestBody @Valid SaveProfileTextRequest dto) {
+        userService.saveUserProfileText(dto);
+        return response.success();
+    }
+
+    @GetMapping("/users/agreement-list")
+    public ResponseEntity<?> getUserAgreementList() {
+        Users users = userService.getUser();
+        List<Agreements> appAgreementList = appService.getAppAgreementList("1.0.0");
+        List<UserAgreements> list = userService.getAppUserAgreements(users);
+        List<UserAgreementsResponse> userAgreementList =
+                list.stream().map(l -> modelMapper.map(l, UserAgreementsResponse.class)).collect(Collectors.toList());
+        return response.success(userAgreementList);
+    }
+
+    @GetMapping("/users/style-list")
+    public ResponseEntity<?> getUserStyleList() {
+        Users user = userService.getUser();
+        List<UserStyles> list = user.getUserStyles();
+        List<UserStylesResponse> userStyleList =
+                list.stream().map(l -> modelMapper.map(l, UserStylesResponse.class)).collect(Collectors.toList());
+        return response.success(userStyleList);
+    }
+
+    @GetMapping("/users/follower-list")
+    public ResponseEntity<?> getUserFollowerList(GetFollowerListRequest dto) {
+        Optional<Users> user = userService.getAppUser();
+        if (user.isEmpty()) throw new RuntimeException("사용자 정보를 조회할 수 없습니다.");
+        return response.success(userService.getUserFollowerList(user.get(), dto));
+    }
+
+    @GetMapping("/users/following-list")
+    public ResponseEntity<?> getUserFollowingList(GetFollowingListRequest dto) {
+        Optional<Users> user = userService.getAppUser();
+        if (user.isEmpty()) throw new RuntimeException("사용자 정보를 조회할 수 없습니다.");
+        return response.success(userService.getUserFollowingList(user.get(), dto));
+    }
+
+    @DeleteMapping("/users/follower/{id}")
+    public ResponseEntity<?> removeUserFollowingList(@PathVariable String id) {
+        Optional<Users> user = userService.getAppUser();
+        if (user.isEmpty()) throw new RuntimeException("사용자 정보를 조회할 수 없습니다.");
+        userService.removeFollower(user.get(), id);
         return response.success();
     }
 }

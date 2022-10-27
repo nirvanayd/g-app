@@ -94,4 +94,8 @@ public class ScraperDomainService {
                 .build();
         scraperRequestRepository.save(scraperRequest);
     }
+
+    public List<ScraperBrands> selectScraperBrand(String host) {
+        return scraperBrandsRepository.findByStoreUrlContains(host);
+    }
 }

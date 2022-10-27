@@ -1,10 +1,7 @@
 package com.nelly.application.exception.handler;
 
 import com.nelly.application.dto.Response;
-import com.nelly.application.exception.AccessDeniedException;
-import com.nelly.application.exception.AuthenticationException;
-import com.nelly.application.exception.ExpireTokenException;
-import com.nelly.application.exception.SystemException;
+import com.nelly.application.exception.*;
 import com.nelly.application.exception.enums.ExceptionCode;
 import io.jsonwebtoken.ExpiredJwtException;
 import lombok.RequiredArgsConstructor;
@@ -69,4 +66,13 @@ public class GAppExceptionHandler {
         ExceptionCode exceptionCode = ExceptionCode.SYSTEM_EXCEPTION;
         return response.fail(exceptionCode.getCode(), exception.getMessage(), exceptionCode.getStatus());
     }
+
+    @ExceptionHandler(NoContentException.class)
+    public ResponseEntity<?> handleRuntimeException(NoContentException exception) {
+        exception.printStackTrace();
+        ExceptionCode exceptionCode = exception.getExceptionCode();
+        return response.fail(exceptionCode.getCode(), exception.getMessage(), exceptionCode.getStatus());
+    }
+
+
 }

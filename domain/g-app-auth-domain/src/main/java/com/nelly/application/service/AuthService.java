@@ -106,9 +106,8 @@ public class AuthService {
 
     public TokenInfoDto getExistTokenInfo(String accessToken, String refreshToken) {
         if(!tokenProvider.validateToken(refreshToken)) {
-            log.info("##### validate fail");
+            throw new RuntimeException("기존 토큰 정보를 조회할 수 없습니다.");
         }
-
 
         Authentication authentication = tokenProvider.getAuthentication(accessToken);
         AppAuthentication auth = findByLoginId(authentication.getName());
