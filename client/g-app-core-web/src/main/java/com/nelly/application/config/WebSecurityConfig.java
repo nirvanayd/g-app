@@ -47,7 +47,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers( "/users/**").hasRole("USER")
                 .antMatchers( "/contents/**").hasRole("USER")
                 .antMatchers( "/brands/**").hasRole("USER")
-                .antMatchers( "/scraper/**").hasRole("USER")
 //                .antMatchers().hasRole("ADMIN")
                 .and()
                 .addFilterBefore(corsFilter, UsernamePasswordAuthenticationFilter.class)
