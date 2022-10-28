@@ -90,44 +90,27 @@ public class ScraperService {
         // scrap 요청
         String moduleName = brand.getModuleName();
         // 비동기 처리
-//        Thread thread = new Thread(new Runnable() {
-//            @Override
-//            public void run() {
-//                ItemScrapDto itemScrapDto = scraperManager.addCurrentItem(url, moduleName);
-//                scraperLogUpdate(scraperLog.getId(), itemScrapDto.getImageList(), itemScrapDto.getName(), itemScrapDto.getPrice(), ScraperLogResult.SUCCESS.getCode());
-//                ScrapItems existScrapItem = scraperDomainService.selectScrapItem(url).orElse(null);
-//                if (existScrapItem == null) {
-//                    ScrapItems scrapItem = scraperDomainService.createScrapItems(url, itemScrapDto.getName(),
-//                            Integer.parseInt(itemScrapDto.getPrice().replaceAll("[^0-9]", "")), "kr",
-//                            brand.getId(), brand.getName());
-//                    if (userId != null) {
-//                        scraperDomainService.updateUserScrapHistory(scrapItem, userId);
-//                    }
-//                } else {
-//                    if (userId != null) {
-//                        scraperDomainService.updateUserScrapHistory(existScrapItem, userId);
-//                    }
-//                }
-//
-//            }
-//        });
-//        thread.start();
-
-        ItemScrapDto itemScrapDto = scraperManager.addCurrentItem(url, moduleName);
-        scraperLogUpdate(scraperLog.getId(), itemScrapDto.getImageList(), itemScrapDto.getName(), itemScrapDto.getPrice(), ScraperLogResult.SUCCESS.getCode());
-        ScrapItems existScrapItem = scraperDomainService.selectScrapItem(url).orElse(null);
-        if (existScrapItem == null) {
-            ScrapItems scrapItem = scraperDomainService.createScrapItems(url, itemScrapDto.getName(),
-                    Integer.parseInt(itemScrapDto.getPrice().replaceAll("[^0-9]", "")), "kr",
-                    brand.getId(), brand.getName());
-            if (userId != null) {
-                scraperDomainService.updateUserScrapHistory(scrapItem, userId);
+        Thread thread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                ItemScrapDto itemScrapDto = scraperManager.addCurrentItem(url, moduleName);
+                scraperLogUpdate(scraperLog.getId(), itemScrapDto.getImageList(), itemScrapDto.getName(), itemScrapDto.getPrice(), ScraperLogResult.SUCCESS.getCode());
+                ScrapItems existScrapItem = scraperDomainService.selectScrapItem(url).orElse(null);
+                if (existScrapItem == null) {
+                    ScrapItems scrapItem = scraperDomainService.createScrapItems(url, itemScrapDto.getName(),
+                            Integer.parseInt(itemScrapDto.getPrice().replaceAll("[^0-9]", "")), "kr",
+                            brand.getId(), brand.getName());
+                    if (userId != null) {
+                        scraperDomainService.updateUserScrapHistory(scrapItem, userId);
+                    }
+                } else {
+                    if (userId != null) {
+                        scraperDomainService.updateUserScrapHistory(existScrapItem, userId);
+                    }
+                }
             }
-        } else {
-            if (userId != null) {
-                scraperDomainService.updateUserScrapHistory(existScrapItem, userId);
-            }
-        }
+        });
+        thread.start();
     }
 
     public void addCart(WebviewRequest dto, Users user) {

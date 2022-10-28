@@ -111,11 +111,9 @@ public class ScraperDomainService {
     @Transactional
     public void updateUserScrapHistory(ScrapItems scrapItem, long userId) {
         Optional<UserScrapHistory> existHistory = userScrapHistoryRepository.findByUserIdAndScrapItem(userId, scrapItem);
-        System.out.println("######## exist id : " + existHistory.get().getId());
         existHistory.ifPresent(userScrapHistory -> userScrapHistoryRepository.deleteById(userScrapHistory.getId()));
         UserScrapHistory userScrapHistory = UserScrapHistory.builder().userId(userId).scrapItem(scrapItem).build();
         UserScrapHistory result = userScrapHistoryRepository.save(userScrapHistory);
-        System.out.println("######## history id : " + result.getId());
     }
 
     public void saveUserScrapCart(ScrapItems scrapItem, long userId) {

@@ -31,7 +31,6 @@ public class ExceptionHandlerFilter extends OncePerRequestFilter {
         try{
             String json = errorResponse.convertToJson(null,
                     ex.getExceptionCode().getCode(), ex.getExceptionCode().getMessage());
-            System.out.println(json);
             response.setCharacterEncoding("UTF-8");
             response.getWriter().write(json);
         }catch (IOException e){

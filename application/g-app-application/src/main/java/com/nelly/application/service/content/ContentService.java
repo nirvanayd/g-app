@@ -323,7 +323,6 @@ public class ContentService {
         for (String key : keys) {
             int value = Integer.parseInt(cacheTemplate.getValue(key));
             Long contentId = Long.parseLong(cacheTemplate.parseCashNameKey(key).get("key"));
-            System.out.println("content ID : " + contentId + " , value : " + value);
             contentDomainService.updateContentMark(contentId, value);
             cacheTemplate.deleteCache(key);
         }
@@ -448,7 +447,6 @@ public class ContentService {
         for (String key : keys) {
             int value = Integer.parseInt(cacheTemplate.getValue(key));
             Long contentId = Long.parseLong(cacheTemplate.parseCashNameKey(key).get("key"));
-            System.out.println("content ID : " + contentId + " , value : " + value);
             contentDomainService.updateContentReply(contentId, value);
             cacheTemplate.deleteCache(key);
         }
