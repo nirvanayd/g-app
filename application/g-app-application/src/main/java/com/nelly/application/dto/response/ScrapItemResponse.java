@@ -20,6 +20,7 @@ public class ScrapItemResponse {
     private int price;
     private String url;
     private String brandName;
+    private String photoUrl;
 
     public ScrapItemResponse toDto(UserScrapHistory userScrapHistory) {
         return ScrapItemResponse.builder()

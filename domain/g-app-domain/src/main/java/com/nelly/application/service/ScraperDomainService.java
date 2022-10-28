@@ -9,6 +9,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -107,11 +108,14 @@ public class ScraperDomainService {
         return scrapItemsRepository.findByUrl(url);
     }
 
+    @Transactional
     public void updateUserScrapHistory(ScrapItems scrapItem, long userId) {
-        Optional<UserScrapHistory> history = userScrapHistoryRepository.findByUserIdAndScrapItem(userId, scrapItem);
-        history.ifPresent(userScrapHistory -> userScrapHistoryRepository.deleteById(userScrapHistory.getId()));
+        Optional<UserScrapHistory> existHistory = userScrapHistoryRepository.findByUserIdAndScrapItem(userId, scrapItem);
+        System.out.println("######## exist id : " + existHistory.get().getId());
+        existHistory.ifPresent(userScrapHistory -> userScrapHistoryRepository.deleteById(userScrapHistory.getId()));
         UserScrapHistory userScrapHistory = UserScrapHistory.builder().userId(userId).scrapItem(scrapItem).build();
-        userScrapHistoryRepository.save(userScrapHistory);
+        UserScrapHistory result = userScrapHistoryRepository.save(userScrapHistory);
+        System.out.println("######## history id : " + result.getId());
     }
 
     public void saveUserScrapCart(ScrapItems scrapItem, long userId) {

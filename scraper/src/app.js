@@ -45,7 +45,7 @@ app.post('/add-item', async (req, res) => {
         }
     } catch (err) {
         res.statusCode = 510;
-        message = '브랜드 모듈 조회 실패';
+        message = '스크랩 오류';
         res.send(message);
         return;
     }

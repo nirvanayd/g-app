@@ -34,7 +34,6 @@ public class ScraperController {
         return response.success(brand.getId());
     }
 
-
     @GetMapping("/scraper/current-item")
     public ResponseEntity<?> getCurrentItemList(GetUserCurrentScrapItemRequest dto) throws MalformedURLException {
         Users user = userService.getAppUser().orElse(null);
