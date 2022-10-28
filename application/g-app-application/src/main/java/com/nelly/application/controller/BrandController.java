@@ -9,6 +9,7 @@ import com.nelly.application.repository.BrandTagsRepository;
 import com.nelly.application.service.brand.BrandService;
 import com.nelly.application.service.user.UserService;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -18,6 +19,7 @@ import java.util.Optional;
 
 @RestController
 @AllArgsConstructor
+@Slf4j
 public class BrandController {
 
     private final BrandService brandService;
@@ -57,8 +59,14 @@ public class BrandController {
 
     @PostMapping("/brands/favorite")
     public ResponseEntity<?> saveUserBrand(@RequestBody SaveUserBrandsRequest saveUserBrandsRequest) {
-        Users user = userService.getAppUser().orElseThrow(() -> new SystemException("사용자 정보를 조회할 수 없습니다."));
-        brandService.saveUserBrands(user.getId(), saveUserBrandsRequest);
+        log.info("### favorite start....");
+        try {
+            Users user = userService.getAppUser().orElseThrow(() -> new SystemException("사용자 정보를 조회할 수 없습니다."));
+            brandService.saveUserBrands(user.getId(), saveUserBrandsRequest);
+            return response.success();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         return response.success();
     }
 

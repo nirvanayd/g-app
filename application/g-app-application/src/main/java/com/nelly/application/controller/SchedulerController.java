@@ -17,25 +17,24 @@ public class SchedulerController {
     private final BrandService brandService;
     private final UserService userService;
 
-    @Scheduled(fixedDelay = 10000)
+    @Scheduled(fixedDelay = 3000)
     public void updateContentCounts() {
         contentService.scheduleContentLikes();
         contentService.scheduleContentMarks();
     }
 
-    @Scheduled(fixedDelay = 10000)
+    @Scheduled(fixedDelay = 3000)
     public void updateFavoriteCounts() {
         brandService.scheduleBrandFavorite();
     }
 
-    @Scheduled(fixedDelay = 10000)
+    @Scheduled(fixedDelay = 3000)
     public void updateContentReplyCounts() {
         contentService.scheduleContentReply();
     }
 
-    @Scheduled(fixedDelay = 10000)
+    @Scheduled(fixedDelay = 3000)
     public void updateFollowCounts() {
         userService.scheduleFollow();
     }
-
 }
