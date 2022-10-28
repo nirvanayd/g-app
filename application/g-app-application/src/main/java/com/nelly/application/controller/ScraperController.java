@@ -3,11 +3,11 @@ package com.nelly.application.controller;
 import com.nelly.application.domain.ScraperBrands;
 import com.nelly.application.domain.Users;
 import com.nelly.application.dto.Response;
-import com.nelly.application.dto.request.SignupDataRequest;
-import com.nelly.application.dto.request.WebviewRequest;
+import com.nelly.application.dto.request.*;
 import com.nelly.application.dto.response.AppInitDataResponse;
 import com.nelly.application.service.scraper.ScraperService;
 import com.nelly.application.service.user.UserService;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -34,10 +34,23 @@ public class ScraperController {
         return response.success(brand.getId());
     }
 
-    @PostMapping("/scraper/add-cart")
+
+    @GetMapping("/scraper/current-item")
+    public ResponseEntity<?> getCurrentItemList(GetUserCurrentScrapItemRequest dto) throws MalformedURLException {
+        Users user = userService.getAppUser().orElse(null);
+        return response.success(scraperService.getCurrentScrapItemList(user, dto));
+    }
+
+    @PostMapping("/scraper/cart")
     public ResponseEntity<?> addCart(@RequestBody WebviewRequest dto) throws MalformedURLException {
         Users user = userService.getAppUser().orElse(null);
-        scraperService.saveScrapRequest(dto, user);
-        return response.success(scraperService.searchScraperBrand(dto));
+        scraperService.addCart(dto, user);
+        return response.success();
+    }
+
+    @GetMapping("/scraper/cart")
+    public ResponseEntity<?> getUserCartList(GetUserCartRequest dto) {
+        Users user = userService.getAppUser().orElse(null);
+        return response.success(scraperService.getScrapCartList(user, dto));
     }
 }

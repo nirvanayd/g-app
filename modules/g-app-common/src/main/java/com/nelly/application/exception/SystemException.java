@@ -7,12 +7,12 @@ public class SystemException extends RuntimeException {
 
     public SystemException(String message) {
         super(message);
-        this.exceptionCode = ExceptionCode.ACCESS_DENIED_EXCEPTION;
+        this.exceptionCode = ExceptionCode.SYSTEM_EXCEPTION;
     }
 
     public SystemException() {
         super();
-        this.exceptionCode = ExceptionCode.ACCESS_DENIED_EXCEPTION;
+        this.exceptionCode = ExceptionCode.SYSTEM_EXCEPTION;
     }
 
     public ExceptionCode getExceptionCode() {

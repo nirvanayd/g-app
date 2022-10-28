@@ -5,6 +5,9 @@ import com.nelly.application.domain.*;
 import com.nelly.application.enums.ScraperLogResult;
 import com.nelly.application.repository.*;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -21,7 +24,8 @@ public class ScraperDomainService {
     private final ScrapItemImagesRepository scrapItemImagesRepository;
     private final ScraperLogRepository scraperLogRepository;
     private final ScraperRequestRepository scraperRequestRepository;
-
+    private final UserScrapHistoryRepository userScrapHistoryRepository;
+    private final UserScrapCartRepository userScrapCartRepository;
 
     public List<ScraperBrandDetails> selectScraperBrandDetail(String host) {
         return scraperBrandDetailsRepository.findAllByHost(host);
@@ -46,12 +50,14 @@ public class ScraperDomainService {
         scraperSimulationLogRepository.save(log);
     }
 
-    public ScrapItems createScrapItems(String url, String name, Integer price, String currency) {
+    public ScrapItems createScrapItems(String url, String name, Integer price, String currency, long brandId, String brandName) {
         ScrapItems scrapItem = ScrapItems.builder()
                 .url(url)
                 .name(name)
                 .price(price)
                 .currency(currency)
+                .brandName(brandName)
+                .brandId(brandId)
                 .build();
 
         return scrapItemsRepository.save(scrapItem);
@@ -62,7 +68,6 @@ public class ScraperDomainService {
                 .scrapItem(ScrapItem)
                 .imageUrl(imageUrl)
                 .build();
-
         scrapItemImagesRepository.save(scrapItemImage);
     }
 
@@ -98,8 +103,33 @@ public class ScraperDomainService {
         return scraperBrandsRepository.findByStoreUrlContains(host);
     }
 
-    public Long selectScrapItem(String url) {
-        Optional<ScrapItems> scrapItem = scrapItemsRepository.findByUrl(url);
-        return scrapItem.map(ScrapItems::getId).orElse(null);
+    public Optional<ScrapItems> selectScrapItem(String url) {
+        return scrapItemsRepository.findByUrl(url);
+    }
+
+    public void updateUserScrapHistory(ScrapItems scrapItem, long userId) {
+        Optional<UserScrapHistory> history = userScrapHistoryRepository.findByUserIdAndScrapItem(userId, scrapItem);
+        history.ifPresent(userScrapHistory -> userScrapHistoryRepository.deleteById(userScrapHistory.getId()));
+        UserScrapHistory userScrapHistory = UserScrapHistory.builder().userId(userId).scrapItem(scrapItem).build();
+        userScrapHistoryRepository.save(userScrapHistory);
+    }
+
+    public void saveUserScrapCart(ScrapItems scrapItem, long userId) {
+        UserScrapCart userScrapCart = UserScrapCart.builder().userId(userId).scrapItem(scrapItem).build();
+        userScrapCartRepository.save(userScrapCart);
+    }
+
+    public Optional<UserScrapCart> selectUserScrapCart(ScrapItems scrapItem, long userId) {
+        return userScrapCartRepository.findByUserIdAndScrapItem(userId, scrapItem);
+    }
+
+    public Page<UserScrapCart> selectUserScrapCartList(Users user, int page, int size) {
+        PageRequest pageRequest = PageRequest.of(page, size, Sort.by("id").descending());
+        return userScrapCartRepository.findAllByUserId(user.getId(), pageRequest);
+    }
+
+    public Page<UserScrapHistory> selectUserScrapItemList(Users user, Integer page, Integer size) {
+        PageRequest pageRequest = PageRequest.of(page, size, Sort.by("id").descending());
+        return userScrapHistoryRepository.findAllByUserId(user.getId(), pageRequest);
     }
 }

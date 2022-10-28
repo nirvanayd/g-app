@@ -12,7 +12,7 @@ import java.time.Duration;
 public class ScraperClientConfig {
 
     HttpClient client = HttpClient.create()
-            .responseTimeout(Duration.ofSeconds(5));
+            .responseTimeout(Duration.ofSeconds(10));
 
     @Bean
     public WebClient scraperClient() {

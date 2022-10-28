@@ -10,4 +10,6 @@ public class GetUserBrandsResponse extends CommonListResponse {
     private long totalPage;
     private long totalCount;
     private List<BrandFavoriteResponse> brandList;
+
+
 }

@@ -27,6 +27,12 @@ public class ScrapItems extends BaseTime{
     @Column(name = "id")
     private Long id;
 
+    @Column(name = "brand_id")
+    private Long brandId;
+
+    @Column(name = "brand_name")
+    private String brandName;
+
     @Column(name = "url", nullable = false)
     private String url;
 
