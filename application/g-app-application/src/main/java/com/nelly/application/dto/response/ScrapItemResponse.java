@@ -1,6 +1,7 @@
 package com.nelly.application.dto.response;
 
 import com.nelly.application.domain.ContentMarks;
+import com.nelly.application.domain.ScrapItemImages;
 import com.nelly.application.domain.UserScrapCart;
 import com.nelly.application.domain.UserScrapHistory;
 import lombok.AllArgsConstructor;
@@ -23,20 +24,24 @@ public class ScrapItemResponse {
     private String photoUrl;
 
     public ScrapItemResponse toDto(UserScrapHistory userScrapHistory) {
+        List<ScrapItemImages> imageList = userScrapHistory.getScrapItem().getScrapItemImages();
         return ScrapItemResponse.builder()
             .name(userScrapHistory.getScrapItem().getName())
                 .price(userScrapHistory.getScrapItem().getPrice())
                 .url(userScrapHistory.getScrapItem().getUrl())
                 .brandName(userScrapHistory.getScrapItem().getBrandName())
+                .photoUrl(imageList.size() > 0 ? imageList.get(0).getOriginImageUrl() : null)
                 .build();
     }
 
     public ScrapItemResponse cartToDto(UserScrapCart userScrapCart) {
+        List<ScrapItemImages> imageList = userScrapCart.getScrapItem().getScrapItemImages();
         return ScrapItemResponse.builder()
                 .name(userScrapCart.getScrapItem().getName())
                 .price(userScrapCart.getScrapItem().getPrice())
                 .url(userScrapCart.getScrapItem().getUrl())
                 .brandName(userScrapCart.getScrapItem().getBrandName())
+                .photoUrl(imageList.size() > 0 ? imageList.get(0).getOriginImageUrl() : null)
                 .build();
     }
 

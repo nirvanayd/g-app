@@ -104,6 +104,7 @@ public class ScraperService {
                     ScrapItems scrapItem = scraperDomainService.createScrapItems(url, itemScrapDto.getName(),
                             Integer.parseInt(itemScrapDto.getPrice().replaceAll("[^0-9]", "")), "kr",
                             brand.getId(), brand.getName());
+                    scraperDomainService.createScrapItemImages(scrapItem, itemScrapDto.getImageList());
                     if (userId != null) {
                         scraperDomainService.updateUserScrapHistory(scrapItem, userId);
                     }

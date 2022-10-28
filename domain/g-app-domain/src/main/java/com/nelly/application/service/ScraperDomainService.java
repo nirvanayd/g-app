@@ -64,12 +64,15 @@ public class ScraperDomainService {
         return scrapItemsRepository.save(scrapItem);
     }
 
-    public void createScrapItemImages(ScrapItems ScrapItem, String imageUrl) {
-        ScrapItemImages scrapItemImage = ScrapItemImages.builder()
-                .scrapItem(ScrapItem)
-                .imageUrl(imageUrl)
-                .build();
-        scrapItemImagesRepository.save(scrapItemImage);
+    public void createScrapItemImages(ScrapItems ScrapItem, List<String> imageUrlList) {
+
+        imageUrlList.forEach(i -> {
+            ScrapItemImages scrapItemImage = ScrapItemImages.builder()
+                    .scrapItem(ScrapItem)
+                    .originImageUrl(i)
+                    .build();
+            scrapItemImagesRepository.save(scrapItemImage);
+        });
     }
 
     public ScraperLog createScrapLog(Long brandId, String targetUrl, Long userId) {
