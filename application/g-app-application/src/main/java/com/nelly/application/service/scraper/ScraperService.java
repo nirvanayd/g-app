@@ -68,6 +68,10 @@ public class ScraperService {
             return false;
         }).findFirst();
 
+        if (a.isEmpty() && dto.getId() != null) {
+            Optional<ScraperBrands> b = list.stream().filter(l -> l.getId().equals(dto.getId())).findFirst();
+            if (b.isPresent()) return b.get();
+        }
         if (a.isEmpty()) return null;
         return a.get();
     }
