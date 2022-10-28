@@ -37,6 +37,9 @@ public class ScraperManager {
         map.put("url", url);
         map.put("moduleName", moduleName);
 
+        log.info("module name : " + moduleName);
+        log.info("url : " + url);
+
         Mono<String> scraperResponse = scraperClient
                 .post()
                 .uri("/add-item")
