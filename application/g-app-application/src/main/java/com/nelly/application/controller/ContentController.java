@@ -36,6 +36,7 @@ public class ContentController {
     @GetMapping("/contents/{id}")
     public ResponseEntity<?> getContentList(@NotBlank @PathVariable("id") String id) {
         Long contentId = Long.parseLong(id);
+
         ContentResponse contentResponse = contentService.getContent(contentId);
         return response.success(contentResponse);
     }

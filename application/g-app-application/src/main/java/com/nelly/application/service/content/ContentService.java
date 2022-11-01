@@ -177,13 +177,22 @@ public class ContentService {
     }
 
     public ContentResponse getContent(Long id) {
+        Optional<Users> selectUser = userService.getAppUser();
         entityManager.clear();
         Optional<Contents> selectContent = contentDomainService.selectContent(id);
         if (selectContent.isEmpty()) throw new SystemException("게시글이 정상적으로 등록되지 않았습니다.");
         Contents content = selectContent.get();
 
         ContentResponse response = new ContentResponse();
-        return response.toDto(content);
+        response = response.toDto(content);
+        if (selectUser.isPresent()) {
+            Users user = selectUser.get();
+            boolean liked = contentDomainService.selectContentLike(content.getId(), user.getId()).isPresent();
+            boolean marked = contentDomainService.selectContentMark(content.getId(), user.getId()).isPresent();
+            response.setMarked(marked);
+            response.setLiked(liked);
+        }
+        return response;
     }
 
     @Transactional
