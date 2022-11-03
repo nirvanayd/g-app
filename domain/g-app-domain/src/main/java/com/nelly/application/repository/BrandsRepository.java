@@ -1,6 +1,7 @@
 package com.nelly.application.repository;
 
 import com.nelly.application.domain.BrandAges;
+import com.nelly.application.domain.BrandPlaces;
 import com.nelly.application.domain.BrandStyles;
 import com.nelly.application.domain.Brands;
 import com.nelly.application.enums.BrandStatus;
@@ -27,6 +28,23 @@ public interface BrandsRepository extends JpaRepository<Brands, Long> {
     Page<Brands> findAllByStatusAndIsDisplay(BrandStatus status, DisplayType displayType, Pageable pageable);
 
     Page<Brands> findAllByNameContainingAndStatusAndIsDisplay(String name, BrandStatus status, DisplayType isDisplay, Pageable pageable);
+
+    List<Brands> findAllByBrandStylesInAndBrandPlacesInAndBrandAgesIn(List<BrandStyles> brandStyleList,
+                                                                      List<BrandPlaces> brandPlaceList,
+                                                                      List<BrandAges> brandAgeList);
+
+    List<Brands> findAllByBrandStylesInAndBrandPlacesIn(List<BrandStyles> brandStyleList,
+                                                                      List<BrandPlaces> brandPlaceList);
+
+    List<Brands> findAllByBrandPlacesInAndBrandAgesIn(List<BrandPlaces> brandPlaceList,
+                                                                      List<BrandAges> brandAgeList);
+
+    List<Brands> findAllByBrandStylesInAndBrandAgesIn(List<BrandStyles> brandStyleList,
+                                                           List<BrandAges> brandAgeList);
+
+    List<Brands> findAllByBrandStylesIn(List<BrandStyles> brandStyleList);
+    List<Brands> findAllByBrandAgesIn(List<BrandAges> brandAgeList);
+    List<Brands> findAllByBrandPlacesIn(List<BrandPlaces> brandPlaceList);
 
     @Transactional
     @Modifying

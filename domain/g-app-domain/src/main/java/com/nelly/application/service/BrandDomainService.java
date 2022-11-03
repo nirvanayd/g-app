@@ -79,6 +79,38 @@ public class BrandDomainService {
         return brandsRepository.findAll(pageRequest);
     }
 
+    public List<Brands> selectBrandListByStylePlaceAge(List<BrandStyles> brandStyleList,
+                                                       List<BrandPlaces> brandPlaceList,
+                                                       List<BrandAges> brandAgeList) {
+        return brandsRepository.findAllByBrandStylesInAndBrandPlacesInAndBrandAgesIn(brandStyleList, brandPlaceList, brandAgeList);
+    }
+
+    public List<Brands> selectBrandListByStylePlace(List<BrandStyles> brandStyleList,
+                                                       List<BrandPlaces> brandPlaceList) {
+        return brandsRepository.findAllByBrandStylesInAndBrandPlacesIn(brandStyleList, brandPlaceList);
+    }
+
+    public List<Brands> selectBrandListByPlaceAge(List<BrandPlaces> brandPlaceList, List<BrandAges> brandAgeList) {
+        return brandsRepository.findAllByBrandPlacesInAndBrandAgesIn(brandPlaceList, brandAgeList);
+    }
+
+    public List<Brands> selectBrandStylesAge(List<BrandStyles> brandStyleList, List<BrandAges> brandAgeList) {
+        return brandsRepository.findAllByBrandStylesInAndBrandAgesIn(brandStyleList, brandAgeList);
+    }
+
+
+    public List<Brands> selectBrandListByStyle(List<BrandStyles> brandStyleList) {
+        return brandsRepository.findAllByBrandStylesIn(brandStyleList);
+    }
+
+    public List<Brands> selectBrandListByAge(List<BrandAges> brandAgeList) {
+        return brandsRepository.findAllByBrandAgesIn(brandAgeList);
+    }
+
+    public List<Brands> selectBrandListByPlace(List<BrandPlaces> brandPlaceList) {
+        return brandsRepository.findAllByBrandPlacesIn(brandPlaceList);
+    }
+
     public Page<Brands> selectBrandList(Integer page, Integer size, String name, BrandStatus status, DisplayType display) {
         PageRequest pageRequest = PageRequest.of(page, size, Sort.by("id").descending());
         if (name == null && status == null && display == null) return selectBrandList(page, size);

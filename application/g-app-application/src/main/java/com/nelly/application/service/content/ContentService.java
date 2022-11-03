@@ -480,8 +480,4 @@ public class ContentService {
         GetUserMarkResponse getUserMarkResponse = new GetUserMarkResponse();
         return getUserMarkResponse.toDtoList(markList);
     }
-
-    public void getUserDetail(Users user, Long detailUserId) {
-
-    }
 }

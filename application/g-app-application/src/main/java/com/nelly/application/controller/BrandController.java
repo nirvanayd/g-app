@@ -59,7 +59,6 @@ public class BrandController {
 
     @PostMapping("/brands/favorite")
     public ResponseEntity<?> saveUserBrand(@RequestBody SaveUserBrandsRequest saveUserBrandsRequest) {
-        log.info("### favorite start....");
         try {
             Users user = userService.getAppUser().orElseThrow(() -> new SystemException("사용자 정보를 조회할 수 없습니다."));
             brandService.saveUserBrands(user.getId(), saveUserBrandsRequest);

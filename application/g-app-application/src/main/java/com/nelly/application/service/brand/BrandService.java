@@ -75,8 +75,6 @@ public class BrandService {
 
     public GetRankResponse getBrandRankList(GetRankRequest getRankRequest) {
         PageRequest pageRequest = PageRequest.of(getRankRequest.getPage(), getRankRequest.getSize());
-        // list end 분기
-        boolean isEnded = false;
         // parameter 분기
         boolean adjustStyle = getRankRequest.getStyle() != null && getRankRequest.getStyle().size() > 0;
         boolean adjustPlace = getRankRequest.getPlace() != null && getRankRequest.getPlace().size() > 0;
@@ -96,23 +94,55 @@ public class BrandService {
         brandAgeList = brandDomainService.selectBrandAges(ageTypeList);
         brandPlaceList = brandDomainService.selectBrandPlaces(placeTypeList);
 
-        if (adjustStyle) {
-            if (adjustAge && adjustPlace) {
-            } else if (!adjustPlace && !adjustAge) {
-//                brandsList = brandDomainService.selectBrandList(brandStyleList);
-            } else if (adjustAge) {
-//                brandsList = brandDomainService.selectBrandList(brandStyleList, brandAgeList);
-            } else if (adjustPlace) {
-            }
+        // make case
+        if (adjustStyle && adjustPlace && adjustAge) {
+            List<Brands> selectBrandList = brandDomainService.selectBrandListByStylePlaceAge(brandStyleList,
+                    brandPlaceList, brandAgeList);
+            rankPage = brandDomainService.selectAppBrandRankList(selectBrandList, pageRequest);
+            return brandRankResponse(rankPage);
+        } else if (adjustStyle && adjustPlace) {
+            List<Brands> selectBrandList = brandDomainService.selectBrandListByStylePlace(brandStyleList, brandPlaceList);
+            rankPage = brandDomainService.selectAppBrandRankList(selectBrandList, pageRequest);
+            return brandRankResponse(rankPage);
+        } else if (adjustPlace && adjustAge) {
+//            List<Brands> selectBrandList = brandDomainService.selectBrandListByPlaceAge(brandPlaceList, brandAgeList);
+//            rankPage = brandDomainService.selectAppBrandRankList(selectBrandList, pageRequest);
+//            return brandRankResponse(rankPage);
+        } else if (adjustStyle && adjustAge) {
+            List<Brands> selectBrandList = brandDomainService.selectBrandStylesAge(brandStyleList, brandAgeList);
+            rankPage = brandDomainService.selectAppBrandRankList(selectBrandList, pageRequest);
+            return brandRankResponse(rankPage);
+        } else if (adjustStyle) {
+            List<Brands> selectBrandList = brandDomainService.selectBrandListByStyle(brandStyleList);
+            rankPage = brandDomainService.selectAppBrandRankList(selectBrandList, pageRequest);
+            return brandRankResponse(rankPage);
+        } else if (adjustPlace) {
+            List<Brands> selectBrandList = brandDomainService.selectBrandListByPlace(brandPlaceList);
+            rankPage = brandDomainService.selectAppBrandRankList(selectBrandList, pageRequest);
+            return brandRankResponse(rankPage);
+        } else if (adjustAge) {
+            List<Brands> selectBrandList = brandDomainService.selectBrandListByAge(brandAgeList);
+            rankPage = brandDomainService.selectAppBrandRankList(selectBrandList, pageRequest);
+            return brandRankResponse(rankPage);
         }
-
         rankPage = brandDomainService.selectAppBrandRankList(pageRequest);
+        return brandRankResponse(rankPage);
+    }
+
+    private GetRankResponse brandRankResponse(Page<BrandRank> rankPage) {
+
+        // list end 분기
+        boolean isEnded = false;
+        List<BrandRank> rankList = rankPage.getContent();
+        List<BrandRankResponse> list = rankList.stream().
+                map(u -> modelMapper.map(u.getBrand(), BrandRankResponse.class)).collect(Collectors.toList());
+
+        List<Long> brandIdList = list.stream().map(BrandRankResponse::getId).collect(Collectors.toList());
 
         Optional<Users> user = userService.getAppUser();
         long totalCount = rankPage.getTotalElements();
         long totalPage = rankPage.getTotalPages();
         long contentSize = rankPage.getContent().size();
-        List<BrandRank> rankList = rankPage.getContent();
 
         if (totalPage == 0) {
             isEnded = true;
@@ -121,11 +151,6 @@ public class BrandService {
         if (contentSize == 0) {
             isEnded = true;
         }
-
-        List<BrandRankResponse> list = rankList.stream().
-                map(u -> modelMapper.map(u.getBrand(), BrandRankResponse.class)).collect(Collectors.toList());
-
-        List<Long> brandIdList = list.stream().map(BrandRankResponse::getId).collect(Collectors.toList());
 
         if (user.isPresent()) {
             List<UserBrands> userBrandList = brandDomainService.selectAppUserBrandList(user.get().getId(), brandIdList);
@@ -146,7 +171,6 @@ public class BrandService {
         getRankResponse.setEnded(isEnded);
         return getRankResponse;
     }
-
 
     public void saveUserBrands(Long userId, SaveUserBrandsRequest saveUserBrandsRequest) {
 
