@@ -2,6 +2,7 @@ package com.nelly.application.service;
 
 import com.nelly.application.domain.*;
 import com.nelly.application.enums.*;
+import com.nelly.application.exception.NoContentException;
 import com.nelly.application.repository.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -70,6 +71,11 @@ public class UserDomainService {
         Users user = userRepository.findById(userId).orElse(null);
         if (user == null) throw new RuntimeException("사용자를 찾을 수 없습니다.");
         return user;
+    }
+
+    public Page<Users> selectAccountList(String keyword, String role, Integer page, Integer size) {
+        PageRequest pageRequest = PageRequest.of(page, size, Sort.by("loginId").ascending());
+        return userRepository.findAllByLoginIdContainsAndRole(keyword, role, pageRequest);
     }
 
     /* admin 사용 */

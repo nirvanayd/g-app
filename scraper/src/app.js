@@ -78,3 +78,9 @@ app.listen(port, () => {
     console.log('env is ' + process.env.NODE_ENV)
     console.log(`Example app listening on port ${port}`)
 })
+
+process.on('uncaughtException', (err) => {
+    console.error("uncaughtException catch ......");
+    // retruen것이 없기 때문에 process를 종료시켜 줘야함돠!
+    process.exit(1);
+});
