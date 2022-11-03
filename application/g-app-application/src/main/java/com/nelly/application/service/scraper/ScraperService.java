@@ -48,7 +48,6 @@ public class ScraperService {
 
     public void saveScrapRequest(WebviewRequest dto, Users user) throws MalformedURLException {
         scraperDomainService.createScraperRequest(dto.getUrl(), user == null ? null : user.getId());
-        UrlInfoDto urlInfoDto = UrlUtil.parseUrl(dto.getUrl());
     }
 
     public ScraperBrands searchScraperBrand(WebviewRequest dto) throws MalformedURLException {

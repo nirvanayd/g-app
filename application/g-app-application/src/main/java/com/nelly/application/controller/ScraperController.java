@@ -5,6 +5,7 @@ import com.nelly.application.domain.Users;
 import com.nelly.application.dto.Response;
 import com.nelly.application.dto.request.*;
 import com.nelly.application.dto.response.AppInitDataResponse;
+import com.nelly.application.dto.response.StoreCheckResponse;
 import com.nelly.application.service.scraper.ScraperService;
 import com.nelly.application.service.user.UserService;
 import lombok.Getter;
@@ -35,12 +36,13 @@ public class ScraperController {
     }
 
     @GetMapping("/scraper/store-check")
-    public ResponseEntity<?> storeCheck(@RequestBody WebviewRequest dto) throws MalformedURLException {
-        Users user = userService.getAppUser().orElse(null);
-        scraperService.saveScrapRequest(dto, user);
+    public ResponseEntity<?> storeCheck(WebviewRequest dto) throws MalformedURLException {
         ScraperBrands brand = scraperService.searchScraperBrand(dto);
-        scraperService.saveHistory(user, brand, dto.getUrl());
-        return response.success(brand.getId());
+        StoreCheckResponse storeCheckResponse = new StoreCheckResponse();
+        storeCheckResponse.setScrapId(brand.getId());
+        storeCheckResponse.setBrandName(brand.getName());
+        storeCheckResponse.setBrandId(brand.getBrandId());
+        return response.success(storeCheckResponse);
     }
 
 
