@@ -34,6 +34,17 @@ public class ScraperController {
         return response.success(brand.getId());
     }
 
+    @GetMapping("/scraper/store-check")
+    public ResponseEntity<?> storeCheck(@RequestBody WebviewRequest dto) throws MalformedURLException {
+        Users user = userService.getAppUser().orElse(null);
+        scraperService.saveScrapRequest(dto, user);
+        ScraperBrands brand = scraperService.searchScraperBrand(dto);
+        scraperService.saveHistory(user, brand, dto.getUrl());
+        return response.success(brand.getId());
+    }
+
+
+
     @GetMapping("/scraper/current-item")
     public ResponseEntity<?> getCurrentItemList(GetUserCurrentScrapItemRequest dto) throws MalformedURLException {
         Users user = userService.getAppUser().orElse(null);

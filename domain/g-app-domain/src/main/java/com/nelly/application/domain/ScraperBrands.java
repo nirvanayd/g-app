@@ -55,4 +55,7 @@ public class ScraperBrands extends BaseTime {
 
     @Column(name="store_url", nullable = true)
     private String storeUrl;
+
+    @Column(name="brand_id", nullable = true)
+    private Long brandId;
 }
