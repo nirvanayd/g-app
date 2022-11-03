@@ -116,7 +116,7 @@ public class ScraperDomainService {
         Optional<UserScrapHistory> existHistory = userScrapHistoryRepository.findByUserIdAndScrapItem(userId, scrapItem);
         existHistory.ifPresent(userScrapHistory -> userScrapHistoryRepository.deleteById(userScrapHistory.getId()));
         UserScrapHistory userScrapHistory = UserScrapHistory.builder().userId(userId).scrapItem(scrapItem).build();
-        UserScrapHistory result = userScrapHistoryRepository.save(userScrapHistory);
+        userScrapHistoryRepository.save(userScrapHistory);
     }
 
     public void saveUserScrapCart(ScrapItems scrapItem, long userId) {

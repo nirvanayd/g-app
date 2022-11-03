@@ -31,8 +31,7 @@ public class ScraperController {
         Users user = userService.getAppUser().orElse(null);
         scraperService.saveScrapRequest(dto, user);
         ScraperBrands brand = scraperService.searchScraperBrand(dto);
-        scraperService.saveHistory(user, brand, dto.getUrl());
-        return response.success(brand.getId());
+        return response.success(scraperService.saveHistory(user, brand, dto.getUrl()));
     }
 
     @GetMapping("/scraper/store-check")

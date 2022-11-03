@@ -75,46 +75,47 @@ public class ScraperService {
         return a.get();
     }
 
-    public void saveHistory(Users user, ScraperBrands brand, String url) throws MalformedURLException {
+    public ScrapItemResponse saveHistory(Users user, ScraperBrands brand, String url) throws MalformedURLException {
         Long userId = (user == null ) ? null : user.getId();
         UrlInfoDto urlInfoDto = UrlUtil.parseUrl(url);
         // 상품 상세인 경우 히스토리에 저장함.
         List<ScraperBrandDetails> detailList = scraperDomainService.selectScraperBrandDetail(urlInfoDto.getHost());
-        if (detailList.size() == 0) return;
+        if (detailList.size() == 0) return null;
 
         ScraperBrandDetails detail = detailList.stream().
                 filter(d -> d.getItemPath() == null || urlInfoDto.getPath().contains(d.getItemPath())).findFirst()
                 .orElse(null);
-        if (detail == null) return;
+        if (detail == null) return null;
 
         // log 초기화
         ScraperLog scraperLog = scrapLogInit(userId, brand.getId(), url);
 
         // scrap 요청
         String moduleName = brand.getModuleName();
-        // 비동기 처리
-        Thread thread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                ItemScrapDto itemScrapDto = scraperManager.addCurrentItem(url, moduleName);
-                scraperLogUpdate(scraperLog.getId(), itemScrapDto.getImageList(), itemScrapDto.getName(), itemScrapDto.getPrice(), ScraperLogResult.SUCCESS.getCode());
-                ScrapItems existScrapItem = scraperDomainService.selectScrapItem(url).orElse(null);
-                if (existScrapItem == null) {
-                    ScrapItems scrapItem = scraperDomainService.createScrapItems(url, itemScrapDto.getName(),
-                            Integer.parseInt(itemScrapDto.getPrice().replaceAll("[^0-9]", "")), "kr",
-                            brand.getId(), brand.getName());
-                    scraperDomainService.createScrapItemImages(scrapItem, itemScrapDto.getImageList());
-                    if (userId != null) {
-                        scraperDomainService.updateUserScrapHistory(scrapItem, userId);
-                    }
-                } else {
-                    if (userId != null) {
-                        scraperDomainService.updateUserScrapHistory(existScrapItem, userId);
-                    }
-                }
+
+        ItemScrapDto itemScrapDto = scraperManager.addCurrentItem(url, moduleName);
+        scraperLogUpdate(scraperLog.getId(), itemScrapDto.getImageList(), itemScrapDto.getName(), itemScrapDto.getPrice(), ScraperLogResult.SUCCESS.getCode());
+        ScrapItems existScrapItem = scraperDomainService.selectScrapItem(url).orElse(null);
+        if (existScrapItem == null) {
+            ScrapItems scrapItem = scraperDomainService.createScrapItems(url, itemScrapDto.getName(),
+                    Integer.parseInt(itemScrapDto.getPrice().replaceAll("[^0-9]", "")), "kr",
+                    brand.getId(), brand.getName());
+            scraperDomainService.createScrapItemImages(scrapItem, itemScrapDto.getImageList());
+            if (userId != null) {
+                scraperDomainService.updateUserScrapHistory(scrapItem, userId);
             }
-        });
-        thread.start();
+        } else {
+            if (userId != null) {
+                scraperDomainService.updateUserScrapHistory(existScrapItem, userId);
+            }
+        }
+
+        return ScrapItemResponse.builder()
+                .name(itemScrapDto.getName())
+                .price(Integer.parseInt(itemScrapDto.getPrice().replaceAll("[^0-9]", "")))
+                .url(url)
+                .photoUrl(itemScrapDto.getImageList().size() > 0 ? itemScrapDto.getImageList().get(0) : null)
+                .brandName(brand.getName()).build();
     }
 
     public void addCart(WebviewRequest dto, Users user) {
