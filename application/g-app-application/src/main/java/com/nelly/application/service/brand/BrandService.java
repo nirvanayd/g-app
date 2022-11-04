@@ -154,7 +154,6 @@ public class BrandService {
 
         if (user.isPresent()) {
             List<UserBrands> userBrandList = brandDomainService.selectAppUserBrandList(user.get().getId(), brandIdList);
-
             for (BrandRankResponse brandRankResponse : list) {
 
                 boolean isFavorite = userBrandList.stream().anyMatch(u -> u.getBrand().getId().equals(brandRankResponse.getId()));

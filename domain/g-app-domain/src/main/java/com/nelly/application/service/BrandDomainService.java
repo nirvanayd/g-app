@@ -13,6 +13,8 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Service
 @RequiredArgsConstructor
@@ -222,7 +224,14 @@ public class BrandDomainService {
         return brandsRepository.findAllByStatusInAndIsDisplayOrderByName(statusList, DisplayType.DISPLAY);
     }
 
-//    public List<Brands> selectBrandList(List<BrandStyles> brandStyleList, List<BrandAges> brandAgeList) {
-//        return brandsRepository.findAllByBrandStylesIn(brandStyleList);
-//    }
+    public Page<Brands> selectBrandListByKeyword(String keyword, Integer page, Integer size) {
+        Pattern englishPattern = Pattern.compile("^[a-zA-Z0-9]*$");
+        Matcher englishMatcher = englishPattern.matcher(keyword);
+        if (englishMatcher.find()) {
+            PageRequest pageRequest = PageRequest.of(page, size, Sort.by("name").descending());
+            return brandsRepository.findAllByNameContaining(keyword, pageRequest);
+        }
+        PageRequest pageRequest = PageRequest.of(page, size, Sort.by("nameKr").descending());
+        return brandsRepository.findAllByNameKrContaining(keyword, pageRequest);
+    }
 }

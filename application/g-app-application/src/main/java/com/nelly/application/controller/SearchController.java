@@ -33,11 +33,12 @@ public class SearchController {
 
     @GetMapping("/search/brand")
     public ResponseEntity<?> searchBrand(SearchRequest dto) {
-        return response.success();
+        return response.success(searchService.searchBrandList(dto));
     }
 
     @GetMapping("/search/tag")
     public ResponseEntity<?> searchTag(SearchRequest dto) {
+        searchService.searchContentList(dto);
         return response.success();
     }
 }

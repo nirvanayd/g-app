@@ -256,4 +256,9 @@ public class ContentDomainService {
     public long countUserMark(Users user) {
         return contentsRepository.countUserMark(user);
     }
+
+    public Page<AppTags> getAppTagList(String keyword, Integer page, Integer size) {
+        PageRequest pageRequest = PageRequest.of(page, size, Sort.by("tag").descending());
+        return appTagsRepository.findAllByTagContains(keyword, pageRequest);
+    }
 }

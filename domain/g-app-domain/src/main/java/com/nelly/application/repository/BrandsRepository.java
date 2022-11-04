@@ -20,6 +20,7 @@ import java.util.List;
 public interface BrandsRepository extends JpaRepository<Brands, Long> {
     // findAll(Pageable)
     Page<Brands> findAllByNameContaining(String name, Pageable pageable);
+    Page<Brands> findAllByNameKrContaining(String keyword, Pageable pageable);
     Page<Brands> findAllByIsDisplay(DisplayType displayType, Pageable pageable);
     Page<Brands> findAllByStatus(BrandStatus status, Pageable pageable);
 
