@@ -4,6 +4,7 @@ import com.nelly.application.domain.ScraperBrands;
 import com.nelly.application.domain.Users;
 import com.nelly.application.dto.Response;
 import com.nelly.application.dto.request.SearchRequest;
+import com.nelly.application.dto.request.SearchTagContentRequest;
 import com.nelly.application.dto.request.WebviewRequest;
 import com.nelly.application.service.search.SearchService;
 import com.nelly.application.service.user.UserService;
@@ -38,6 +39,10 @@ public class SearchController {
 
     @GetMapping("/search/tag")
     public ResponseEntity<?> searchTag(SearchRequest dto) {
+        return response.success(searchService.searchTagList(dto));
+    }
+    @GetMapping("/search/tag-content")
+    public ResponseEntity<?> searchAppTagContent(SearchTagContentRequest dto) {
         return response.success(searchService.searchContentList(dto));
     }
 }

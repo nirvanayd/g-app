@@ -262,7 +262,8 @@ public class ContentDomainService {
         return appTagsRepository.findAllByTagContains(keyword, pageRequest);
     }
 
-    public void countAppTagCount(Long id) {
-
+    public Page<Contents> selectAppTagContentList(long id, Integer page, Integer size) {
+        PageRequest pageRequest = PageRequest.of(page, size, Sort.by("modifiedDate").descending());
+        return contentsRepository.findAllByItemHashTags_AppTag_Id(id, pageRequest);
     }
 }

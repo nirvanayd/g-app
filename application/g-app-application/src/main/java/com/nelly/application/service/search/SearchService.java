@@ -1,14 +1,9 @@
 package com.nelly.application.service.search;
 
-import com.nelly.application.domain.AppTags;
-import com.nelly.application.domain.Brands;
-import com.nelly.application.domain.UserBrands;
-import com.nelly.application.domain.Users;
+import com.nelly.application.domain.*;
 import com.nelly.application.dto.request.SearchRequest;
-import com.nelly.application.dto.response.AccountResponse;
-import com.nelly.application.dto.response.BrandRankResponse;
-import com.nelly.application.dto.response.ContentMemberResponse;
-import com.nelly.application.dto.response.SearchTagResponse;
+import com.nelly.application.dto.request.SearchTagContentRequest;
+import com.nelly.application.dto.response.*;
 import com.nelly.application.enums.RoleType;
 import com.nelly.application.exception.NoContentException;
 import com.nelly.application.service.BrandDomainService;
@@ -71,7 +66,7 @@ public class SearchService {
         return list;
     }
     
-    public List<SearchTagResponse> searchContentList(SearchRequest dto) {
+    public List<SearchTagResponse> searchTagList(SearchRequest dto) {
         // 태그 정보
         Page<AppTags> selectAppTagList =
                 contentDomainService.getAppTagList(dto.getKeyword(), dto.getPage(), dto.getSize());
@@ -82,5 +77,27 @@ public class SearchService {
 
         return appTagList.stream().
                 map(u -> modelMapper.map(u, SearchTagResponse.class)).collect(Collectors.toList());
+    }
+
+    public List<ContentResponse> searchContentList(SearchTagContentRequest dto) {
+        Page<Contents> selectContentList = contentDomainService.selectAppTagContentList(dto.getId(), dto.getPage(), dto.getSize());
+        if (selectContentList.isEmpty()) throw new NoContentException();
+
+        Optional<Users> selectUser = userService.getAppUser();
+
+        ContentResponse response = new ContentResponse();
+        List<ContentResponse> list = response.toDtoList(selectContentList.getContent());
+
+        if (selectUser.isPresent()) {
+            Users user = selectUser.get();
+            // 좋아요, 마크 여부
+            list.forEach(l -> {
+                boolean liked = contentDomainService.selectContentLike(l.getId(), user.getId()).isPresent();
+                boolean marked = contentDomainService.selectContentMark(l.getId(), user.getId()).isPresent();
+                l.setLiked(liked);
+                l.setMarked(marked);
+            });
+        }
+        return list;
     }
 }

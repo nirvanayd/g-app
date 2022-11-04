@@ -37,4 +37,6 @@ public interface ContentsRepository extends JpaRepository<Contents, Long> {
 
     @Query("SELECT COALESCE(SUM(c.markCount),0) FROM Contents c WHERE c.deletedDate IS NULL")
     long countUserMark(@Param("detailUser") Users detailUser);
+
+    Page<Contents> findAllByItemHashTags_AppTag_Id(long id, Pageable pageable);
 }
