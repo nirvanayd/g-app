@@ -261,4 +261,8 @@ public class ContentDomainService {
         PageRequest pageRequest = PageRequest.of(page, size, Sort.by("tag").descending());
         return appTagsRepository.findAllByTagContains(keyword, pageRequest);
     }
+
+    public void countAppTagCount(Long id) {
+
+    }
 }

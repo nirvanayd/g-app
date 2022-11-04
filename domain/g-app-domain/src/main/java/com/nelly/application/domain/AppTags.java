@@ -3,6 +3,7 @@ package com.nelly.application.domain;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import lombok.*;
+import org.hibernate.annotations.Formula;
 
 import javax.persistence.*;
 
@@ -24,4 +25,7 @@ public class AppTags extends BaseTime{
 
     @Column(name = "tag", nullable = false, length = 100)
     private String tag;
+
+    @Formula("(select count(1) from content_hash_tags c where c.tag_id = id)")
+    private long count;
 }

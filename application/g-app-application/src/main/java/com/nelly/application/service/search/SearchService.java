@@ -8,6 +8,7 @@ import com.nelly.application.dto.request.SearchRequest;
 import com.nelly.application.dto.response.AccountResponse;
 import com.nelly.application.dto.response.BrandRankResponse;
 import com.nelly.application.dto.response.ContentMemberResponse;
+import com.nelly.application.dto.response.SearchTagResponse;
 import com.nelly.application.enums.RoleType;
 import com.nelly.application.exception.NoContentException;
 import com.nelly.application.service.BrandDomainService;
@@ -70,13 +71,16 @@ public class SearchService {
         return list;
     }
     
-    public void searchContentList(SearchRequest dto) {
+    public List<SearchTagResponse> searchContentList(SearchRequest dto) {
         // 태그 정보
         Page<AppTags> selectAppTagList =
                 contentDomainService.getAppTagList(dto.getKeyword(), dto.getPage(), dto.getSize());
 
         if (selectAppTagList.isEmpty()) throw new NoContentException();
 
+        List<AppTags> appTagList = selectAppTagList.getContent();
 
+        return appTagList.stream().
+                map(u -> modelMapper.map(u, SearchTagResponse.class)).collect(Collectors.toList());
     }
 }

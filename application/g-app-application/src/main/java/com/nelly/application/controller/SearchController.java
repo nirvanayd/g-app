@@ -38,7 +38,6 @@ public class SearchController {
 
     @GetMapping("/search/tag")
     public ResponseEntity<?> searchTag(SearchRequest dto) {
-        searchService.searchContentList(dto);
-        return response.success();
+        return response.success(searchService.searchContentList(dto));
     }
 }
