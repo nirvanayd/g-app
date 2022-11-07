@@ -37,7 +37,7 @@ public class ScraperService {
     private final ScraperDomainService scraperDomainService;
     private final ScraperManager scraperManager;
 
-    public ScraperBrandDetails getScraperBrand(UrlInfoDto urlInfoDto) throws MalformedURLException {
+    public ScraperBrandDetails getScraperBrand(UrlInfoDto urlInfoDto) {
         List<ScraperBrandDetails> detailList = scraperDomainService.selectScraperBrandDetail(urlInfoDto.getHost());
 
         if (detailList.size() == 0) throw new RuntimeException("브랜드 정보를 조회할 수 없습니다.");
@@ -71,8 +71,12 @@ public class ScraperService {
             Optional<ScraperBrands> b = list.stream().filter(l -> l.getId().equals(dto.getId())).findFirst();
             if (b.isPresent()) return b.get();
         }
-        if (a.isEmpty()) return null;
-        return a.get();
+        if (a.isEmpty()) {
+            // select brand from scraper detail
+            ScraperBrandDetails scraperBrandDetail = getScraperBrand(urlInfoDto);
+            if (scraperBrandDetail != null) return scraperBrandDetail.getScraperBrand();
+        }
+        return a.orElse(null);
     }
 
     public ScrapItemResponse saveHistory(Users user, ScraperBrands brand, String url) throws MalformedURLException {
@@ -95,11 +99,13 @@ public class ScraperService {
 
         ItemScrapDto itemScrapDto = scraperManager.addCurrentItem(url, moduleName);
 
-        if (!itemScrapDto.getBrandName().isEmpty()) {
-            parseBrandName(itemScrapDto.getBrandName());
+        if (itemScrapDto.getBrandName() != null && !itemScrapDto.getBrandName().isEmpty()) {
+            brand.setName(parseBrandName(itemScrapDto.getBrandName()) == null ?
+                    brand.getName() : parseBrandName(itemScrapDto.getBrandName()));
         }
 
-        scraperLogUpdate(scraperLog.getId(), itemScrapDto.getImageList(), itemScrapDto.getName(), itemScrapDto.getPrice(), ScraperLogResult.SUCCESS.getCode());
+        scraperLogUpdate(scraperLog.getId(), itemScrapDto.getImageList(), itemScrapDto.getName(),
+                itemScrapDto.getPrice(), ScraperLogResult.SUCCESS.getCode());
         ScrapItems existScrapItem = scraperDomainService.selectScrapItem(url).orElse(null);
         if (existScrapItem == null) {
             ScrapItems scrapItem = scraperDomainService.createScrapItems(url, itemScrapDto.getName(),
@@ -170,8 +176,12 @@ public class ScraperService {
         scraperDomainService.updateScrapLog(scraperLogId, imageList, name, price, resultCode);
     }
 
-    private void parseBrandName(String brandName) {
+    private String parseBrandName(String brandName) {
         // 공백제외하여 비교함
-
+        String[] partialStr = brandName.split("\\s+");
+        if (partialStr.length == 0) return null;
+        Optional<ScraperBrands> selectBrand = scraperDomainService.selectScraperBrandByName(partialStr[0]);
+        if (selectBrand.isEmpty()) return null;
+        return selectBrand.get().getName();
     }
 }

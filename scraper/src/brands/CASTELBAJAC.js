@@ -50,11 +50,7 @@ class CASTELBAJAC {
     }
 
     async getBrandName(page) {
-        try {
-            return;
-        } catch ( Error ) {
-            return null;
-        }
+        return null;
     }
 }
 

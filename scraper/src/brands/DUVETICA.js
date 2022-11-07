@@ -50,11 +50,7 @@ class DUVETICA {
     }
 
     async getBrandName(page) {
-        try {
-            return;
-        } catch ( Error ) {
-            return null;
-        }
+        return null;
     }
 }
 

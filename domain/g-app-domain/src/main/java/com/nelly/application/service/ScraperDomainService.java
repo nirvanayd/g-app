@@ -137,4 +137,8 @@ public class ScraperDomainService {
         PageRequest pageRequest = PageRequest.of(page, size, Sort.by("id").descending());
         return userScrapHistoryRepository.findAllByUserId(user.getId(), pageRequest);
     }
+
+    public Optional<ScraperBrands> selectScraperBrandByName(String str) {
+        return scraperBrandsRepository.findByNameContains(str);
+    }
 }
