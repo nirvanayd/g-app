@@ -82,9 +82,6 @@ public class SearchService {
     public List<ContentThumbResponse> searchContentList(SearchTagContentRequest dto) {
         Page<Contents> selectContentList = contentDomainService.selectAppTagContentList(dto.getId(), dto.getPage(), dto.getSize());
         if (selectContentList.isEmpty()) throw new NoContentException();
-
-        Optional<Users> selectUser = userService.getAppUser();
-
         ContentThumbResponse response = new ContentThumbResponse();
         return response.toDtoList(selectContentList.getContent());
     }

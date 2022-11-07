@@ -353,8 +353,8 @@ public class UserService {
         Page<Contents> selectContentList = contentDomainService.selectContentList(ownerUser, page, contentSize);
         Page<ContentMarks> selectMarkList = contentDomainService.selectUserMarkList(ownerUser, page, contentSize);
 
-        Long userLikeCount = contentDomainService.countUserLike(ownerUser);
-        Long userMarkCount = contentDomainService.countUserMark(ownerUser);
+        long userLikeCount = contentDomainService.countUserLike(ownerUser);
+        long userMarkCount = contentDomainService.countUserMark(ownerUser);
 
         List<ContentThumbResponse> list = new ArrayList<>();
         long totalContentCount = selectContentList.getTotalElements();
@@ -378,7 +378,7 @@ public class UserService {
 
     public List<ContentThumbResponse> getUserDetailContentList(Long userDetailId, GetContentListRequest dto) {
         Users detailUser = getUser(userDetailId);
-        dto.setSize(9);
+        dto.setSize(21);
         Page<Contents> selectContentList = contentDomainService.selectContentList(detailUser, dto.getPage(), dto.getSize());
         ContentThumbResponse contentThumbResponse = new ContentThumbResponse();
         if (selectContentList.isEmpty()) throw new NoContentException();
@@ -387,7 +387,7 @@ public class UserService {
 
     public List<MarkContentThumbResponse> getUserDetailMarkContentList(Long userDetailId, GetContentListRequest dto) {
         Users detailUser = getUser(userDetailId);
-        dto.setSize(10);
+        dto.setSize(21);
         Page<ContentMarks> selectMarkList = contentDomainService.selectUserMarkList(detailUser, dto.getPage(), dto.getSize());
         MarkContentThumbResponse contentThumbResponse = new MarkContentThumbResponse();
         if (selectMarkList.isEmpty()) throw new NoContentException();
