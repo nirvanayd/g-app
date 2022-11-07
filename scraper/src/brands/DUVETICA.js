@@ -48,6 +48,14 @@ class DUVETICA {
             return null;
         }
     }
+
+    async getBrandName(page) {
+        try {
+            return;
+        } catch ( Error ) {
+            return null;
+        }
+    }
 }
 
 module.exports = new DUVETICA();

@@ -61,13 +61,15 @@ app.post('/add-item', async (req, res) => {
     const price = await BrandModule.getPrice(page);
     const name = await BrandModule.getName(page);
     const imageList = await BrandModule.getImageList(page);
+    const brandName = await BrandModule.getBrandName(page);
 
     await browser.close();
 
     const obj = {
         'price': price,
         'name': name,
-        'imageList': imageList
+        'imageList': imageList,
+        'brandName': brandName
     }
 
     res.send(JSON.stringify(obj));

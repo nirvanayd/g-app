@@ -79,25 +79,13 @@ public class SearchService {
                 map(u -> modelMapper.map(u, SearchTagResponse.class)).collect(Collectors.toList());
     }
 
-    public List<ContentResponse> searchContentList(SearchTagContentRequest dto) {
+    public List<ContentThumbResponse> searchContentList(SearchTagContentRequest dto) {
         Page<Contents> selectContentList = contentDomainService.selectAppTagContentList(dto.getId(), dto.getPage(), dto.getSize());
         if (selectContentList.isEmpty()) throw new NoContentException();
 
         Optional<Users> selectUser = userService.getAppUser();
 
-        ContentResponse response = new ContentResponse();
-        List<ContentResponse> list = response.toDtoList(selectContentList.getContent());
-
-        if (selectUser.isPresent()) {
-            Users user = selectUser.get();
-            // 좋아요, 마크 여부
-            list.forEach(l -> {
-                boolean liked = contentDomainService.selectContentLike(l.getId(), user.getId()).isPresent();
-                boolean marked = contentDomainService.selectContentMark(l.getId(), user.getId()).isPresent();
-                l.setLiked(liked);
-                l.setMarked(marked);
-            });
-        }
-        return list;
+        ContentThumbResponse response = new ContentThumbResponse();
+        return response.toDtoList(selectContentList.getContent());
     }
 }

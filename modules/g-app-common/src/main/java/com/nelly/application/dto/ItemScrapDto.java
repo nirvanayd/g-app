@@ -9,4 +9,5 @@ public class ItemScrapDto {
     private List<String> imageList;
     private String name;
     private String price;
+    private String brandName;
 }

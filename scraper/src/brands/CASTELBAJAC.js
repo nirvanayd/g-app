@@ -48,6 +48,14 @@ class CASTELBAJAC {
             return null;
         }
     }
+
+    async getBrandName(page) {
+        try {
+            return;
+        } catch ( Error ) {
+            return null;
+        }
+    }
 }
 
 module.exports = new CASTELBAJAC();

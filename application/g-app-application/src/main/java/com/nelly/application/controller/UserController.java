@@ -69,8 +69,8 @@ public class UserController {
                 .refreshToken(tokenInfoDto.getRefreshToken())
                 .build();
 
-        log.info("reissue/response access token --> " + tokenInfoDto.getAccessToken());
-        log.info("reissue/response refresh token --> " + tokenInfoDto.getRefreshToken());
+//        log.info("reissue/response access token --> " + tokenInfoDto.getAccessToken());
+//        log.info("reissue/response refresh token --> " + tokenInfoDto.getRefreshToken());
         return response.success(data);
     }
 

@@ -48,6 +48,17 @@ class WIDEANGLE {
             return null;
         }
     }
+
+    async getBrandName(page) {
+        try {
+            return await page.evaluate(() => {
+                return document.querySelector('input#brand-nm').value;
+            })
+        } catch ( Error ) {
+            console.log('price error');
+            return null;
+        }
+    }
 }
 
 module.exports = new WIDEANGLE();

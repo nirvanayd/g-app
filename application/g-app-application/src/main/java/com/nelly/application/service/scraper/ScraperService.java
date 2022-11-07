@@ -94,6 +94,11 @@ public class ScraperService {
         String moduleName = brand.getModuleName();
 
         ItemScrapDto itemScrapDto = scraperManager.addCurrentItem(url, moduleName);
+
+        if (!itemScrapDto.getBrandName().isEmpty()) {
+            parseBrandName(itemScrapDto.getBrandName());
+        }
+
         scraperLogUpdate(scraperLog.getId(), itemScrapDto.getImageList(), itemScrapDto.getName(), itemScrapDto.getPrice(), ScraperLogResult.SUCCESS.getCode());
         ScrapItems existScrapItem = scraperDomainService.selectScrapItem(url).orElse(null);
         if (existScrapItem == null) {
@@ -163,5 +168,10 @@ public class ScraperService {
 
     private void scraperLogUpdate(Long scraperLogId, List<String> imageList, String name, String price, String resultCode) {
         scraperDomainService.updateScrapLog(scraperLogId, imageList, name, price, resultCode);
+    }
+
+    private void parseBrandName(String brandName) {
+        // 공백제외하여 비교함
+
     }
 }

@@ -48,6 +48,19 @@ class PEARLYGATES {
             return null;
         }
     }
+
+    async getBrandName(page) {
+        try {
+            return await page.evaluate(() => {
+                return document.querySelector('.base.arrRBlack.brand.hrLine1 p').innerText;
+            })
+        } catch ( Error ) {
+            console.log('price error');
+            return null;
+        }
+    }
+
+
 }
 
 module.exports = new PEARLYGATES();
