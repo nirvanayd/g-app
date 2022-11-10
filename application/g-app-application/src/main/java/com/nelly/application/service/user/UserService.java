@@ -13,6 +13,7 @@ import com.nelly.application.exception.SystemException;
 import com.nelly.application.mail.MailSender;
 import com.nelly.application.repository.UserNotificationTokensRepository;
 import com.nelly.application.service.ContentDomainService;
+import com.nelly.application.service.ScraperDomainService;
 import com.nelly.application.service.UserDomainService;
 import com.nelly.application.service.AuthService;
 import com.nelly.application.util.AgeUtil;
@@ -38,6 +39,7 @@ public class UserService {
     private final AuthService authService;
     private final UserDomainService userDomainService;
     private final ContentDomainService contentDomainService;
+    private final ScraperDomainService scraperDomainService;
     private final EncryptUtils encryptUtils;
     private final CacheTemplate cacheTemplate;
     private final MailSender mailSender;
@@ -352,6 +354,7 @@ public class UserService {
         int contentSize = 9;
         Page<Contents> selectContentList = contentDomainService.selectContentList(ownerUser, page, contentSize);
         Page<ContentMarks> selectMarkList = contentDomainService.selectUserMarkList(ownerUser, page, contentSize);
+        Page<UserScrapCart> selectUserCart = scraperDomainService.selectUserScrapCartList(ownerUser, page, contentSize);
 
         long userLikeCount = contentDomainService.countUserLike(ownerUser);
         long userMarkCount = contentDomainService.countUserMark(ownerUser);
@@ -359,19 +362,25 @@ public class UserService {
         List<ContentThumbResponse> list = new ArrayList<>();
         long totalContentCount = selectContentList.getTotalElements();
         long totalContentMarkCount = selectMarkList.getTotalElements();
+        long totalCartCount = selectUserCart.getTotalElements();
         ContentThumbResponse contentThumbResponse = new ContentThumbResponse();
         MarkContentThumbResponse markContentThumbResponse = new MarkContentThumbResponse();
+        ScrapItemResponse scrapItemResponse = new ScrapItemResponse();
         List<ContentThumbResponse> contentList =
                 contentThumbResponse.toDtoList(selectContentList.getContent());
         List<MarkContentThumbResponse> markList =
                 markContentThumbResponse.toDtoMarkList(selectMarkList.getContent());
+        List<ScrapItemResponse> cartList = scrapItemResponse.cartToDtoList(selectUserCart.getContent());
+
 
         response.setLikeCount(userLikeCount);
         response.setMarkCount(userMarkCount);
         response.setContentsCount((int)totalContentCount);
         response.setContentMarkCount((int)totalContentMarkCount);
+        response.setCartCount((int)totalCartCount);
         response.setContentList(contentList);
         response.setContentMarkList(markList);
+        response.setCartList(cartList);
         response.setOwner(true);
         return response;
     }

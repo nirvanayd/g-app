@@ -34,12 +34,14 @@ public class GetMyPageResponse {
     private int followerCount;
     private long likeCount;
     private long markCount;
+    private int cartCount;
     private int contentsCount;
     private int contentMarkCount;
     private boolean followed;
     private boolean isOwner;
     private List<ContentThumbResponse> contentList;
     private List<MarkContentThumbResponse> contentMarkList;
+    private List<ScrapItemResponse> cartList;
 
     public GetMyPageResponse toDto(Users u) {
         return GetMyPageResponse.builder().

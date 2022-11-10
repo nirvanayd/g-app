@@ -131,7 +131,9 @@ public class ScraperService {
 
     public void addCart(WebviewRequest dto, Users user) {
         Optional<ScrapItems> existScrapItem = scraperDomainService.selectScrapItem(dto.getUrl());
-        if (existScrapItem.isEmpty()) return;
+        if (existScrapItem.isEmpty()) {
+            throw new SystemException("상품 정보를 찾을 수 없습니다.");
+        }
         // 아이템 없는 경우 재저장 고려
         if (scraperDomainService.selectUserScrapCart(existScrapItem.get(), user.getId()).isPresent()) {
             throw new SystemException("이미 장바구니에 추가된 제품입니다.");
