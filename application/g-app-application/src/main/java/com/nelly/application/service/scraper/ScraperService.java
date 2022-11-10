@@ -156,6 +156,7 @@ public class ScraperService {
     }
 
     public GetUserCartResponse getScrapCartList(Users user, GetUserCartRequest dto) {
+        dto.setSize(21);
         Page<UserScrapCart> existUserCart = scraperDomainService.selectUserScrapCartList(user, dto.getPage(), dto.getSize());
         if (existUserCart.isEmpty()) {
             throw new NoContentException();
