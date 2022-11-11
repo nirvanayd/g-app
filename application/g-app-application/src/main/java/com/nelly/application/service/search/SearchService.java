@@ -5,9 +5,11 @@ import com.nelly.application.dto.request.SearchRequest;
 import com.nelly.application.dto.request.SearchTagContentRequest;
 import com.nelly.application.dto.response.*;
 import com.nelly.application.enums.RoleType;
+import com.nelly.application.enums.SearchLogType;
 import com.nelly.application.exception.NoContentException;
 import com.nelly.application.service.BrandDomainService;
 import com.nelly.application.service.ContentDomainService;
+import com.nelly.application.service.SearchDomainService;
 import com.nelly.application.service.UserDomainService;
 import com.nelly.application.service.user.UserService;
 import lombok.RequiredArgsConstructor;
@@ -27,17 +29,17 @@ public class SearchService {
     private final UserDomainService userDomainService;
     private final BrandDomainService brandDomainService;
     private final ContentDomainService contentDomainService;
+    private final SearchDomainService searchDomainService;
     private final UserService userService;
     private final ModelMapper modelMapper;
 
     public List<AccountResponse> searchAccount(SearchRequest dto) {
+        Optional<Users> user = userService.getAppUser();
+        searchDomainService.saveLog(user, SearchLogType.BRAND, dto.getKeyword());
         Page<Users> selectAccountList =
                 userDomainService.selectAccountList(dto.getKeyword(), RoleType.USER.getCode(), dto.getPage(), dto.getSize());
-
         if (selectAccountList.isEmpty()) throw new NoContentException();
-
         List<Users> accountList = selectAccountList.getContent();
-
         AccountResponse accountResponse = new AccountResponse();
         return accountResponse.toDtoList(accountList);
     }
@@ -48,6 +50,7 @@ public class SearchService {
 
         if (selectBrandList.isEmpty()) throw new NoContentException();
         Optional<Users> user = userService.getAppUser();
+        searchDomainService.saveLog(user, SearchLogType.BRAND, dto.getKeyword());
 
         List<Brands> brandList = selectBrandList.getContent();
 
@@ -64,6 +67,7 @@ public class SearchService {
                 //
             }
         }
+
         return list;
     }
     
@@ -71,6 +75,9 @@ public class SearchService {
         // 태그 정보
         Page<AppTags> selectAppTagList =
                 contentDomainService.getAppTagList(dto.getKeyword(), dto.getPage(), dto.getSize());
+
+        Optional<Users> user = userService.getAppUser();
+        searchDomainService.saveLog(user, SearchLogType.TAG, dto.getKeyword());
 
         if (selectAppTagList.isEmpty()) throw new NoContentException();
 
@@ -90,36 +97,36 @@ public class SearchService {
     public GetSearchIntroResponse getSearchIntroData() {
         GetSearchIntroResponse getSearchIntroResponse = new GetSearchIntroResponse();
 
-        List<String> currentList = new ArrayList<>();
-        currentList.add("test1");
-        currentList.add("test22");
-        currentList.add("tester22");
-        currentList.add("PEARLY GATES");
-        currentList.add("ST ANDREWS");
-        currentList.add("DUVETICA");
-        currentList.add("MASTER");
-        currentList.add("MASTER BUNNY");
-        currentList.add("PING");
-        currentList.add("까스텔바작");
+        Optional<Users> user = userService.getAppUser();
 
+        List<SearchLogResponse> currentList = new ArrayList<>();
+        if (user.isPresent()) {
+            Page<SearchLog> searchLogList
+                    = searchDomainService.selectUserSearchLog(user.get());
 
-        List<String> brandList = new ArrayList<>();
-        brandList.add("DUVETICA");
-        brandList.add("CASTELBAJAC");
-        brandList.add("MASTER BUNNY EDITION");
-        brandList.add("PEARLY GATES");
-        brandList.add("ST ANDREWS");
-        brandList.add("PING");
+            searchLogList.stream().forEach(l -> {
+                currentList.add(
+                        SearchLogResponse.builder().type(l.getSearchLogType().getCode()).keyword(l.getKeyword()).build());
+            });
+        }
 
-        List<String> hotKeywordList = new ArrayList<>();
-        hotKeywordList.add("듀베티카");
-        hotKeywordList.add("필드코디");
-        hotKeywordList.add("까스텔바작");
-        hotKeywordList.add("핑");
-        hotKeywordList.add("tester12");
-        hotKeywordList.add("test1");
-        hotKeywordList.add("hello");
-        hotKeywordList.add("헬로우");
+        List<SearchLogResponse> brandList = new ArrayList<>();
+        brandList.add(SearchLogResponse.builder().keyword("DUVETICA").type(SearchLogType.BRAND.getCode()).build());
+        brandList.add(SearchLogResponse.builder().keyword("CASTELBAJAC").type(SearchLogType.BRAND.getCode()).build());
+        brandList.add(SearchLogResponse.builder().keyword("MASTER BUNNY EDITION").type(SearchLogType.BRAND.getCode()).build());
+        brandList.add(SearchLogResponse.builder().keyword("PEARLY GATES").type(SearchLogType.BRAND.getCode()).build());
+        brandList.add(SearchLogResponse.builder().keyword("ST ANDREWS").type(SearchLogType.BRAND.getCode()).build());
+        brandList.add(SearchLogResponse.builder().keyword("PING").type(SearchLogType.BRAND.getCode()).build());
+
+        List<SearchLogResponse> hotKeywordList = new ArrayList<>();
+        hotKeywordList.add(SearchLogResponse.builder().keyword("듀베티카").type(SearchLogType.BRAND.getCode()).build());
+        hotKeywordList.add(SearchLogResponse.builder().keyword("필드코디").type(SearchLogType.TAG.getCode()).build());
+        hotKeywordList.add(SearchLogResponse.builder().keyword("까스텔바작").type(SearchLogType.BRAND.getCode()).build());
+        hotKeywordList.add(SearchLogResponse.builder().keyword("핑").type(SearchLogType.BRAND.getCode()).build());
+        hotKeywordList.add(SearchLogResponse.builder().keyword("tester12").type(SearchLogType.ACCOUNT.getCode()).build());
+        hotKeywordList.add(SearchLogResponse.builder().keyword("test1").type(SearchLogType.ACCOUNT.getCode()).build());
+        hotKeywordList.add(SearchLogResponse.builder().keyword("hello").type(SearchLogType.TAG.getCode()).build());
+        hotKeywordList.add(SearchLogResponse.builder().keyword("헬로우").type(SearchLogType.TAG.getCode()).build());
 
         getSearchIntroResponse.setHotBrandList(brandList);
         getSearchIntroResponse.setHotKeywordList(hotKeywordList);
