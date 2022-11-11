@@ -21,6 +21,7 @@ import com.nelly.application.util.CacheTemplate;
 import com.nelly.application.util.EncryptUtils;
 import com.nelly.application.util.S3Uploader;
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,6 +32,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
@@ -45,6 +47,7 @@ public class UserService {
     private final MailSender mailSender;
     private final AwsProperties awsProperties;
     private final S3Uploader s3Uploader;
+    private final ModelMapper modelMapper;
 
     private static final String BEARER_TYPE = "Bearer";
     private static final String DIRECTORY_SEPARATOR = "/";
@@ -372,7 +375,11 @@ public class UserService {
                 markContentThumbResponse.toDtoMarkList(selectMarkList.getContent());
         List<ScrapItemResponse> cartList = scrapItemResponse.cartToDtoList(selectUserCart.getContent());
 
+        List<UserAgreements> agreementList = userDomainService.getUserAgreements(ownerUser);
+        List<UserAgreementsResponse> userAgreementList =
+                agreementList.stream().map(l -> modelMapper.map(l, UserAgreementsResponse.class)).collect(Collectors.toList());
 
+        response.setUserAgreementList(userAgreementList);
         response.setLikeCount(userLikeCount);
         response.setMarkCount(userMarkCount);
         response.setContentsCount((int)totalContentCount);
