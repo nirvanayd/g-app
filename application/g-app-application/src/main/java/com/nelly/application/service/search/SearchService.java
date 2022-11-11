@@ -15,6 +15,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -84,5 +85,46 @@ public class SearchService {
         if (selectContentList.isEmpty()) throw new NoContentException();
         ContentThumbResponse response = new ContentThumbResponse();
         return response.toDtoList(selectContentList.getContent());
+    }
+
+    public GetSearchIntroResponse getSearchIntroData() {
+        GetSearchIntroResponse getSearchIntroResponse = new GetSearchIntroResponse();
+
+        List<String> currentList = new ArrayList<>();
+        currentList.add("test1");
+        currentList.add("test22");
+        currentList.add("tester22");
+        currentList.add("PEARLY GATES");
+        currentList.add("ST ANDREWS");
+        currentList.add("DUVETICA");
+        currentList.add("MASTER");
+        currentList.add("MASTER BUNNY");
+        currentList.add("PING");
+        currentList.add("까스텔바작");
+
+
+        List<String> brandList = new ArrayList<>();
+        brandList.add("DUVETICA");
+        brandList.add("CASTELBAJAC");
+        brandList.add("MASTER BUNNY EDITION");
+        brandList.add("PEARLY GATES");
+        brandList.add("ST ANDREWS");
+        brandList.add("PING");
+
+        List<String> hotKeywordList = new ArrayList<>();
+        hotKeywordList.add("듀베티카");
+        hotKeywordList.add("필드코디");
+        hotKeywordList.add("까스텔바작");
+        hotKeywordList.add("핑");
+        hotKeywordList.add("tester12");
+        hotKeywordList.add("test1");
+        hotKeywordList.add("hello");
+        hotKeywordList.add("헬로우");
+
+        getSearchIntroResponse.setHotBrandList(brandList);
+        getSearchIntroResponse.setHotKeywordList(hotKeywordList);
+        getSearchIntroResponse.setCurrentKeywordList(currentList);
+
+        return getSearchIntroResponse;
     }
 }

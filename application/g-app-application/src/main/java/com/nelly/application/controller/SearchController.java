@@ -45,4 +45,9 @@ public class SearchController {
     public ResponseEntity<?> searchAppTagContent(SearchTagContentRequest dto) {
         return response.success(searchService.searchContentList(dto));
     }
+
+    @GetMapping("/search/intro")
+    public ResponseEntity<?> getSearchIntro() {
+        return response.success(searchService.getSearchIntroData());
+    }
 }
