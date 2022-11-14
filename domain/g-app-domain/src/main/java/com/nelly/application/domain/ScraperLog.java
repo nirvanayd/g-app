@@ -22,9 +22,6 @@ public class ScraperLog extends BaseTime {
     @Column(name = "id")
     private Long id;
 
-    @Column(name="user_id", nullable = true)
-    private Long userId;
-
     @Column(name="scraper_brand_id", nullable = false)
     private Long scraperBrandId;
 

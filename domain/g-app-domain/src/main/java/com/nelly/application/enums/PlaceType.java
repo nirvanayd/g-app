@@ -2,6 +2,7 @@ package com.nelly.application.enums;
 
 import com.nelly.application.enums.enumInterface.CommonEnums;
 import com.nelly.application.enums.enumInterface.CommonStringCode;
+import dto.EnumStringCodeValue;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
@@ -28,6 +29,10 @@ public enum PlaceType implements CommonStringCode {
 
     public static PlaceType getPlaceType(String code) {
         return Arrays.stream(PlaceType.values()).filter(c -> c.code.equals(code)).findFirst().orElse(EMPTY);
+    }
+
+    public static List<EnumStringCodeValue> getPlaceList() {
+        return Arrays.stream(PlaceType.values()).filter(c -> c.code != null).map(EnumStringCodeValue::new).collect(Collectors.toList());
     }
 
     public static List<PlaceType> getPlaceList(List<String> codeList) {

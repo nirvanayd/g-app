@@ -79,7 +79,6 @@ public class ScraperDomainService {
         ScraperLog log = ScraperLog.builder()
                 .scraperBrandId(brandId)
                 .targetUrl(targetUrl)
-                .userId(userId)
                 .resultCode(ScraperLogResult.INIT.getCode())
                 .build();
         return scraperLogRepository.save(log);

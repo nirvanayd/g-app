@@ -82,6 +82,10 @@ public class ScraperService {
     public ScrapItemResponse saveHistory(Users user, ScraperBrands brand, String url) throws MalformedURLException {
         Long userId = (user == null ) ? null : user.getId();
         UrlInfoDto urlInfoDto = UrlUtil.parseUrl(url);
+
+        Optional<ScrapItems> existItem = scraperDomainService.selectScrapItem(url);
+
+
         // 상품 상세인 경우 히스토리에 저장함.
         List<ScraperBrandDetails> detailList = scraperDomainService.selectScraperBrandDetail(urlInfoDto.getHost());
         if (detailList.size() == 0) return null;

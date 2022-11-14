@@ -5,7 +5,9 @@ import com.nelly.application.domain.Brands;
 import com.nelly.application.domain.UserAgreements;
 import com.nelly.application.domain.Users;
 import com.nelly.application.dto.response.*;
+import com.nelly.application.enums.AgeType;
 import com.nelly.application.enums.MarketingType;
+import com.nelly.application.enums.PlaceType;
 import com.nelly.application.enums.StyleType;
 import com.nelly.application.service.AppDomainService;
 import com.nelly.application.service.BrandDomainService;
@@ -32,6 +34,8 @@ public class AppService {
         List<Agreements> agreementsList = appDomainService.selectAgreements(version);
         List<EnumStringCodeValue> styleTypeList = StyleType.getStyleList();
         List<EnumStringCodeValue> marketingTypeList = MarketingType.getMarketingTypeList();
+        List<EnumStringCodeValue> ageList = AgeType.getAgeList();
+        List<EnumStringCodeValue> placeList = PlaceType.getPlaceList();
 
         List<AgreementResponse> agreementResponses = agreementsList.stream().
                 map(u -> modelMapper.map(u, AgreementResponse.class)).collect(Collectors.toList());
@@ -48,6 +52,8 @@ public class AppService {
 
         response.setAgreementsList(agreementResponses);
         response.setStyleList(styleTypeList);
+        response.setPlaceList(placeList);
+        response.setAgeList(ageList);
         response.setBrandList(brandResponseList);
         return response;
     }

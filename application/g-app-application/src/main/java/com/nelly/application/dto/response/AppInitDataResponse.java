@@ -11,4 +11,6 @@ public class AppInitDataResponse {
     private List<AgreementResponse> agreementsList;
     private List<EnumStringCodeValue> styleList;
     private List<BrandInitResponse> brandList;
+    private List<EnumStringCodeValue> ageList;
+    private List<EnumStringCodeValue> placeList;
 }
