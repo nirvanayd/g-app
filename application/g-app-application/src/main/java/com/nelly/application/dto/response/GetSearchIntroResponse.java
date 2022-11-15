@@ -6,7 +6,7 @@ import java.util.List;
 
 @Data
 public class GetSearchIntroResponse {
-    private List<SearchLogResponse> currentKeywordList;
-    private List<SearchLogResponse> hotKeywordList;
-    private List<SearchLogResponse> hotBrandList;
+    private List<String> currentKeywordList;
+    private List<String> hotKeywordList;
+    private List<String> hotBrandList;
 }

@@ -99,34 +99,33 @@ public class SearchService {
 
         Optional<Users> user = userService.getAppUser();
 
-        List<SearchLogResponse> currentList = new ArrayList<>();
+        List<String> currentList = new ArrayList<>();
         if (user.isPresent()) {
             Page<SearchLog> searchLogList
                     = searchDomainService.selectUserSearchLog(user.get());
 
             searchLogList.stream().forEach(l -> {
-                currentList.add(
-                        SearchLogResponse.builder().type(l.getSearchLogType().getCode()).keyword(l.getKeyword()).build());
+                currentList.add(l.getKeyword());
             });
         }
 
-        List<SearchLogResponse> brandList = new ArrayList<>();
-        brandList.add(SearchLogResponse.builder().keyword("DUVETICA").type(SearchLogType.BRAND.getCode()).build());
-        brandList.add(SearchLogResponse.builder().keyword("CASTELBAJAC").type(SearchLogType.BRAND.getCode()).build());
-        brandList.add(SearchLogResponse.builder().keyword("MASTER BUNNY EDITION").type(SearchLogType.BRAND.getCode()).build());
-        brandList.add(SearchLogResponse.builder().keyword("PEARLY GATES").type(SearchLogType.BRAND.getCode()).build());
-        brandList.add(SearchLogResponse.builder().keyword("ST ANDREWS").type(SearchLogType.BRAND.getCode()).build());
-        brandList.add(SearchLogResponse.builder().keyword("PING").type(SearchLogType.BRAND.getCode()).build());
+        List<String> brandList = new ArrayList<>();
+        brandList.add("DUVETICA");
+        brandList.add("CASTELBAJAC");
+        brandList.add("MASTER BUNNY EDITION");
+        brandList.add("PEARLY GATES");
+        brandList.add("ST ANDREWS");
+        brandList.add("PING");
 
-        List<SearchLogResponse> hotKeywordList = new ArrayList<>();
-        hotKeywordList.add(SearchLogResponse.builder().keyword("듀베티카").type(SearchLogType.BRAND.getCode()).build());
-        hotKeywordList.add(SearchLogResponse.builder().keyword("필드코디").type(SearchLogType.TAG.getCode()).build());
-        hotKeywordList.add(SearchLogResponse.builder().keyword("까스텔바작").type(SearchLogType.BRAND.getCode()).build());
-        hotKeywordList.add(SearchLogResponse.builder().keyword("핑").type(SearchLogType.BRAND.getCode()).build());
-        hotKeywordList.add(SearchLogResponse.builder().keyword("tester12").type(SearchLogType.ACCOUNT.getCode()).build());
-        hotKeywordList.add(SearchLogResponse.builder().keyword("test1").type(SearchLogType.ACCOUNT.getCode()).build());
-        hotKeywordList.add(SearchLogResponse.builder().keyword("hello").type(SearchLogType.TAG.getCode()).build());
-        hotKeywordList.add(SearchLogResponse.builder().keyword("헬로우").type(SearchLogType.TAG.getCode()).build());
+        List<String> hotKeywordList = new ArrayList<>();
+        hotKeywordList.add("듀베티카");
+        hotKeywordList.add("필드코디");
+        hotKeywordList.add("까스텔바작");
+        hotKeywordList.add("핑");
+        hotKeywordList.add("tester12");
+        hotKeywordList.add("test1");
+        hotKeywordList.add("hello");
+        hotKeywordList.add("헬로우");
 
         getSearchIntroResponse.setHotBrandList(brandList);
         getSearchIntroResponse.setHotKeywordList(hotKeywordList);
