@@ -109,13 +109,14 @@ public class SearchService {
             });
         }
 
-        List<String> brandList = new ArrayList<>();
-        brandList.add("DUVETICA");
-        brandList.add("CASTELBAJAC");
-        brandList.add("MASTER BUNNY EDITION");
-        brandList.add("PEARLY GATES");
-        brandList.add("ST ANDREWS");
-        brandList.add("PING");
+        List<SearchBrandResponse> brandList = new ArrayList<>();
+
+        Page<Brands> selectBrandList = brandDomainService.selectBrandList(0, 10);
+
+        selectBrandList.stream().forEach(l -> {
+            brandList.add(SearchBrandResponse.builder().id(l.getId()).logoImageUrl(l.getLogoImageUrl()).name(l.getName()).build());
+        });
+
 
         List<String> hotKeywordList = new ArrayList<>();
         hotKeywordList.add("듀베티카");

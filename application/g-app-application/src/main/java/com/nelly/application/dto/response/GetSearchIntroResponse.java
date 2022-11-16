@@ -8,5 +8,5 @@ import java.util.List;
 public class GetSearchIntroResponse {
     private List<String> currentKeywordList;
     private List<String> hotKeywordList;
-    private List<String> hotBrandList;
+    private List<SearchBrandResponse> hotBrandList;
 }
