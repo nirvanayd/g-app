@@ -12,7 +12,7 @@ import lombok.RequiredArgsConstructor;
 @Builder
 @RequiredArgsConstructor
 @AllArgsConstructor
-public class SearchBrandResponse extends CommonListResponse {
+public class SearchBrandResponse {
     private long id;
     private String name;
     @JsonIgnore
