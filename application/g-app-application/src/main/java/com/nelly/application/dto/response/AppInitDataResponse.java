@@ -13,4 +13,5 @@ public class AppInitDataResponse {
     private List<BrandInitResponse> brandList;
     private List<EnumStringCodeValue> ageList;
     private List<EnumStringCodeValue> placeList;
+    private List<ReportItemResponse> reportItemList;
 }

@@ -2,6 +2,7 @@ package com.nelly.application.service.app;
 
 import com.nelly.application.domain.Agreements;
 import com.nelly.application.domain.Brands;
+import com.nelly.application.domain.ReportItems;
 import com.nelly.application.dto.response.*;
 import com.nelly.application.enums.AgeType;
 import com.nelly.application.enums.MarketingType;
@@ -46,6 +47,10 @@ public class AppService {
         List<BrandInitResponse> brandResponseList =
                 brandList.stream().map(u -> modelMapper.map(u, BrandInitResponse.class)).collect(Collectors.toList());
 
+        List<ReportItems> reportItemList = appDomainService.selectReportItemList();
+        List<ReportItemResponse> reportItemResponseList =
+                reportItemList.stream().map(r -> modelMapper.map(r, ReportItemResponse.class)).collect(Collectors.toList());
+
         AppInitDataResponse response = new AppInitDataResponse();
 
         response.setAgreementsList(agreementResponses);
@@ -53,6 +58,7 @@ public class AppService {
         response.setPlaceList(placeList);
         response.setAgeList(ageList);
         response.setBrandList(brandResponseList);
+        response.setReportItemList(reportItemResponseList);
         return response;
     }
 
