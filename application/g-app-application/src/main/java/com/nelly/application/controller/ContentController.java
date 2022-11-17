@@ -36,7 +36,7 @@ public class ContentController {
     @GetMapping("/contents/{id}")
     public ResponseEntity<?> getContentList(@NotBlank @PathVariable("id") String id) {
         Long contentId = Long.parseLong(id);
-
+        contentService.checkContentStatus(contentId, true);
         ContentResponse contentResponse = contentService.getContent(contentId);
         return response.success(contentResponse);
     }
@@ -87,18 +87,21 @@ public class ContentController {
 
     @PostMapping("/contents/like")
     public ResponseEntity<?> saveContentLike(@RequestBody SaveLikeRequest dto) {
+        contentService.checkContentStatus(dto.getContentId(), false);
         contentService.saveContentLike(dto);
         return response.success();
     }
 
     @PostMapping("/contents/mark")
     public ResponseEntity<?> saveContentMark(@RequestBody SaveMarkRequest dto) {
+        contentService.checkContentStatus(dto.getContentId(), false);
         contentService.saveContentMark(dto);
         return response.success();
     }
 
     @PostMapping("/comments")
     public ResponseEntity<?> addComment(@RequestBody AddCommentRequest dto) {
+        contentService.checkContentStatus(dto.getContentId(), false);
         CommentResponse commentResponse = contentService.addComment(dto);
         return response.success(commentResponse);
     }
@@ -124,6 +127,7 @@ public class ContentController {
                                                    GetCommentListRequest dto
                                            ) {
         Long contentId = Long.parseLong(id);
+        contentService.checkContentStatus(contentId, true);
         return response.success(contentService.getCommentList(contentId, dto));
     }
 
@@ -133,5 +137,11 @@ public class ContentController {
     ) {
         Long parentId = Long.parseLong(id);
         return response.success(contentService.getChildCommentList(parentId, dto));
+    }
+
+    @PostMapping("/contents/report")
+    public ResponseEntity<?> saveReport(@RequestBody AddContentReportRequest dto ) {
+        contentService.addReport(dto);
+        return response.success();
     }
 }

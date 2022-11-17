@@ -26,6 +26,9 @@ public class ContentDomainService {
     private final AppTagsRepository appTagsRepository;
     private final ContentHashTagsRepository contentHashTagsRepository;
     private final CommentsRepository commentsRepository;
+    private final ReportContentsRepository reportContentsRepository;
+
+    private final int DISPLAY_STATUS = 1;
 
     public Contents createContent(Users user, String contentText) {
         Contents contents = Contents.builder()
@@ -176,10 +179,15 @@ public class ContentDomainService {
 
     public Page<Contents> selectContentList(Integer page, Integer size) {
         PageRequest pageRequest = PageRequest.of(page, size, Sort.by("id").descending());
-        return contentsRepository.findAll(pageRequest);
+        return contentsRepository.findAllByIsDisplay(DISPLAY_STATUS, pageRequest);
     }
 
     public Page<Contents> selectContentList(Users user, Integer page, Integer size) {
+        PageRequest pageRequest = PageRequest.of(page, size, Sort.by("id").descending());
+        return contentsRepository.findAllByUserAndIsDisplay(user, 1, pageRequest);
+    }
+
+    public Page<Contents> selectOwnerContentList(Users user, Integer page, Integer size) {
         PageRequest pageRequest = PageRequest.of(page, size, Sort.by("id").descending());
         return contentsRepository.findAllByUser(user, pageRequest);
     }
@@ -265,5 +273,17 @@ public class ContentDomainService {
     public Page<Contents> selectAppTagContentList(long id, Integer page, Integer size) {
         PageRequest pageRequest = PageRequest.of(page, size, Sort.by("modifiedDate").descending());
         return contentsRepository.findAllByItemHashTags_AppTag_Id(id, pageRequest);
+    }
+
+    public ReportContents saveContentReport(ReportContents reportContent) {
+        return reportContentsRepository.save(reportContent);
+    }
+
+    public Optional<ReportContents> selectReportContents(Contents content, Users user) {
+        return reportContentsRepository.findByContentAndAndUser(content, user);
+    }
+
+    public long countBlockContentCount(Users user) {
+        return contentsRepository.countBlockContentCount(user);
     }
 }

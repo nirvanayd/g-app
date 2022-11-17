@@ -8,9 +8,11 @@ import com.nelly.application.dto.request.*;
 import com.nelly.application.dto.response.*;
 import com.nelly.application.enums.DeleteStatus;
 import com.nelly.application.enums.RoleType;
+import com.nelly.application.enums.UserStatus;
 import com.nelly.application.enums.YesOrNoType;
 import com.nelly.application.exception.NoContentException;
 import com.nelly.application.exception.SystemException;
+import com.nelly.application.service.AppDomainService;
 import com.nelly.application.service.ContentDomainService;
 import com.nelly.application.service.UserDomainService;
 import com.nelly.application.service.brand.BrandService;
@@ -46,8 +48,11 @@ public class ContentService {
     private final BrandService brandService;
     private final ContentDomainService contentDomainService;
     private final UserDomainService userDomainService;
+    private final AppDomainService appDomainService;
     private final EntityManager entityManager;
     private static final String DIRECTORY_SEPARATOR = "/";
+
+    private static final int REPORT_COUNT  = 1;
 
     @Transactional
     public Contents addContent(AddContentRequest dto) {
@@ -103,6 +108,16 @@ public class ContentService {
      */
     private void parseTag(String contentText) {
 
+    }
+
+    public void checkContentStatus(long id, boolean allowOwner) {
+        Optional<Contents> selectContent = contentDomainService.selectContent(id);
+        if (selectContent.isEmpty()) return;
+        Contents content = selectContent.get();
+        // writer인 경우 허용
+        Optional<Users> selectUser = userService.getAppUser();
+        if (allowOwner && selectUser.isPresent() && content.getUser().equals(selectUser.get())) return;
+        if (content.getIsDisplay() == 0) throw new SystemException("비공개 처리된 컨텐츠입니다.");
     }
 
     @Transactional
@@ -479,5 +494,43 @@ public class ContentService {
         List<ContentMarks> markList = selectMarkList.getContent();
         GetUserMarkResponse getUserMarkResponse = new GetUserMarkResponse();
         return getUserMarkResponse.toDtoList(markList);
+    }
+
+    @Transactional
+    public void addReport(AddContentReportRequest dto) {
+        Users user = userService.getUser();
+        // content 상태 확인
+        Optional<Contents> selectContent = contentDomainService.selectContent(dto.getContentId());
+        if (selectContent.isEmpty()) throw new SystemException("컨텐츠를 조회할 수 없습니다.");
+        Contents content = selectContent.get();
+
+        // 이미 신고한 컨텐츠인지 확인
+        Optional<ReportContents> selectReportContent = contentDomainService.selectReportContents(content, user);
+        if (selectReportContent.isPresent()) throw new SystemException("이미 신고된 컨텐츠입니다.");
+
+        Optional<ReportItems> selectReportItem = appDomainService.selectReportItem(dto.getReportId());
+        if (selectReportItem.isEmpty()) throw new SystemException("신고 유형이 올바르지 않습니다.");
+        // 신고처리
+        ReportContents reportContents = ReportContents.builder()
+                .reportItem(selectReportItem.get())
+                .content(content)
+                .user(user).build();
+        contentDomainService.saveContentReport(reportContents);
+
+        if (content.getReportCount() + 1 >= REPORT_COUNT) {
+            // 컨텐츠 블락 처리
+            content.setIsDisplay(0);
+            contentDomainService.saveContent(content);
+
+            // 블락 컨텐츠가 3개인 경우 계정 정지 처리
+            Users writer = content.getUser();
+            long count = contentDomainService.countBlockContentCount(writer);
+            if (count >= REPORT_COUNT) {
+                writer.setStatus(UserStatus.BLOCK);
+                userDomainService.saveUser(writer);
+                // 차단된 계정 로그아웃처리함.
+                userService.removeUserToken(writer.getAuthId());
+            }
+        }
     }
 }

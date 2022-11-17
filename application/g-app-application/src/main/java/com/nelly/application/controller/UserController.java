@@ -51,9 +51,9 @@ public class UserController {
     public ResponseEntity<?> login(@RequestBody @Valid LoginRequest dto) {
         TokenInfoDto tokenInfoDto = userService.login(dto);
 
-        log.info("access token --> " + tokenInfoDto.getAccessToken());
-        log.info("refresh token --> " + tokenInfoDto.getRefreshToken());
-
+        // 상태 체크
+        Optional<Users> loginUser = userService.getAppUser(tokenInfoDto.getAuthId());
+        loginUser.ifPresent(l -> userService.checkAuthAppUser(loginUser.get()));
         LoginResponse data = LoginResponse.builder().accessToken(tokenInfoDto.getAccessToken())
                 .refreshToken(tokenInfoDto.getRefreshToken()).build();
         return response.success(data);

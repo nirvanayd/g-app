@@ -15,6 +15,8 @@ import java.util.Optional;
 public interface ContentsRepository extends JpaRepository<Contents, Long> {
     Optional<Contents> findByUserAndId(Users user, Long id);
 
+    Page<Contents> findAllByIsDisplay(int isDisplay, Pageable pageable);
+
     @Transactional
     @Modifying
     @Query("UPDATE Contents c SET c.likeCount = c.likeCount + :value WHERE c.id = :contentId")
@@ -31,6 +33,7 @@ public interface ContentsRepository extends JpaRepository<Contents, Long> {
     void updateContentReply(@Param("contentId") Long contentId, @Param("value") int value);
 
     Page<Contents> findAllByUser(Users user, Pageable pageable);
+    Page<Contents> findAllByUserAndIsDisplay(Users user, int isDisplay, Pageable pageable);
 
     @Query("SELECT COALESCE(SUM(c.likeCount),0) FROM Contents c WHERE c.deletedDate IS NULL AND c.user = :user")
     long countUserLike(@Param("user") Users user);
@@ -39,4 +42,7 @@ public interface ContentsRepository extends JpaRepository<Contents, Long> {
     long countUserMark(@Param("detailUser") Users detailUser);
 
     Page<Contents> findAllByItemHashTags_AppTag_Id(long id, Pageable pageable);
+
+    @Query("SELECT COALESCE(COUNT(c.id),0) FROM Contents c WHERE c.deletedDate IS NULL AND c.user = :user AND c.isDisplay = 0")
+    long countBlockContentCount(@Param("user") Users user);
 }

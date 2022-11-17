@@ -7,6 +7,7 @@ import com.nelly.application.dto.TokenInfoDto;
 import com.nelly.application.dto.response.*;
 import com.nelly.application.enums.Authority;
 import com.nelly.application.enums.RoleType;
+import com.nelly.application.enums.UserStatus;
 import com.nelly.application.enums.YesOrNoType;
 import com.nelly.application.exception.NoContentException;
 import com.nelly.application.exception.SystemException;
@@ -88,14 +89,15 @@ public class UserService {
             users.ifPresent(value -> createUserFcmToken(value, request.getFcmToken()));
         }
 
+        removeUserToken(tokenInfoDto.getAuthId());
         // 해당 authId의 토큰은 로그아웃처리.
-        String existToken = cacheTemplate.getValue(String.valueOf(tokenInfoDto.getAuthId()), "accessToken");
-        if (existToken != null) {
-            try {
-                Long expireTime = authService.getExpiration(existToken);
-                cacheTemplate.putValue(existToken, "logout", expireTime, TimeUnit.MILLISECONDS);
-            } catch (Exception e) {}
-        }
+//        String existToken = cacheTemplate.getValue(String.valueOf(tokenInfoDto.getAuthId()), "accessToken");
+//        if (existToken != null) {
+//            try {
+//                Long expireTime = authService.getExpiration(existToken);
+//                cacheTemplate.putValue(existToken, "logout", expireTime, TimeUnit.MILLISECONDS);
+//            } catch (Exception e) {}
+//        }
 
         // redis 저장
         cacheTemplate.putValue(String.valueOf(tokenInfoDto.getAuthId()), tokenInfoDto.getRefreshToken(), "token",
@@ -106,6 +108,16 @@ public class UserService {
 
         // return
         return tokenInfoDto;
+    }
+
+    public void removeUserToken(long authId) {
+        String existToken = cacheTemplate.getValue(String.valueOf(authId), "accessToken");
+        if (existToken != null) {
+            try {
+                Long expireTime = authService.getExpiration(existToken);
+                cacheTemplate.putValue(existToken, "logout", expireTime, TimeUnit.MILLISECONDS);
+            } catch (Exception e) {}
+        }
     }
 
     public String getToken(String bearerToken) {
@@ -147,6 +159,10 @@ public class UserService {
     public Optional<Users> getAppUser() {
         Long authId = authService.getAppAuthenticationId();
         if (authId == null) return Optional.empty();
+        return userDomainService.selectAppUsers(authId);
+    }
+
+    public Optional<Users> getAppUser(long authId) {
         return userDomainService.selectAppUsers(authId);
     }
 
@@ -355,7 +371,7 @@ public class UserService {
         GetMyPageResponse response = getMyPageResponse.toDto(ownerUser);
         int page = 0;
         int contentSize = 9;
-        Page<Contents> selectContentList = contentDomainService.selectContentList(ownerUser, page, contentSize);
+        Page<Contents> selectContentList = contentDomainService.selectOwnerContentList(ownerUser, page, contentSize);
         Page<ContentMarks> selectMarkList = contentDomainService.selectUserMarkList(ownerUser, page, contentSize);
         Page<UserScrapCart> selectUserCart = scraperDomainService.selectUserScrapCartList(ownerUser, page, contentSize);
 
@@ -494,5 +510,12 @@ public class UserService {
         userDomainService.deleteUserFollow(userFollow.getId());
         cacheTemplate.decrValue(String.valueOf(user.getId()), "follower");
         cacheTemplate.decrValue(String.valueOf(followingUser.getId()), "following");
+    }
+
+    public void checkAuthAppUser(Users user) {
+        if (user == null) return;
+        if (user.getStatus().equals(UserStatus.BLOCK)) throw new SystemException("사용이 중지된 계정입니다. 관리자에 문의해 주세요.");
+        if (user.getStatus().equals(UserStatus.LEAVE)) throw new SystemException("탈퇴 처리된 중지된 계정입니다.");
+        return;
     }
 }

@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -22,5 +23,9 @@ public class AppDomainService {
 
     public List<ReportItems> selectReportItemList() {
         return reportItemsRepository.findAllByTypeOrderBySeqAsc("content");
+    }
+
+    public Optional<ReportItems> selectReportItem(Long id) {
+        return reportItemsRepository.findById(id);
     }
 }
