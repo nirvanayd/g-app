@@ -10,6 +10,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface ContentsRepository extends JpaRepository<Contents, Long> {
@@ -45,4 +46,6 @@ public interface ContentsRepository extends JpaRepository<Contents, Long> {
 
     @Query("SELECT COALESCE(COUNT(c.id),0) FROM Contents c WHERE c.deletedDate IS NULL AND c.user = :user AND c.isDisplay = 0")
     long countBlockContentCount(@Param("user") Users user);
+
+    List<Contents> findAllByIsDisplay(int isDisplay);
 }

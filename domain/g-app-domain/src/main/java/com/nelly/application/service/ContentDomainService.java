@@ -286,4 +286,11 @@ public class ContentDomainService {
     public long countBlockContentCount(Users user) {
         return contentsRepository.countBlockContentCount(user);
     }
+
+    /**
+     * test fucntion
+     */
+    public List<Contents> selectBlockContentList() {
+        return contentsRepository.findAllByIsDisplay(0);
+    }
 }

@@ -32,4 +32,6 @@ public interface AppUserRepository extends JpaRepository<Users, Long> {
     List<Users> findAllByLoginIdContainsAndRole(String loginId, String role);
     Optional<Users> findByLoginIdAndRole(String loginId, String role);
     Optional<Users> findByEmailAndRole(String email, String role);
+
+    List<Users> findAllByStatus(UserStatus status);
 }

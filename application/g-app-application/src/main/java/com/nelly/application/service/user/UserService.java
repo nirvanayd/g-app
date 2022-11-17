@@ -518,4 +518,16 @@ public class UserService {
         if (user.getStatus().equals(UserStatus.LEAVE)) throw new SystemException("탈퇴 처리된 중지된 계정입니다.");
         return;
     }
+
+    /**
+     * test function
+     */
+    public void resetBlock() {
+        List<Users> blockUserList = userDomainService.selectBlockUserList();
+
+        blockUserList.forEach(l -> {
+            l.setStatus(UserStatus.NORMAL);
+            userDomainService.saveUser(l);
+        });
+    }
 }

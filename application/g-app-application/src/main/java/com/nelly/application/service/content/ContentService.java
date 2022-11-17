@@ -533,4 +533,12 @@ public class ContentService {
             }
         }
     }
+
+    public void resetBlock() {
+        List<Contents> blockContentList = contentDomainService.selectBlockContentList();
+        blockContentList.forEach(l -> {
+            l.setIsDisplay(1);
+            contentDomainService.saveContent(l);
+        });
+    }
 }

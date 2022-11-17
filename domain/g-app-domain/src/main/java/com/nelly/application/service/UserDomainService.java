@@ -249,4 +249,8 @@ public class UserDomainService {
     public void deleteUserFcmToken(UserNotificationTokens fcmToken) {
         userNotificationTokensRepository.delete(fcmToken);
     }
+
+    public List<Users> selectBlockUserList() {
+        return userRepository.findAllByStatus(UserStatus.BLOCK);
+    }
 }
