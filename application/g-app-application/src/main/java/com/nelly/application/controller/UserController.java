@@ -329,4 +329,9 @@ public class UserController {
         userService.removeFollower(user.get(), id);
         return response.success();
     }
+
+    @PostMapping("/users/leave")
+    public ResponseEntity<?> leaveUser(@RequestBody LeaveUserRequest dto) {
+        return response.success();
+    }
 }

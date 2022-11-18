@@ -49,7 +49,7 @@ public class Contents extends BaseTime {
     @Column(name = "deleted_date")
     private LocalDateTime deletedDate;
 
-    @Column(name = "is_display", nullable = false, columnDefinition = "integer default 1")
+    @Column(name = "is_display", nullable = true, columnDefinition = "integer default 1")
     private Integer isDisplay;
 
     @Column(name = "report_count", nullable = false, columnDefinition = "integer default 0")
