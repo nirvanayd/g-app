@@ -53,6 +53,7 @@ public class ContentService {
     private static final String DIRECTORY_SEPARATOR = "/";
 
     private static final int REPORT_COUNT  = 1;
+    private static final int REPORT_USER_COUNT  = 2;
 
     @Transactional
     public Contents addContent(AddContentRequest dto) {
@@ -525,7 +526,7 @@ public class ContentService {
             // 블락 컨텐츠가 3개인 경우 계정 정지 처리
             Users writer = content.getUser();
             long count = contentDomainService.countBlockContentCount(writer);
-            if (count >= REPORT_COUNT) {
+            if (count >= REPORT_USER_COUNT) {
                 writer.setStatus(UserStatus.BLOCK);
                 userDomainService.saveUser(writer);
                 // 차단된 계정 로그아웃처리함.
