@@ -34,4 +34,11 @@ public class SearchDomainService {
         PageRequest pageRequest = PageRequest.of(0, 10, Sort.by("id").descending());
         return searchLogRepository.findAllByUserId(user.getId(), pageRequest);
     }
+
+    public void deleteUserCurrentKeyword(Users user, String keyword) {
+        Optional<SearchLog> existLog = searchLogRepository.findByUserIdAndKeyword(user.getId(), keyword);
+        if (existLog.isPresent()) {
+            searchLogRepository.delete(existLog.get());
+        }
+    }
 }

@@ -1,12 +1,14 @@
 package com.nelly.application.service.search;
 
 import com.nelly.application.domain.*;
+import com.nelly.application.dto.request.RemoveCurrentKeywordRequest;
 import com.nelly.application.dto.request.SearchRequest;
 import com.nelly.application.dto.request.SearchTagContentRequest;
 import com.nelly.application.dto.response.*;
 import com.nelly.application.enums.RoleType;
 import com.nelly.application.enums.SearchLogType;
 import com.nelly.application.exception.NoContentException;
+import com.nelly.application.exception.SystemException;
 import com.nelly.application.service.BrandDomainService;
 import com.nelly.application.service.ContentDomainService;
 import com.nelly.application.service.SearchDomainService;
@@ -133,5 +135,12 @@ public class SearchService {
         getSearchIntroResponse.setCurrentKeywordList(currentList);
 
         return getSearchIntroResponse;
+    }
+
+    public void removeCurrentKeyword(RemoveCurrentKeywordRequest dto) {
+        Optional<Users> selectUser = userService.getAppUser();
+        if (selectUser.isEmpty()) throw new SystemException("사용자 정보를 조회할 수 없습니다.");
+        searchDomainService.deleteUserCurrentKeyword(selectUser.get(), dto.getKeyword());
+        return;
     }
 }

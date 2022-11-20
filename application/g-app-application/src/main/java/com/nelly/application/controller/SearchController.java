@@ -3,6 +3,7 @@ package com.nelly.application.controller;
 import com.nelly.application.domain.ScraperBrands;
 import com.nelly.application.domain.Users;
 import com.nelly.application.dto.Response;
+import com.nelly.application.dto.request.RemoveCurrentKeywordRequest;
 import com.nelly.application.dto.request.SearchRequest;
 import com.nelly.application.dto.request.SearchTagContentRequest;
 import com.nelly.application.dto.request.WebviewRequest;
@@ -12,10 +13,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.net.MalformedURLException;
 
@@ -49,5 +47,11 @@ public class SearchController {
     @GetMapping("/search/intro")
     public ResponseEntity<?> getSearchIntro() {
         return response.success(searchService.getSearchIntroData());
+    }
+
+    @DeleteMapping("/search/current-keyword")
+    public ResponseEntity<?> removeCurrentKeyword(@RequestBody RemoveCurrentKeywordRequest dto) {
+        searchService.removeCurrentKeyword(dto);
+        return response.success();
     }
 }
