@@ -339,7 +339,13 @@ public class UserService {
         GetUserDetailResponse response = getUserDetailResponse.toDto(detailUser);
         int page = 0;
         int size = 20;
+
         Page<Contents> selectContentList = contentDomainService.selectContentList(detailUser, page, size);
+
+        Optional<Users> selectUser = getAppUser();
+        if (selectUser.isPresent() && detailUser.equals(getAppUser().get())) {
+            selectContentList = contentDomainService.selectOwnerContentList(detailUser, page, size);
+        }
 
         Long userLikeCount = contentDomainService.countUserLike(detailUser);
         Long userMarkCount = contentDomainService.countUserMark(detailUser);
