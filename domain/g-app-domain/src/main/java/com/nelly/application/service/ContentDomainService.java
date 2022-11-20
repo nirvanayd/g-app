@@ -38,6 +38,7 @@ public class ContentDomainService {
                 .replyCount(0)
                 .markCount(0)
                 .viewCount(0)
+                .reportCount(0)
                 .build();
 
         return contentsRepository.save(contents);
