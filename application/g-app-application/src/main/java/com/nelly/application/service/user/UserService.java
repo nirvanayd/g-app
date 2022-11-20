@@ -535,8 +535,14 @@ public class UserService {
      */
     public void resetBlock() {
         List<Users> blockUserList = userDomainService.selectBlockUserList();
+        List<Users> leaveUserList = userDomainService.selectLeaveUserList();
 
         blockUserList.forEach(l -> {
+            l.setStatus(UserStatus.NORMAL);
+            userDomainService.saveUser(l);
+        });
+
+        leaveUserList.forEach(l -> {
             l.setStatus(UserStatus.NORMAL);
             userDomainService.saveUser(l);
         });

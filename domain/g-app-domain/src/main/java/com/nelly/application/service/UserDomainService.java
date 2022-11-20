@@ -253,4 +253,8 @@ public class UserDomainService {
     public List<Users> selectBlockUserList() {
         return userRepository.findAllByStatus(UserStatus.BLOCK);
     }
+
+    public List<Users> selectLeaveUserList() {
+        return userRepository.findAllByStatus(UserStatus.LEAVE);
+    }
 }
