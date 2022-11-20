@@ -18,6 +18,7 @@ import java.util.stream.Collectors;
 public class ContentThumbResponse {
     private Long id;
     private String photo;
+    private int isDisplay;
 
     public List<ContentThumbResponse> toDtoList(List<Contents> list) {
         return list.stream().map(this::toDto).collect(Collectors.toList());
@@ -32,6 +33,7 @@ public class ContentThumbResponse {
         return ContentThumbResponse.builder().
                 id(c.getId()).
                 photo(contentImage == null ? null : contentImage.getContentImageUrl()).
+                isDisplay(c.getIsDisplay()).
                 build();
     }
 
