@@ -42,6 +42,9 @@ public class S3Uploader {
             PutObjectRequest putObjectRequest = new PutObjectRequest(bucket, path, byteArrayInputStream, objectMetadata);
             amazonS3Client.putObject(putObjectRequest.withCannedAcl(CannedAccessControlList.PublicRead));
 
+            // thumbnail image
+
+
         } catch (IOException e) {
             throw new RuntimeException("업로드 실패");
         }

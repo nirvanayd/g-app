@@ -533,6 +533,8 @@ public class ContentService {
                 userService.removeUserToken(writer.getAuthId());
             }
         }
+        content.setReportCount(content.getReportCount() + 1);
+        contentDomainService.saveContent(content);
     }
 
     public void resetBlock() {
