@@ -49,7 +49,7 @@ public class SearchController {
         return response.success(searchService.getSearchIntroData());
     }
 
-    @DeleteMapping("/search/current-keyword")
+    @PostMapping("/search/current-keyword")
     public ResponseEntity<?> removeCurrentKeyword(@RequestBody RemoveCurrentKeywordRequest dto) {
         searchService.removeCurrentKeyword(dto);
         return response.success();
