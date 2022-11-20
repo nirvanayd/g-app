@@ -31,6 +31,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -83,7 +84,6 @@ public class UserService {
         String password = request.getPassword();
 
         TokenInfoDto tokenInfoDto = authService.login(loginId, password, RoleType.USER.getCode());
-
         if (request.getFcmToken() != null) {
             Optional<Users> users = userDomainService.selectAppUsers(tokenInfoDto.getAuthId());
             users.ifPresent(value -> createUserFcmToken(value, request.getFcmToken()));
@@ -515,8 +515,19 @@ public class UserService {
     public void checkAuthAppUser(Users user) {
         if (user == null) return;
         if (user.getStatus().equals(UserStatus.BLOCK)) throw new SystemException("사용이 중지된 계정입니다. 관리자에 문의해 주세요.");
-        if (user.getStatus().equals(UserStatus.LEAVE)) throw new SystemException("탈퇴 처리된 중지된 계정입니다.");
+        if (user.getStatus().equals(UserStatus.LEAVE)) throw new SystemException("탈퇴 처리된 계정입니다.");
         return;
+    }
+
+    public void leaveRequest(LeaveUserRequest dto) {
+        Optional<Users> selectedUser = getAppUser();
+        if (selectedUser.isEmpty()) throw new SystemException("사용자 정보를 조회할 수 없습니다.");
+        Users user = selectedUser.get();
+        user.setStatus(UserStatus.LEAVE);
+        user.setLeaveDate(LocalDateTime.now());
+        // token remove
+        removeUserToken(user.getAuthId());
+        userDomainService.saveUser(user);
     }
 
     /**

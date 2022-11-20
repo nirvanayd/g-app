@@ -332,6 +332,7 @@ public class UserController {
 
     @PostMapping("/users/leave")
     public ResponseEntity<?> leaveUser(@RequestBody LeaveUserRequest dto) {
+        userService.leaveRequest(dto);
         return response.success();
     }
 }

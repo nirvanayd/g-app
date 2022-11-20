@@ -2,6 +2,7 @@ package com.nelly.application.repository;
 
 import com.nelly.application.domain.Contents;
 import com.nelly.application.domain.Users;
+import com.nelly.application.enums.UserStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -17,6 +18,8 @@ public interface ContentsRepository extends JpaRepository<Contents, Long> {
     Optional<Contents> findByUserAndId(Users user, Long id);
 
     Page<Contents> findAllByIsDisplay(int isDisplay, Pageable pageable);
+
+    Page<Contents> findAllByIsDisplayAndUser_Status(int isDisplay, UserStatus userStatus, Pageable pageable);
 
     @Transactional
     @Modifying

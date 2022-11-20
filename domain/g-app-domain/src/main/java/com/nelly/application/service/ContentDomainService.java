@@ -2,6 +2,7 @@ package com.nelly.application.service;
 
 import com.nelly.application.domain.*;
 import com.nelly.application.enums.DeleteStatus;
+import com.nelly.application.enums.UserStatus;
 import com.nelly.application.enums.YesOrNoType;
 import com.nelly.application.repository.*;
 import lombok.RequiredArgsConstructor;
@@ -181,7 +182,7 @@ public class ContentDomainService {
 
     public Page<Contents> selectContentList(Integer page, Integer size) {
         PageRequest pageRequest = PageRequest.of(page, size, Sort.by("id").descending());
-        return contentsRepository.findAllByIsDisplay(DISPLAY_STATUS, pageRequest);
+        return contentsRepository.findAllByIsDisplayAndUser_Status(DISPLAY_STATUS, UserStatus.NORMAL, pageRequest);
     }
 
     public Page<Contents> selectContentList(Users user, Integer page, Integer size) {
