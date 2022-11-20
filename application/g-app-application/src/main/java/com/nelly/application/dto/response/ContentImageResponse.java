@@ -15,3 +15,4 @@ public class ContentImageResponse {
     private String photoURL;
     private List<TagResponse> tagList;
 }
+

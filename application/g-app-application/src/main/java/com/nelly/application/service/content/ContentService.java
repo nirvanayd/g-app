@@ -217,12 +217,14 @@ public class ContentService {
         // get user id
         Users user = userService.getUser();
         for (MultipartFile file: images) {
+            String fileFormatName = Objects.requireNonNull(file.getContentType()).substring(file.getContentType().lastIndexOf("/") + 1);
             if (file.getOriginalFilename() == null || file.getOriginalFilename().isEmpty()) continue;
             imageUrlList.add(awsProperties.getCloudFront().getUrl() +
                     s3Uploader.upload(
                             awsProperties.getS3().getBucket(),
                             file,
                             getS3ContentPath() + DIRECTORY_SEPARATOR + user.getId()));
+
         }
         return AddContentImageResponse.builder()
                 .imageUrlList(imageUrlList)
