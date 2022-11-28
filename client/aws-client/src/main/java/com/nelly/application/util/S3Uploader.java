@@ -13,7 +13,6 @@ import com.drew.metadata.exif.ExifIFD0Directory;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import marvin.image.MarvinImage;
-import org.marvinproject.image.transform.rotate.Rotate;
 import org.marvinproject.image.transform.scale.Scale;
 import org.springframework.http.ContentDisposition;
 import org.springframework.http.HttpStatus;
@@ -23,8 +22,6 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 import javax.imageio.ImageIO;
-import java.awt.*;
-import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -60,7 +57,10 @@ public class S3Uploader {
             throw new RuntimeException("업로드 실패");
         }
 
+        return path;
+
         // thumbnail image
+        /*
         MultipartFile resizedFile = resizeImage(fileName, fileFormatName, multipartFile, 900);
         String thumbFileName = fileName + "/900";
         String thumbPath = dirName + DIRECTORY_SEPARATOR + thumbFileName;
@@ -73,16 +73,8 @@ public class S3Uploader {
         } catch (IOException e) {
             throw new RuntimeException("업로드 실패");
         }
-
         return thumbPath;
-    }
-
-    public void uploadThumb(String bucket, MultipartFile multipartFile, String dirName) {
-
-    }
-
-    public String upload(String url, String dirName) throws IOException {
-        return "";
+       */
     }
 
     public static String buildFileName(String originalFileName) {
@@ -107,12 +99,13 @@ public class S3Uploader {
             int orientation = 1;
             BufferedImage image = ImageIO.read(originalImage.getInputStream());
             BufferedInputStream inputStream =  new BufferedInputStream(originalImage.getInputStream());
-            Metadata metadata = ImageMetadataReader.readMetadata(inputStream, true);
+//            Metadata metadata = ImageMetadataReader.readMetadata(inputStream, true);
+            // meta2
 
-            ExifIFD0Directory exifIFD0 = metadata.getDirectory(ExifIFD0Directory.class);
-            if (exifIFD0 != null) {
-                orientation = exifIFD0.getInt(ExifIFD0Directory.TAG_ORIENTATION);
-            }
+//            ExifIFD0Directory exifIFD0 = metadata.getDirectory(ExifIFD0Directory.class);
+//            if (exifIFD0 != null) {
+//                orientation = exifIFD0.getInt(ExifIFD0Directory.TAG_ORIENTATION);
+//            }
 
             // 세로 이미지 회전
             switch (orientation) {
@@ -152,7 +145,7 @@ public class S3Uploader {
 
             return new MockMultipartFile(fileName, baos.toByteArray());
 
-        } catch (IOException | ImageProcessingException | MetadataException e) {
+        } catch (IOException e) {
             e.printStackTrace();
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "파일 리사이즈에 실패했습니다.");
         }
