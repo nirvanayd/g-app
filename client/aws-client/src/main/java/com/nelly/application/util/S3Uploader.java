@@ -104,12 +104,15 @@ public class S3Uploader {
     private MultipartFile resizeImage(String fileName, String fileFormatName, MultipartFile originalImage, int targetWidth) {
         try {
             // MultipartFile -> BufferedImage Convert
+            int orientation = 1;
             BufferedImage image = ImageIO.read(originalImage.getInputStream());
             BufferedInputStream inputStream =  new BufferedInputStream(originalImage.getInputStream());
             Metadata metadata = ImageMetadataReader.readMetadata(inputStream, true);
 
             ExifIFD0Directory exifIFD0 = metadata.getDirectory(ExifIFD0Directory.class);
-            int orientation = exifIFD0.getInt(ExifIFD0Directory.TAG_ORIENTATION);
+            if (exifIFD0 != null) {
+                orientation = exifIFD0.getInt(ExifIFD0Directory.TAG_ORIENTATION);
+            }
 
             // 세로 이미지 회전
             switch (orientation) {
