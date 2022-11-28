@@ -153,6 +153,7 @@ public class S3Uploader {
             return new MockMultipartFile(fileName, baos.toByteArray());
 
         } catch (IOException | ImageProcessingException | MetadataException e) {
+            e.printStackTrace();
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "파일 리사이즈에 실패했습니다.");
         }
     }
