@@ -27,6 +27,7 @@ public class ContentResponse {
     private boolean liked;
     private boolean marked;
     private String updatedAt;
+    private Integer isDisplay;
 
     public List<ContentResponse> toDtoList(List<Contents> contentList) {
         return contentList.stream().map(this::toDto).collect(Collectors.toList());

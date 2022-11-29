@@ -198,9 +198,17 @@ public class ContentService {
         Optional<Contents> selectContent = contentDomainService.selectContent(id);
         if (selectContent.isEmpty()) throw new SystemException("게시글이 정상적으로 등록되지 않았습니다.");
         Contents content = selectContent.get();
-
         ContentResponse response = new ContentResponse();
         response = response.toDto(content);
+
+        if (content.getIsDisplay() == 0) {
+            if (selectUser.isPresent() && selectUser.get().equals(content.getUser())) {
+                response.setIsDisplay(content.getIsDisplay());
+            } else {
+                throw new SystemException("비공개 처리된 게시물입니다.");
+            }
+        }
+
         if (selectUser.isPresent()) {
             Users user = selectUser.get();
             boolean liked = contentDomainService.selectContentLike(content.getId(), user.getId()).isPresent();
