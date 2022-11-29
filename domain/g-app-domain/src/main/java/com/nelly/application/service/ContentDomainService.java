@@ -28,6 +28,7 @@ public class ContentDomainService {
     private final ContentHashTagsRepository contentHashTagsRepository;
     private final CommentsRepository commentsRepository;
     private final ReportContentsRepository reportContentsRepository;
+    private final UnblockRequestRepository unblockRequestRepository;
 
     private final int DISPLAY_STATUS = 1;
 
@@ -290,10 +291,21 @@ public class ContentDomainService {
         return contentsRepository.countBlockContentCount(user);
     }
 
+    public void saveUnblockRequest(Contents content, String text) {
+        UnblockRequest unblockRequest = UnblockRequest.builder().content(content).text(text).build();
+        unblockRequestRepository.save(unblockRequest);
+    }
+
+    public Optional<UnblockRequest> selectUnblockRequest(Contents content, int status) {
+        return unblockRequestRepository.findByContentAndStatus(content, status);
+    }
+
     /**
      * test fucntion
      */
     public List<Contents> selectBlockContentList() {
         return contentsRepository.findAllByIsDisplay(0);
     }
+
+
 }

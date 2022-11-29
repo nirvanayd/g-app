@@ -144,4 +144,10 @@ public class ContentController {
         contentService.addReport(dto);
         return response.success();
     }
+
+    @PostMapping("/contents/unblock")
+    public ResponseEntity<?> unblock(@RequestBody UnblockContentRequest dto ) {
+        contentService.unblockContent(dto);
+        return response.success();
+    }
 }

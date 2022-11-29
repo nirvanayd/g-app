@@ -554,4 +554,31 @@ public class ContentService {
             contentDomainService.saveContent(l);
         });
     }
+
+    public void unblockContent(UnblockContentRequest dto) {
+        Optional<Contents> selectContent = contentDomainService.selectContent(dto.getContentId());
+        if (selectContent.isEmpty()) {
+            throw new SystemException("컨텐츠 정보를 조회할 수 없습니다.");
+        }
+
+        Contents content = selectContent.get();
+
+        Optional<Users> selectUser = userService.getAppUser();
+        if (selectUser.isEmpty()) {
+            throw new SystemException("사용자 정보를 조회할 수 없습니다.");
+        }
+        Users appUser = selectUser.get();
+
+        if (!content.getUser().getId().equals(appUser.getId())) {
+            throw new SystemException("요청 권한이 없습니다.");
+        }
+
+        // 이미 요청이 되어있는지 확인
+        Optional<UnblockRequest> selectUnblockRequest = contentDomainService.selectUnblockRequest(content, 0);
+        if (selectUnblockRequest.isPresent()) {
+            throw new SystemException("이미 차단 해제 요청이 된 컨텐츠입니다.");
+        }
+
+        contentDomainService.saveUnblockRequest(content, dto.getText());
+    }
 }
