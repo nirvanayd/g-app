@@ -116,7 +116,7 @@ public class SearchService {
         Page<Brands> selectBrandList = brandDomainService.selectBrandList(0, 10);
 
         selectBrandList.stream().forEach(l -> {
-            brandList.add(SearchBrandResponse.builder().id(l.getId()).logoImageUrl(l.getLogoImageUrl()).name(l.getName()).build());
+            brandList.add(SearchBrandResponse.builder().id(l.getId()).photoURL(l.getLogoImageUrl()).name(l.getName()).build());
         });
 
 
