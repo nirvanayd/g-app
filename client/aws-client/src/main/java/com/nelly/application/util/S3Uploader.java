@@ -57,24 +57,23 @@ public class S3Uploader {
             throw new RuntimeException("업로드 실패");
         }
 
-        return path;
+
 
         // thumbnail image
-        /*
         MultipartFile resizedFile = resizeImage(fileName, fileFormatName, multipartFile, 900);
-        String thumbFileName = fileName + "/900";
-        String thumbPath = dirName + DIRECTORY_SEPARATOR + thumbFileName;
-        try (InputStream inputStream = resizedFile.getInputStream()) {
-            byte[] bytes = IOUtils.toByteArray(inputStream);
-            objectMetadata.setContentLength(bytes.length);
-            ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(bytes);
-            PutObjectRequest putObjectRequest = new PutObjectRequest(bucket, thumbPath, byteArrayInputStream, objectMetadata);
-            amazonS3Client.putObject(putObjectRequest.withCannedAcl(CannedAccessControlList.PublicRead));
-        } catch (IOException e) {
-            throw new RuntimeException("업로드 실패");
-        }
-        return thumbPath;
-       */
+//        String thumbFileName = fileName + "/900";
+//        String thumbPath = dirName + DIRECTORY_SEPARATOR + thumbFileName;
+//        try (InputStream inputStream = resizedFile.getInputStream()) {
+//            byte[] bytes = IOUtils.toByteArray(inputStream);
+//            objectMetadata.setContentLength(bytes.length);
+//            ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(bytes);
+//            PutObjectRequest putObjectRequest = new PutObjectRequest(bucket, thumbPath, byteArrayInputStream, objectMetadata);
+//            amazonS3Client.putObject(putObjectRequest.withCannedAcl(CannedAccessControlList.PublicRead));
+//        } catch (IOException e) {
+//            throw new RuntimeException("업로드 실패");
+//        }
+//        return thumbPath;
+        return path;
     }
 
     public static String buildFileName(String originalFileName) {

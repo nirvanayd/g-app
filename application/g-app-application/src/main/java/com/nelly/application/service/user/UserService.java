@@ -340,11 +340,12 @@ public class UserService {
         int page = 0;
         int size = 20;
 
-        Page<Contents> selectContentList = contentDomainService.selectContentList(detailUser, page, size);
-
+        Page<Contents> selectContentList = null;
         Optional<Users> selectUser = getAppUser();
         if (selectUser.isPresent() && detailUser.equals(getAppUser().get())) {
             selectContentList = contentDomainService.selectOwnerContentList(detailUser, page, size);
+        } else {
+            selectContentList = contentDomainService.selectContentList(detailUser, page, size);
         }
 
         Long userLikeCount = contentDomainService.countUserLike(detailUser);
@@ -416,8 +417,16 @@ public class UserService {
 
     public List<ContentThumbResponse> getUserDetailContentList(Long userDetailId, GetContentListRequest dto) {
         Users detailUser = getUser(userDetailId);
+        Optional<Users> appUser = getAppUser();
         dto.setSize(21);
         Page<Contents> selectContentList = contentDomainService.selectContentList(detailUser, dto.getPage(), dto.getSize());
+
+        if (appUser.isPresent() && detailUser.equals(appUser.get())) {
+            selectContentList = contentDomainService.selectOwnerContentList(detailUser, dto.getPage(), dto.getSize());
+        } else {
+            selectContentList = contentDomainService.selectContentList(detailUser, dto.getPage(), dto.getSize());
+        }
+
         ContentThumbResponse contentThumbResponse = new ContentThumbResponse();
         if (selectContentList.isEmpty()) throw new NoContentException();
         return contentThumbResponse.toDtoList(selectContentList.getContent());

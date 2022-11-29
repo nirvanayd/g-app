@@ -241,7 +241,6 @@ public class UserController {
     public ResponseEntity<?> getUserDetailContentList(@PathVariable String id,
                                                       GetContentListRequest dto) {
         Long userDetailId = Long.parseLong(id);
-        Optional<Users> user = userService.getAppUser();
         return response.success(userService.getUserDetailContentList(userDetailId, dto));
     }
 
