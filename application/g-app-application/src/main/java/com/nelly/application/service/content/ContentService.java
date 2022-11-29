@@ -202,7 +202,7 @@ public class ContentService {
         response = response.toDto(content);
 
         if (content.getIsDisplay() == 0) {
-            if (selectUser.isPresent() && selectUser.get().equals(content.getUser())) {
+            if (selectUser.isPresent() && Objects.equals(selectUser.get().getId(), content.getUser().getId())) {
                 response.setIsDisplay(content.getIsDisplay());
             } else {
                 throw new SystemException("비공개 처리된 게시물입니다.");
