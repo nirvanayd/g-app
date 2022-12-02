@@ -22,6 +22,7 @@ import com.nelly.application.util.CacheTemplate;
 import com.nelly.application.util.EncryptUtils;
 import com.nelly.application.util.S3Uploader;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
@@ -36,6 +37,7 @@ import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
+@Slf4j
 @RequiredArgsConstructor
 @Service
 public class UserService {
@@ -112,11 +114,14 @@ public class UserService {
 
     public void removeUserToken(long authId) {
         String existToken = cacheTemplate.getValue(String.valueOf(authId), "accessToken");
+        log.info(existToken);
         if (existToken != null) {
             try {
                 Long expireTime = authService.getExpiration(existToken);
                 cacheTemplate.putValue(existToken, "logout", expireTime, TimeUnit.MILLISECONDS);
-            } catch (Exception e) {}
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
     }
 
