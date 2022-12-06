@@ -48,6 +48,6 @@ public class GetUserDetailResponse {
                 profileTitle(u.getProfileTitle()).
                 profileText(u.getProfileText()).
                 status(u.getStatus().toString()).
-                followerCount(u.getFollowerCount()).build();
+                followerCount(u.getFollowingCount()).build();
     }
 }
