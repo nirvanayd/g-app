@@ -10,6 +10,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -59,13 +60,23 @@ public class UserDomainService {
         List<UserMarketing> existMarketing = userMarketingTypeRepository.findAllByUser(refUser);
         userMarketingTypeRepository.deleteAll(existMarketing);
         for (String code: userMarketingType) {
-            UserMarketing userMarketing = UserMarketing.builder().marketingType(MarketingType.getMarketingType(code)).user(refUser).build();
-            userMarketingTypeRepository.save(userMarketing);
+            saveMarketingType(refUser, code);
         }
+    }
+
+    public void saveMarketingType(Users user, String userMarketingType) {
+        UserMarketing userMarketing = UserMarketing.builder().
+                marketingType(MarketingType.getMarketingType(userMarketingType)).
+                user(user).build();
+        userMarketingTypeRepository.save(userMarketing);
     }
 
     public List<UserMarketing> selectUserMarketingList(Users user) {
         return userMarketingTypeRepository.findAllByUser(user);
+    }
+
+    public void removeUserMarketing(UserMarketing userMarketing) {
+        userMarketingTypeRepository.delete(userMarketing);
     }
 
     public Users getUsers(long authId) {

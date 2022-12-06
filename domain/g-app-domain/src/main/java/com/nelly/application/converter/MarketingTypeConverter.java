@@ -1,7 +1,6 @@
 package com.nelly.application.converter;
 
 import com.nelly.application.enums.MarketingType;
-import com.nelly.application.enums.StyleType;
 
 import javax.persistence.AttributeConverter;
 import javax.persistence.Converter;

@@ -266,8 +266,33 @@ public class UserService {
 
     @Transactional
     public void updateMarketingAgreement(Users user, UpdateMarketingAgreementRequest dto) {
-        userDomainService.saveUserAgreement(user.getId(), AgreementType.MARKETING_POLICY.getCode(), dto.getUseYn());
-        userDomainService.addUserMarketingType(user, dto.getUserMarketingType());
+        List<UserMarketing> selectUserMarketing = userDomainService.selectUserMarketingList(user);
+
+        int marketingAgreementCount = 0;
+        UserMarketing exist =
+                selectUserMarketing.stream().
+                        filter(l -> l.getMarketingType().getCode().equals(dto.getUserMarketingType())).
+                        findFirst().orElse(null);
+
+        if (exist != null) {
+            marketingAgreementCount = selectUserMarketing.size();
+        }
+
+        if (dto.getUseYn().equals("Y")) {
+            if (exist != null) return;
+            userDomainService.saveMarketingType(user, dto.getUserMarketingType());
+            marketingAgreementCount++;
+        } else if (dto.getUseYn().equals("N") && exist != null) {
+            userDomainService.removeUserMarketing(exist);
+            marketingAgreementCount--;
+        }
+
+        // 체크된 항목에 따라 marketing agreement 항목 변경
+        if (marketingAgreementCount > 0) {
+            userDomainService.saveUserAgreement(user.getId(), AgreementType.MARKETING_POLICY.getCode(), YesOrNoType.YES.getCode());
+        } else {
+            userDomainService.saveUserAgreement(user.getId(), AgreementType.MARKETING_POLICY.getCode(), YesOrNoType.NO.getCode());
+        }
     }
 
     public List<UserAgreements> getAppUserAgreements(Users user) {

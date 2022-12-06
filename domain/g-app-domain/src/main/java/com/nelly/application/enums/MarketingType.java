@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 @Getter
 public enum MarketingType implements CommonStringCode {
 
-    SNS("SNS", "SNS"),
+    SNS("SMS", "SMS"),
     EMAIL("EMAIL", "이메일"),
     EMPTY(null, "");
 
