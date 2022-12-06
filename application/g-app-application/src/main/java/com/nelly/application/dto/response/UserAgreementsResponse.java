@@ -2,8 +2,10 @@ package com.nelly.application.dto.response;
 
 import lombok.Data;
 
+import java.util.List;
+
 @Data
 public class UserAgreementsResponse {
-    private String agreementType;
-    private String useYn;
+    List<UserAgreementResponse> agreementList;
+    List<String> marketingTypeList;
 }

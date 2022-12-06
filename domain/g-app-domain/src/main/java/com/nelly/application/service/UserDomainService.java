@@ -55,10 +55,17 @@ public class UserDomainService {
 
     public void addUserMarketingType(Users user, List<String> userMarketingType) {
         Users refUser = userRepository.getById(user.getId());
+        // 기존 agreement 삭제
+        List<UserMarketing> existMarketing = userMarketingTypeRepository.findAllByUser(refUser);
+        userMarketingTypeRepository.deleteAll(existMarketing);
         for (String code: userMarketingType) {
             UserMarketing userMarketing = UserMarketing.builder().marketingType(MarketingType.getMarketingType(code)).user(refUser).build();
             userMarketingTypeRepository.save(userMarketing);
         }
+    }
+
+    public List<UserMarketing> selectUserMarketingList(Users user) {
+        return userMarketingTypeRepository.findAllByUser(user);
     }
 
     public Users getUsers(long authId) {

@@ -5,10 +5,7 @@ import com.nelly.application.domain.*;
 import com.nelly.application.dto.request.*;
 import com.nelly.application.dto.TokenInfoDto;
 import com.nelly.application.dto.response.*;
-import com.nelly.application.enums.Authority;
-import com.nelly.application.enums.RoleType;
-import com.nelly.application.enums.UserStatus;
-import com.nelly.application.enums.YesOrNoType;
+import com.nelly.application.enums.*;
 import com.nelly.application.exception.AuthenticationException;
 import com.nelly.application.exception.NoContentException;
 import com.nelly.application.exception.SystemException;
@@ -267,8 +264,18 @@ public class UserService {
         userDomainService.saveUserAgreement(user.getId(), dto.getAgreementType(), dto.getUseYn());
     }
 
+    @Transactional
+    public void updateMarketingAgreement(Users user, UpdateMarketingAgreementRequest dto) {
+        userDomainService.saveUserAgreement(user.getId(), AgreementType.MARKETING_POLICY.getCode(), dto.getUseYn());
+        userDomainService.addUserMarketingType(user, dto.getUserMarketingType());
+    }
+
     public List<UserAgreements> getAppUserAgreements(Users user) {
         return userDomainService.getUserAgreements(user);
+    }
+
+    public List<UserMarketing> getUserMarketingList(Users user) {
+        return userDomainService.selectUserMarketingList(user);
     }
 
     public void addUserAgreement(Users user, List<UserAgreementRequest> list) {

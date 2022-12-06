@@ -1,9 +1,6 @@
 package com.nelly.application.controller;
 
-import com.nelly.application.domain.Agreements;
-import com.nelly.application.domain.UserAgreements;
-import com.nelly.application.domain.UserStyles;
-import com.nelly.application.domain.Users;
+import com.nelly.application.domain.*;
 import com.nelly.application.dto.TokenInfoDto;
 import com.nelly.application.dto.request.*;
 import com.nelly.application.dto.Response;
@@ -185,6 +182,14 @@ public class UserController {
         return response.success();
     }
 
+    @PostMapping("/users/marketing-agreement")
+    public ResponseEntity<?> updateMarketingAgreement(@RequestBody @Valid UpdateMarketingAgreementRequest dto) {
+        Optional<Users> user = userService.getAppUser();
+        if (user.isEmpty()) throw new RuntimeException("사용자 정보를 조회할 수 없습니다.");
+        userService.updateMarketingAgreement(user.get(), dto);
+        return response.success();
+    }
+
     /**
      * 사용자 스타일 변경
      * */
@@ -293,9 +298,17 @@ public class UserController {
         Users users = userService.getUser();
         List<Agreements> appAgreementList = appService.getAppAgreementList("1.0.0");
         List<UserAgreements> list = userService.getAppUserAgreements(users);
-        List<UserAgreementsResponse> userAgreementList =
-                list.stream().map(l -> modelMapper.map(l, UserAgreementsResponse.class)).collect(Collectors.toList());
-        return response.success(userAgreementList);
+        List<UserMarketing> userMarketingList = userService.getUserMarketingList(users);
+
+        UserAgreementsResponse userAgreementsResponse = new UserAgreementsResponse();
+
+        List<UserAgreementResponse> userAgreementList =
+                list.stream().map(l -> modelMapper.map(l, UserAgreementResponse.class)).collect(Collectors.toList());
+        List<String> marketingTypeList = userMarketingList.stream().map(u -> u.getMarketingType().getCode()).collect(Collectors.toList());
+
+        userAgreementsResponse.setAgreementList(userAgreementList);
+        userAgreementsResponse.setMarketingTypeList(marketingTypeList);
+        return response.success(userAgreementsResponse);
     }
 
     @GetMapping("/users/style-list")
