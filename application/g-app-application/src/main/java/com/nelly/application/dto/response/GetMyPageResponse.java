@@ -43,7 +43,7 @@ public class GetMyPageResponse {
     private List<MarkContentThumbResponse> contentMarkList;
     private List<ScrapItemResponse> cartList;
 
-    private List<UserAgreementsResponse> userAgreementList;
+//    private List<UserAgreementsResponse> userAgreementList;
 
     public GetMyPageResponse toDto(Users u) {
         return GetMyPageResponse.builder().

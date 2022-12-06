@@ -409,11 +409,6 @@ public class UserService {
                 markContentThumbResponse.toDtoMarkList(selectMarkList.getContent());
         List<ScrapItemResponse> cartList = scrapItemResponse.cartToDtoList(selectUserCart.getContent());
 
-        List<UserAgreements> agreementList = userDomainService.getUserAgreements(ownerUser);
-        List<UserAgreementsResponse> userAgreementList =
-                agreementList.stream().map(l -> modelMapper.map(l, UserAgreementsResponse.class)).collect(Collectors.toList());
-
-        response.setUserAgreementList(userAgreementList);
         response.setLikeCount(userLikeCount);
         response.setMarkCount(userMarkCount);
         response.setContentsCount((int)totalContentCount);
