@@ -9,6 +9,7 @@ import com.nelly.application.enums.Authority;
 import com.nelly.application.enums.RoleType;
 import com.nelly.application.enums.UserStatus;
 import com.nelly.application.enums.YesOrNoType;
+import com.nelly.application.exception.AuthenticationException;
 import com.nelly.application.exception.NoContentException;
 import com.nelly.application.exception.SystemException;
 import com.nelly.application.mail.MailSender;
@@ -343,18 +344,12 @@ public class UserService {
         GetUserDetailResponse getUserDetailResponse = new GetUserDetailResponse();
         GetUserDetailResponse response = getUserDetailResponse.toDto(detailUser);
         int page = 0;
-        int size = 20;
+        int size = 9;
 
-        Page<Contents> selectContentList = null;
-        Optional<Users> selectUser = getAppUser();
-        if (selectUser.isPresent() && detailUser.equals(getAppUser().get())) {
-            selectContentList = contentDomainService.selectOwnerContentList(detailUser, page, size);
-        } else {
-            selectContentList = contentDomainService.selectContentList(detailUser, page, size);
-        }
+        Page<Contents> selectContentList = contentDomainService.selectContentList(detailUser, page, size);
 
-        Long userLikeCount = contentDomainService.countUserLike(detailUser);
-        Long userMarkCount = contentDomainService.countUserMark(detailUser);
+        long userLikeCount = contentDomainService.countUserLike(detailUser);
+        long userMarkCount = contentDomainService.countUserMark(detailUser);
 
         List<ContentThumbResponse> list = new ArrayList<>();
         long totalContentCount = selectContentList.getTotalElements();
@@ -379,6 +374,10 @@ public class UserService {
 
     public GetMyPageResponse getUserDetailOwner(Long userDetailId) {
         Users ownerUser = getUser(userDetailId);
+        Optional<Users> appUser = getAppUser();
+        if (appUser.isEmpty()) throw new AuthenticationException();
+        if (!Objects.equals(appUser.get().getId(), userDetailId)) throw new AuthenticationException();
+
         GetMyPageResponse getMyPageResponse = new GetMyPageResponse();
         GetMyPageResponse response = getMyPageResponse.toDto(ownerUser);
         int page = 0;
@@ -420,26 +419,38 @@ public class UserService {
         return response;
     }
 
-    public List<ContentThumbResponse> getUserDetailContentList(Long userDetailId, GetContentListRequest dto) {
-        Users detailUser = getUser(userDetailId);
+    public List<ContentThumbResponse> getOwnerUserDetailContentList(GetContentListRequest dto) {
         Optional<Users> appUser = getAppUser();
-        dto.setSize(21);
-        Page<Contents> selectContentList = contentDomainService.selectContentList(detailUser, dto.getPage(), dto.getSize());
-
-        if (appUser.isPresent() && detailUser.equals(appUser.get())) {
-            selectContentList = contentDomainService.selectOwnerContentList(detailUser, dto.getPage(), dto.getSize());
-        } else {
-            selectContentList = contentDomainService.selectContentList(detailUser, dto.getPage(), dto.getSize());
-        }
-
+        if (appUser.isEmpty()) throw new SystemException("사용자 정보를 조회할 수 없습니다.");
+        Page<Contents> selectContentList = contentDomainService.selectOwnerContentList(appUser.get(), dto.getPage(), dto.getSize());
         ContentThumbResponse contentThumbResponse = new ContentThumbResponse();
         if (selectContentList.isEmpty()) throw new NoContentException();
         return contentThumbResponse.toDtoList(selectContentList.getContent());
     }
 
+    public List<ContentThumbResponse> getUserDetailContentList(Long userDetailId, GetContentListRequest dto) {
+        Users detailUser = getUser(userDetailId);
+        Optional<Users> appUser = getAppUser();
+        dto.setSize(9);
+        Page<Contents> selectContentList = contentDomainService.selectContentList(detailUser, dto.getPage(), dto.getSize());
+        ContentThumbResponse contentThumbResponse = new ContentThumbResponse();
+        if (selectContentList.isEmpty()) throw new NoContentException();
+        return contentThumbResponse.toDtoList(selectContentList.getContent());
+    }
+
+    public List<MarkContentThumbResponse> getOwnerUserDetailMarkContentList(GetContentListRequest dto) {
+        Optional<Users> appUser = getAppUser();
+        if (appUser.isEmpty()) throw new SystemException("사용자 정보를 조회할 수 없습니다.");
+        dto.setSize(9);
+        Page<ContentMarks> selectMarkList = contentDomainService.selectUserMarkList(appUser.get(), dto.getPage(), dto.getSize());
+        MarkContentThumbResponse contentThumbResponse = new MarkContentThumbResponse();
+        if (selectMarkList.isEmpty()) throw new NoContentException();
+        return contentThumbResponse.toDtoMarkList(selectMarkList.getContent());
+    }
+
     public List<MarkContentThumbResponse> getUserDetailMarkContentList(Long userDetailId, GetContentListRequest dto) {
         Users detailUser = getUser(userDetailId);
-        dto.setSize(21);
+        dto.setSize(9);
         Page<ContentMarks> selectMarkList = contentDomainService.selectUserMarkList(detailUser, dto.getPage(), dto.getSize());
         MarkContentThumbResponse contentThumbResponse = new MarkContentThumbResponse();
         if (selectMarkList.isEmpty()) throw new NoContentException();

@@ -9,6 +9,7 @@ import com.nelly.application.dto.request.*;
 import com.nelly.application.dto.Response;
 import com.nelly.application.dto.response.*;
 import com.nelly.application.enums.StyleType;
+import com.nelly.application.exception.SystemException;
 import com.nelly.application.mail.MailSender;
 import com.nelly.application.service.app.AppService;
 import com.nelly.application.service.content.ContentService;
@@ -59,7 +60,7 @@ public class UserController {
         return response.success(data);
     }
 
-    @PostMapping("/reissue")
+    @PostMapping(" /reissue")
     public ResponseEntity<?> userTest(@RequestBody ReissueRequest requestDto) {
         log.info("reissue/access token --> " + requestDto.getAccessToken());
         log.info("reissue/refresh token --> " + requestDto.getRefreshToken());
@@ -223,18 +224,12 @@ public class UserController {
     public ResponseEntity<?> getUserDetailById(@PathVariable String id) {
         Long userDetailId = Long.parseLong(id);
         Optional<Users> user = userService.getAppUser();
+        return response.success(userService.getUserDetail(userDetailId, user));
+    }
 
-        if (user.isPresent()) {
-            // 토큰이 없을 때는 다른 사람 페이지
-            // 토큰이 있을 때 user.id === userDetailId --> 본인 마이페이지
-            // 토큰이 있을 때 user.id !== userDetailId --> 다른 사람 페이지
-            if (Objects.equals(user.get().getId(), userDetailId)) {
-                return response.success(userService.getUserDetailOwner(userDetailId));
-            }
-            return response.success(userService.getUserDetail(userDetailId, user));
-        } else {
-            return response.success(userService.getUserDetail(userDetailId, user));
-        }
+    @GetMapping("/user/detail/content")
+    public ResponseEntity<?> getOwnerUserDetailContentList(GetContentListRequest dto) {
+        return response.success(userService.getOwnerUserDetailContentList(dto));
     }
 
     @GetMapping("/user/detail/content/{id}")
@@ -242,6 +237,11 @@ public class UserController {
                                                       GetContentListRequest dto) {
         Long userDetailId = Long.parseLong(id);
         return response.success(userService.getUserDetailContentList(userDetailId, dto));
+    }
+
+    @GetMapping("/user/detail/mark")
+    public ResponseEntity<?> getUserDetailMarkContentList(GetContentListRequest dto) {
+        return response.success(userService.getOwnerUserDetailMarkContentList(dto));
     }
 
     @GetMapping("/user/detail/mark/{id}")

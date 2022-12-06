@@ -246,6 +246,11 @@ public class ContentDomainService {
         return contentMarksRepository.findAllByContentId(contentId, pageRequest);
     }
 
+    public Page<ContentMarks> selectOwnerUserMarkList(Users user, Integer page, Integer size) {
+        PageRequest pageRequest = PageRequest.of(page, size, Sort.by("id").descending());
+        return contentMarksRepository.findAllByUserAndContent_DeletedDateNull(user, pageRequest);
+    }
+
     public Page<ContentMarks> selectUserMarkList(Users user, Integer page, Integer size) {
         PageRequest pageRequest = PageRequest.of(page, size, Sort.by("id").descending());
         return contentMarksRepository.findAllByUserAndContent_DeletedDateNull(user, pageRequest);
