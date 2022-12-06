@@ -376,7 +376,7 @@ public class UserService {
         Users ownerUser = getUser(userDetailId);
         Optional<Users> appUser = getAppUser();
         if (appUser.isEmpty()) throw new AuthenticationException();
-        if (!Objects.equals(appUser.get().getId(), userDetailId)) throw new AuthenticationException();
+        if (!Objects.equals(appUser.get().getId(), userDetailId)) throw new SystemException("접근 권한이 없습니다.");
 
         GetMyPageResponse getMyPageResponse = new GetMyPageResponse();
         GetMyPageResponse response = getMyPageResponse.toDto(ownerUser);
