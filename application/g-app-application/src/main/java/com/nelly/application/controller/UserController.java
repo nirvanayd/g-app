@@ -224,13 +224,20 @@ public class UserController {
     }
 
     @GetMapping("/users/detail/mark/{id}")
-    public ResponseEntity<?> getUserMark(@PathVariable String id, GetUserLikeRequest dto) {
+    public ResponseEntity<?> getUserMark(@PathVariable String id, GetContentListRequest dto) {
+        Long userDetailId = Long.parseLong(id);
+        return response.success(contentService.getUserMarkList(userDetailId, dto));
+    }
+
+    @GetMapping("/user/detail/mark/{id}")
+    public ResponseEntity<?> getUserDetailMarkContentList(@PathVariable String id,
+                                                          GetContentListRequest dto) {
         Long userDetailId = Long.parseLong(id);
         return response.success(contentService.getUserMarkList(userDetailId, dto));
     }
 
     @GetMapping("/users/mark")
-    public ResponseEntity<?> getUserOwnerMark(GetUserLikeRequest dto) {
+    public ResponseEntity<?> getUserOwnerMark(GetContentListRequest dto) {
         Optional<Users> user = userService.getAppUser();
         if (user.isEmpty()) throw new RuntimeException("사용자 정보를 조회할 수 없습니다.");
         Users appUser = user.get();
@@ -259,14 +266,6 @@ public class UserController {
     @GetMapping("/user/detail/mark")
     public ResponseEntity<?> getUserDetailMarkContentList(GetContentListRequest dto) {
         return response.success(userService.getOwnerUserDetailMarkContentList(dto));
-    }
-
-    @GetMapping("/user/detail/mark/{id}")
-    public ResponseEntity<?> getUserDetailMarkContentList(@PathVariable String id,
-                                                      GetContentListRequest dto) {
-        Long userDetailId = Long.parseLong(id);
-        Optional<Users> user = userService.getAppUser();
-        return response.success(userService.getUserDetailMarkContentList(userDetailId, dto));
     }
 
     @PostMapping("/users/upload-profile")

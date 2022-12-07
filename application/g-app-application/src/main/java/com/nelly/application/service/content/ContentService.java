@@ -502,12 +502,12 @@ public class ContentService {
         return getUserLikeResponse.toDtoList(likeList);
     }
 
-    public List<GetUserMarkResponse> getUserMarkList(Long userDetailId, GetUserLikeRequest dto) {
+    public List<GetUserMarkResponse> getUserMarkList(Long userDetailId, GetContentListRequest dto) {
         Users user = userService.getUser(userDetailId);
         return getUserMarkList(user, dto);
     }
 
-    public List<GetUserMarkResponse> getUserMarkList(Users user, GetUserLikeRequest dto) {
+    public List<GetUserMarkResponse> getUserMarkList(Users user, GetContentListRequest dto) {
         Page<ContentMarks> selectMarkList = contentDomainService.selectUserContentMark(user, dto.getPage(), dto.getSize());
         if (selectMarkList.isEmpty()) {
             throw new NoContentException();
