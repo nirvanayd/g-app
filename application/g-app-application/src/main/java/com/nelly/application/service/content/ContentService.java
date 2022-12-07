@@ -555,6 +555,10 @@ public class ContentService {
         });
     }
 
+    public void resetReport() {
+        contentDomainService.resetReportAll();
+    }
+
     public void unblockContent(UnblockContentRequest dto) {
         Optional<Contents> selectContent = contentDomainService.selectContent(dto.getContentId());
         if (selectContent.isEmpty()) {

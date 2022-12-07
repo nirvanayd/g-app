@@ -36,6 +36,7 @@ public class TestController {
     @GetMapping("/reset-block")
     public ResponseEntity<String> resetBlock() {
         contentService.resetBlock();
+        contentService.resetReport();
         userService.resetBlock();
         return ResponseEntity.ok("success");
     }

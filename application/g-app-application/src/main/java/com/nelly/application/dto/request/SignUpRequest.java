@@ -21,6 +21,7 @@ public class SignUpRequest {
     @Pattern(regexp = "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+.[A-Za-z]{2,6}$", message = "이메일 형식에 맞지 않습니다.")
     private String email;
 
+    @NotEmpty(message = "생년월일은 필수 입력값입니다.")
     @Pattern(regexp = "^(19[0-9][0-9]|20\\d{2})(0[0-9]|1[0-2])(0[1-9]|[1-2][0-9]|3[0-1])$", message = "생년월일 양식이 맞지 않습니다.")
     private String birth;
 

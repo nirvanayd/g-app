@@ -73,6 +73,4 @@ public class GAppExceptionHandler {
         ExceptionCode exceptionCode = exception.getExceptionCode();
         return response.fail(exceptionCode.getCode(), exception.getMessage(), exceptionCode.getStatus());
     }
-
-
 }

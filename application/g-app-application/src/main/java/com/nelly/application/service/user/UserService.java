@@ -112,7 +112,6 @@ public class UserService {
 
     public void removeUserToken(long authId) {
         String existToken = cacheTemplate.getValue(String.valueOf(authId), "accessToken");
-        log.info(existToken);
         if (existToken != null) {
             try {
                 Long expireTime = authService.getExpiration(existToken);
@@ -373,6 +372,8 @@ public class UserService {
 
     public GetUserDetailResponse getUserDetail(Long userDetailId, Optional<Users> user) {
         Users detailUser = getUser(userDetailId);
+        if (detailUser.getStatus().equals(UserStatus.BLOCK)) throw new SystemException("사용 중지된 계정입니다.");
+        if (detailUser.getStatus().equals(UserStatus.LEAVE)) throw new SystemException("탈퇴 처리된 계정입니다.");
         GetUserDetailResponse getUserDetailResponse = new GetUserDetailResponse();
         GetUserDetailResponse response = getUserDetailResponse.toDto(detailUser);
         int page = 0;

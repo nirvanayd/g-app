@@ -312,5 +312,8 @@ public class ContentDomainService {
         return contentsRepository.findAllByIsDisplay(0);
     }
 
+    public void resetReportAll() {
+        reportContentsRepository.deleteAll();
+    }
 
 }
