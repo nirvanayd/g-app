@@ -39,7 +39,7 @@ public class SearchService {
         Optional<Users> user = userService.getAppUser();
         searchDomainService.saveLog(user, SearchLogType.BRAND, dto.getKeyword());
         Page<Users> selectAccountList =
-                userDomainService.selectAccountList(dto.getKeyword(), RoleType.USER.getCode(), dto.getPage(), dto.getSize());
+                userDomainService.selectSearchAccountList(dto.getKeyword(), RoleType.USER.getCode(), dto.getPage(), dto.getSize());
         if (selectAccountList.isEmpty()) throw new NoContentException();
         List<Users> accountList = selectAccountList.getContent();
         AccountResponse accountResponse = new AccountResponse();

@@ -370,6 +370,8 @@ public class UserService {
         }
     }
 
+
+
     public GetUserDetailResponse getUserDetail(Long userDetailId, Optional<Users> user) {
         Users detailUser = getUser(userDetailId);
         if (detailUser.getStatus().equals(UserStatus.BLOCK)) throw new SystemException("사용 중지된 계정입니다.");

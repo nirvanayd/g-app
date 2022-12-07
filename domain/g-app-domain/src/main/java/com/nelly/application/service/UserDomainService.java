@@ -100,6 +100,11 @@ public class UserDomainService {
         return userRepository.findAllByLoginIdContainsAndRole(keyword, role, pageRequest);
     }
 
+    public Page<Users> selectSearchAccountList(String keyword, String role, Integer page, Integer size) {
+        PageRequest pageRequest = PageRequest.of(page, size, Sort.by("loginId").ascending());
+        return userRepository.findAllByLoginIdContainsAndRoleAndStatus(keyword, role, UserStatus.NORMAL, pageRequest);
+    }
+
     /* admin 사용 */
     public Page<Users> selectAccountList(Integer page, Integer size, String role) {
         PageRequest pageRequest = PageRequest.of(page, size, Sort.by("id").descending());
