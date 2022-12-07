@@ -209,6 +209,12 @@ public class UserController {
         return response.success();
     }
 
+    @GetMapping("/users/detail/like/{id}")
+    public ResponseEntity<?> getUserLike(@PathVariable String id, GetUserLikeRequest dto) {
+        Long userDetailId = Long.parseLong(id);
+        return response.success(contentService.getUserLikeList(userDetailId, dto));
+    }
+
     @GetMapping("/users/like")
     public ResponseEntity<?> getUserLike(GetUserLikeRequest dto) {
         Optional<Users> user = userService.getAppUser();
@@ -217,8 +223,14 @@ public class UserController {
         return response.success(contentService.getUserLikeList(appUser, dto));
     }
 
+    @GetMapping("/users/detail/mark/{id}")
+    public ResponseEntity<?> getUserMark(@PathVariable String id, GetUserLikeRequest dto) {
+        Long userDetailId = Long.parseLong(id);
+        return response.success(contentService.getUserMarkList(userDetailId, dto));
+    }
+
     @GetMapping("/users/mark")
-    public ResponseEntity<?> getUserMark(GetUserLikeRequest dto) {
+    public ResponseEntity<?> getUserOwnerMark(GetUserLikeRequest dto) {
         Optional<Users> user = userService.getAppUser();
         if (user.isEmpty()) throw new RuntimeException("사용자 정보를 조회할 수 없습니다.");
         Users appUser = user.get();

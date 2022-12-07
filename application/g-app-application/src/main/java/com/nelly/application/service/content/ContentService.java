@@ -487,6 +487,11 @@ public class ContentService {
         }
     }
 
+    public List<GetUserLikeResponse> getUserLikeList(Long userDetailId, GetUserLikeRequest dto) {
+        Users user = userService.getUser(userDetailId);
+        return getUserLikeList(user, dto);
+    }
+
     public List<GetUserLikeResponse> getUserLikeList(Users user, GetUserLikeRequest dto) {
         Page<ContentLikes> selectLikeList = contentDomainService.selectUserContentLike(user, dto.getPage(), dto.getSize());
         if (selectLikeList.isEmpty()) {
@@ -495,6 +500,11 @@ public class ContentService {
         List<ContentLikes> likeList = selectLikeList.getContent();
         GetUserLikeResponse getUserLikeResponse = new GetUserLikeResponse();
         return getUserLikeResponse.toDtoList(likeList);
+    }
+
+    public List<GetUserMarkResponse> getUserMarkList(Long userDetailId, GetUserLikeRequest dto) {
+        Users user = userService.getUser(userDetailId);
+        return getUserMarkList(user, dto);
     }
 
     public List<GetUserMarkResponse> getUserMarkList(Users user, GetUserLikeRequest dto) {
