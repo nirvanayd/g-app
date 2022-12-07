@@ -55,6 +55,7 @@ public class GAppExceptionHandler {
     @ExceptionHandler(SystemException.class)
     public ResponseEntity<?> handleSystemException(SystemException exception) {
         log.info(">>> SystemException");
+        exception.printStackTrace();
         ExceptionCode exceptionCode = exception.getExceptionCode();
         return response.fail(exceptionCode.getCode(), exception.getMessage(), exceptionCode.getStatus());
     }
@@ -69,7 +70,6 @@ public class GAppExceptionHandler {
 
     @ExceptionHandler(NoContentException.class)
     public ResponseEntity<?> handleRuntimeException(NoContentException exception) {
-        exception.printStackTrace();
         ExceptionCode exceptionCode = exception.getExceptionCode();
         return response.fail(exceptionCode.getCode(), exception.getMessage(), exceptionCode.getStatus());
     }
