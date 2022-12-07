@@ -229,13 +229,6 @@ public class UserController {
         return response.success(contentService.getUserMarkList(userDetailId, dto));
     }
 
-    @GetMapping("/user/detail/mark/{id}")
-    public ResponseEntity<?> getUserDetailMarkContentList(@PathVariable String id,
-                                                          GetContentListRequest dto) {
-        Long userDetailId = Long.parseLong(id);
-        return response.success(contentService.getUserMarkList(userDetailId, dto));
-    }
-
     @GetMapping("/users/mark")
     public ResponseEntity<?> getUserOwnerMark(GetContentListRequest dto) {
         Optional<Users> user = userService.getAppUser();
@@ -243,6 +236,8 @@ public class UserController {
         Users appUser = user.get();
         return response.success(contentService.getUserMarkList(appUser, dto));
     }
+
+
 
     @GetMapping("/users/detail/{id}")
     public ResponseEntity<?> getUserDetailById(@PathVariable String id) {
