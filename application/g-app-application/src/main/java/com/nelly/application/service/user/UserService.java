@@ -339,15 +339,15 @@ public class UserService {
         if (dto.getFollowYn().equals(YesOrNoType.YES.getCode())) {
             if (selectUserFollow.isEmpty()) {
                 userDomainService.saveUserFollow(user, followingUser);
-                cacheTemplate.incrValue(String.valueOf(user.getId()), "follower");
-                cacheTemplate.incrValue(String.valueOf(followingUser.getId()), "following");
+                cacheTemplate.incrValue(String.valueOf(followingUser.getId()), "follower");
+                cacheTemplate.incrValue(String.valueOf(user.getId()), "following");
             }
         } else if (dto.getFollowYn().equals(YesOrNoType.NO.getCode())) {
             if (selectUserFollow.isPresent()) {
                 UserFollow userFollow = selectUserFollow.get();
                 userDomainService.deleteUserFollow(userFollow.getId());
-                cacheTemplate.decrValue(String.valueOf(user.getId()), "follower");
-                cacheTemplate.decrValue(String.valueOf(followingUser.getId()), "following");
+                cacheTemplate.decrValue(String.valueOf(followingUser.getId()), "follower");
+                cacheTemplate.decrValue(String.valueOf(user.getId()), "following");
             }
         }
     }

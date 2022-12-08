@@ -238,7 +238,6 @@ public class UserController {
     }
 
 
-
     @GetMapping("/users/detail/{id}")
     public ResponseEntity<?> getUserDetailById(@PathVariable String id) {
         Long userDetailId = Long.parseLong(id);
@@ -324,6 +323,20 @@ public class UserController {
         List<UserStylesResponse> userStyleList =
                 list.stream().map(l -> modelMapper.map(l, UserStylesResponse.class)).collect(Collectors.toList());
         return response.success(userStyleList);
+    }
+
+    @GetMapping("/users/follower-list/{id}")
+    public ResponseEntity<?> getUserFollowerList(@PathVariable String id, GetFollowerListRequest dto) {
+        Long userDetailId = Long.parseLong(id);
+        Users user = userService.getUser(userDetailId);
+        return response.success(userService.getUserFollowerList(user, dto));
+    }
+
+    @GetMapping("/users/following-list/{id}")
+    public ResponseEntity<?> getUserFollowingList(@PathVariable String id, GetFollowingListRequest dto) {
+        Long userDetailId = Long.parseLong(id);
+        Users user = userService.getUser(userDetailId);
+        return response.success(userService.getUserFollowingList(user, dto));
     }
 
     @GetMapping("/users/follower-list")
