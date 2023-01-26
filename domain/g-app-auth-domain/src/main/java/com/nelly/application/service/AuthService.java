@@ -143,6 +143,15 @@ public class AuthService {
         return tokenInfoDto;
     }
 
+    public TokenInfoDto reissue(String accessToken, long expireTime) {
+        Authentication authentication = tokenProvider.getAuthentication(accessToken);
+        AppAuthentication auth = findByLoginId(authentication.getName());
+        TokenInfoDto tokenInfoDto = tokenProvider.generateToken(authentication, expireTime);
+        // authId 갱신
+        tokenInfoDto.setAuthId(auth.getId());
+        return tokenInfoDto;
+    }
+
     public long getAuthenticationId() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         AppAuthentication auth = findByLoginId(authentication.getName());

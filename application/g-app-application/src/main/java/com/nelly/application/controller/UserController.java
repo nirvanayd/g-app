@@ -75,8 +75,6 @@ public class UserController {
 
     @PostMapping("/reissue")
     public ResponseEntity<?> userTest(@RequestBody ReissueRequest requestDto) {
-        log.info("reissue/access token --> " + requestDto.getAccessToken());
-        log.info("reissue/refresh token --> " + requestDto.getRefreshToken());
         TokenInfoDto tokenInfoDto = userService.reissue(requestDto);
         LoginResponse data = LoginResponse.builder()
                 .accessToken(tokenInfoDto.getAccessToken())

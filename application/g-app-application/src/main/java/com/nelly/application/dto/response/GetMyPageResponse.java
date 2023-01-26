@@ -39,6 +39,7 @@ public class GetMyPageResponse {
     private int contentMarkCount;
     private boolean followed;
     private boolean isOwner;
+    private String socialType;
     private List<ContentThumbResponse> contentList;
     private List<MarkContentThumbResponse> contentMarkList;
     private List<ScrapItemResponse> cartList;

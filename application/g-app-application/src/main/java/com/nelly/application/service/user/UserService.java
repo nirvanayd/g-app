@@ -317,6 +317,12 @@ public class UserService {
             throw new RuntimeException("잘못된 요청입니다.");
         }
 
+        if (requestDto.getExpireTime() != null) {
+            TokenInfoDto newTokenInfoDto = authService.reissue(requestDto.getAccessToken(), requestDto.getExpireTime());
+            cacheTemplate.putValue(String.valueOf(newTokenInfoDto.getAuthId()), newTokenInfoDto.getRefreshToken(), "token",
+                    newTokenInfoDto.getRefreshTokenExpirationTime(), TimeUnit.MILLISECONDS);
+            return newTokenInfoDto;
+        }
         TokenInfoDto newTokenInfoDto = authService.reissue(requestDto.getAccessToken());
         cacheTemplate.putValue(String.valueOf(newTokenInfoDto.getAuthId()), newTokenInfoDto.getRefreshToken(), "token",
                 newTokenInfoDto.getRefreshTokenExpirationTime(), TimeUnit.MILLISECONDS);
@@ -493,6 +499,13 @@ public class UserService {
         if (appUser.isEmpty()) throw new AuthenticationException();
         if (!Objects.equals(appUser.get().getId(), userDetailId)) throw new SystemException("접근 권한이 없습니다.");
 
+        String socialType = null;
+        Optional<SocialUsers> existSocialUser = userDomainService.selectSocialUser(appUser.get().getAuthId());
+
+        if (existSocialUser.isPresent()) {
+            socialType = existSocialUser.get().getType();
+        }
+
         GetMyPageResponse getMyPageResponse = new GetMyPageResponse();
         GetMyPageResponse response = getMyPageResponse.toDto(ownerUser);
         int page = 0;
@@ -526,6 +539,7 @@ public class UserService {
         response.setContentMarkList(markList);
         response.setCartList(cartList);
         response.setOwner(true);
+        response.setSocialType(socialType);
         return response;
     }
 

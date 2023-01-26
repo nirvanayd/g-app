@@ -73,7 +73,47 @@ public class TokenProvider {
                 .build();
     }
 
+    public TokenInfoDto generateToken(Authentication authentication, long expireTime) {
+
+        // debug
+        expireTime = 60 * 2 * 1000L;
+
+        // 권한 가져오기
+        String authorities = authentication.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .collect(Collectors.joining(","));
+
+        long now = (new Date()).getTime();
+        // Access Token 생성
+        Date accessTokenExpiresIn = new Date(now + expireTime);
+
+        String accessToken = Jwts.builder()
+                .setSubject(authentication.getName())
+                .claim(AUTHORITIES_KEY, authorities)
+                .setExpiration(accessTokenExpiresIn)
+                .signWith(key, SignatureAlgorithm.HS256)
+                .compact();
+
+        // Refresh Token 생성
+        String refreshToken = Jwts.builder()
+                .claim(AUTHORITIES_KEY, authorities)
+                .setIssuedAt(new Date())
+                .setExpiration(new Date(now + REFRESH_TOKEN_EXPIRE_TIME))
+                .signWith(key, SignatureAlgorithm.HS256)
+                .compact();
+
+        return TokenInfoDto.builder()
+                .accessToken(accessToken)
+                .refreshToken(refreshToken)
+                .grantType(BEARER_TYPE)
+                .refreshTokenExpirationTime(REFRESH_TOKEN_EXPIRE_TIME)
+                .build();
+    }
+
     public TokenInfoDto generateToken(String loginId, String role, long expireTime) {
+        // debug
+        expireTime = 60 * 2 * 1000L;
+
         long now = (new Date()).getTime();
         // Access Token 생성
         Date accessTokenExpiresIn = new Date(now + expireTime);
