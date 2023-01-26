@@ -5,7 +5,6 @@ import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import com.nelly.application.converter.UserStatusConverter;
 import com.nelly.application.enums.UserStatus;
 import lombok.*;
-import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.Formula;
 
 import javax.persistence.*;
@@ -22,7 +21,7 @@ import java.util.List;
 @JsonIdentityInfo(
         generator = ObjectIdGenerators.PropertyGenerator.class,
         property = "id")
-public class Users extends BaseTime{
+public class Users extends BaseTime {
 
     @Id
     @GeneratedValue(strategy=GenerationType.IDENTITY)

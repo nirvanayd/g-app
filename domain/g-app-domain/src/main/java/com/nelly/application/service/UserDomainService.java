@@ -3,6 +3,7 @@ package com.nelly.application.service;
 import com.nelly.application.domain.*;
 import com.nelly.application.enums.*;
 import com.nelly.application.exception.NoContentException;
+import com.nelly.application.exception.SocialAuthenticationException;
 import com.nelly.application.repository.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,6 +24,7 @@ import java.util.Optional;
 public class UserDomainService {
 
     private final AppUserRepository userRepository;
+    private final SocialUserRepository socialUserRepository;
     private final UserStylesRepository userStylesRepository;
     private final UserMarketingTypeRepository userMarketingTypeRepository;
     private final UserAgreementsRepository userAgreementsRepository;
@@ -40,6 +42,19 @@ public class UserDomainService {
                 .build();
 
         return userRepository.save(user);
+    }
+
+    public void addSocialUser(Long authId, String uid, String type) {
+        SocialUsers socialUser = SocialUsers.builder()
+                .authId(authId)
+                .uid(uid)
+                .type(type)
+                .build();
+        socialUserRepository.save(socialUser);
+    }
+
+    public Optional<SocialUsers> selectSocialUser(String uid, String type) {
+        return socialUserRepository.findByUidAndType(uid, type);
     }
 
     public Users saveUser(Users user) {

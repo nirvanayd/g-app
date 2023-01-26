@@ -45,6 +45,12 @@ public class UserController {
         return response.success();
     }
 
+    @PostMapping("/social-sign-up")
+    public ResponseEntity<?> signUp(@RequestBody @Valid SocialSignUpRequest dto) {
+        userService.signUp(dto);
+        return response.success();
+    }
+
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody @Valid LoginRequest dto) {
         TokenInfoDto tokenInfoDto = userService.login(dto);
@@ -57,7 +63,22 @@ public class UserController {
         return response.success(data);
     }
 
-    @PostMapping(" /reissue")
+    @PostMapping("/social-login")
+    public ResponseEntity<?> login(@RequestBody @Valid SocialLoginRequest dto) {
+
+
+
+        TokenInfoDto tokenInfoDto = userService.login(dto);
+//        // 상태 체크
+//        Optional<Users> loginUser = userService.getAppUser(tokenInfoDto.getAuthId());
+//        loginUser.ifPresent(l -> userService.checkAuthAppUser(loginUser.get()));
+//        LoginResponse data = LoginResponse.builder().accessToken(tokenInfoDto.getAccessToken())
+//                .refreshToken(tokenInfoDto.getRefreshToken()).build();
+//        return response.success(data);
+        return response.success();
+    }
+
+    @PostMapping("/test-issue")
     public ResponseEntity<?> userTest(@RequestBody ReissueRequest requestDto) {
         log.info("reissue/access token --> " + requestDto.getAccessToken());
         log.info("reissue/refresh token --> " + requestDto.getRefreshToken());

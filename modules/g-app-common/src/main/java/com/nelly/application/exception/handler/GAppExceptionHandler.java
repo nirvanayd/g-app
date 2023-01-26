@@ -73,4 +73,13 @@ public class GAppExceptionHandler {
         ExceptionCode exceptionCode = exception.getExceptionCode();
         return response.fail(exceptionCode.getCode(), exception.getMessage(), exceptionCode.getStatus());
     }
+
+    @ExceptionHandler(SocialAuthenticationException.class)
+    public ResponseEntity<?> handleRuntimeException(SocialAuthenticationException exception) {
+        ExceptionCode exceptionCode = exception.getExceptionCode();
+        if (exception.getData() != null) {
+            return response.fail(exception.getData(), exceptionCode.getCode(), exception.getMessage(), exceptionCode.getStatus());
+        }
+        return response.fail(exceptionCode.getCode(), exception.getMessage(), exceptionCode.getStatus());
+    }
 }

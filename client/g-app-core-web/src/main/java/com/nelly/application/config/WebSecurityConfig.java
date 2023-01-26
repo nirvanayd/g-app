@@ -36,7 +36,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 .authorizeRequests()
                 .antMatchers("/hello", "/env").permitAll()
-                .antMatchers("/sign-up", "/login", "/authority", "/duplicate-id", "/find-id", "/reset-password").permitAll()
+                .antMatchers("/sign-up", "/login", "/authority", "/duplicate-id", "/find-id", "/reset-password", "/reissue").permitAll()
                 .antMatchers("/users/logout").permitAll()
                 .antMatchers("/brands/rank", "/brands/intro/**", "/brands/keyword").permitAll()
                 .antMatchers(HttpMethod.GET, "/contents/**").permitAll()

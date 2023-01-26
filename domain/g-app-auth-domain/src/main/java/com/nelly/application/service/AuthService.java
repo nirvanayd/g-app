@@ -1,5 +1,6 @@
 package com.nelly.application.service;
 
+import antlr.Token;
 import com.nelly.application.domain.AppAuthentication;
 import com.nelly.application.dto.TokenInfoDto;
 import com.nelly.application.enums.Authority;
@@ -14,6 +15,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
@@ -66,7 +68,6 @@ public class AuthService {
         // authenticate 매서드가 실행될 때 CustomUserDetailsService 에서 만든 loadUserByUsername 메서드가 실행
         try {
             Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
-
             TokenInfoDto tokenInfoDto = tokenProvider.generateToken(authentication);
 
             // 3. refresh 토큰 DB 업데이트.
@@ -86,6 +87,11 @@ public class AuthService {
         } catch (BadCredentialsException be) {
             throw new RuntimeException("아이디 또는 비밀번호가 일치하지 않습니다.");
         }
+    }
+
+    public TokenInfoDto login(String uid, String email, String type, long expired) {
+
+        return null;
     }
 
     public TokenInfoDto getAppAuthentication(String token) {

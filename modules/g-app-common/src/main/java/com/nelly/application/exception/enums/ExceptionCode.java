@@ -13,6 +13,8 @@ public enum ExceptionCode {
     ACCESS_DENIED_EXCEPTION(HttpStatus.GONE, "ACCESS DENIED EXCEPTION", "접근 권한이 없습니다."),
     EXPIRED_TOKEN_EXCEPTION(HttpStatus.LENGTH_REQUIRED, "EXPIRED TOKEN EXCEPTION", "토큰이 만료되었습니다."), // 411 -> ( 410 )
     SCRAPER_EXCEPTION(HttpStatus.NOT_EXTENDED, "SCRAPER EXCEPTION", "제품 정보 수집 중 오류가 발생했습니다."),
+    SOCIAL_AUTHENTICATION_EXCEPTION(HttpStatus.PRECONDITION_FAILED, "SOCIAL_AUTHENTICATION_EXCEPTION",
+            "소셜회원미가입 상태입니다."),
     // 5xx
     SYSTEM_EXCEPTION(HttpStatus.NOT_EXTENDED, "SYSTEM EXCEPTION", "시스템 오류"),
     // 이하 Parameter validation exception handler

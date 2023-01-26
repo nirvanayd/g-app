@@ -8,6 +8,7 @@ import com.nelly.application.dto.response.*;
 import com.nelly.application.enums.*;
 import com.nelly.application.exception.AuthenticationException;
 import com.nelly.application.exception.NoContentException;
+import com.nelly.application.exception.SocialAuthenticationException;
 import com.nelly.application.exception.SystemException;
 import com.nelly.application.mail.MailSender;
 import com.nelly.application.repository.UserNotificationTokensRepository;
@@ -78,6 +79,33 @@ public class UserService {
     }
 
     @Transactional
+    public void signUp(SocialSignUpRequest dto) {
+        // 가입유형 확인
+        this.checkSignUpType(dto.getType());
+        if (authService.findByLoginId(dto.getNickName()) != null) throw new RuntimeException("사용 중인 닉네임입니다.");
+        if (userDomainService.existEmail(dto.getEmail())) throw new RuntimeException("사용 중인 이메일입니다.");
+        // 14세 확인
+        int age = AgeUtil.getAge(AgeUtil.getYear(dto.getBirth()), AgeUtil.getMonth(dto.getBirth()),
+                AgeUtil.getDate(dto.getBirth()));
+        if (age < 14) {
+            throw new SystemException("만 14세 미만은 가입할 수 없습니다.");
+        }
+        // 비밀번호 암호화 임시 처리
+        String encryptPassword = encryptUtils.encrypt(dto.getUid());
+        // 마케팅 수신동의
+        Long authId = authService.signUp(dto.getNickName(), encryptPassword);
+        if (authId == null) throw new RuntimeException("회원가입 중 오류가 발생하였습니다.");
+        Users user = userDomainService.addUser(authId, dto.getNickName(), dto.getEmail(), dto.getBirth(), Authority.ROLE_USER);
+
+        // 소셜회원정보저장
+        userDomainService.addSocialUser(authId, dto.getUid(), dto.getType());
+
+        addUserAgreement(user, dto.getAgreementList());
+        userDomainService.addUserStyle(user, dto.getUserStyle());
+        userDomainService.addUserMarketingType(user, dto.getUserMarketingType());
+    }
+
+    @Transactional
     public TokenInfoDto login(LoginRequest request) {
 
         String loginId = request.getLoginId();
@@ -108,6 +136,21 @@ public class UserService {
 
         // return
         return tokenInfoDto;
+    }
+
+    @Transactional
+    public TokenInfoDto login(SocialLoginRequest request) {
+        // 해당 uid와 email로 회원 있는지 확인.
+        // 없으면 회원가입 redirect exception
+        Optional<SocialUsers> existUser = userDomainService.selectSocialUser(request.getUid(), request.getType());
+        if (existUser.isEmpty()) throw new SocialAuthenticationException("회원 가입 후 사용해주세요.", request.getType());
+
+        TokenInfoDto tokenInfoDto = authService.login(
+                request.getUid(),
+                request.getEmail(),
+                request.getType(),
+                request.getExpireTime());
+        return null;
     }
 
     public void removeUserToken(long authId) {
@@ -591,6 +634,10 @@ public class UserService {
         userDomainService.saveUser(user);
     }
 
+    private void checkSignUpType(String type) {
+        if (!SignUpType.hasCode(type)) throw new RuntimeException("가입유형이 올바르지 않습니다.");
+    }
+
     /**
      * test function
      */
@@ -608,4 +655,5 @@ public class UserService {
             userDomainService.saveUser(l);
         });
     }
+
 }
