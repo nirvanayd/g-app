@@ -14,12 +14,14 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
@@ -89,9 +91,18 @@ public class AuthService {
         }
     }
 
-    public TokenInfoDto login(String uid, String email, String type, long expired) {
-
-        return null;
+    public TokenInfoDto login(long authId, String uid, String email, String type, long expired, String role) {
+        Optional<AppAuthentication> existUser = authRepository.findById(authId);
+        if (existUser.isEmpty()) throw new RuntimeException("사용자를 찾을 수 없습니다.");
+        // 소셜 로그인은 USER만 가능
+        AppAuthentication auth = existUser.get();
+        String authorities = String.join(",", auth.getRoles());
+        TokenInfoDto tokenInfoDto = tokenProvider.generateToken(auth.getLoginId(), authorities, expired);
+        auth.getRoles().stream().filter(c -> c.equals(role)).findFirst().orElseThrow(()->new AccessDeniedException("접근 권한이 없습니다."));
+        auth.setRt(tokenInfoDto.getRefreshToken());
+        authRepository.save(auth);
+        tokenInfoDto.setAuthId(auth.getId());
+        return tokenInfoDto;
     }
 
     public TokenInfoDto getAppAuthentication(String token) {

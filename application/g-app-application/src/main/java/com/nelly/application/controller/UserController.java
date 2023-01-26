@@ -54,7 +54,6 @@ public class UserController {
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody @Valid LoginRequest dto) {
         TokenInfoDto tokenInfoDto = userService.login(dto);
-
         // 상태 체크
         Optional<Users> loginUser = userService.getAppUser(tokenInfoDto.getAuthId());
         loginUser.ifPresent(l -> userService.checkAuthAppUser(loginUser.get()));
@@ -65,16 +64,13 @@ public class UserController {
 
     @PostMapping("/social-login")
     public ResponseEntity<?> login(@RequestBody @Valid SocialLoginRequest dto) {
-        // 같은 이메일로 다른 유형으로 이미 가입한 사용자인지 검사함.
-        userService.validateSocialUser(dto.getEmail(), dto.getType());
         TokenInfoDto tokenInfoDto = userService.login(dto);
-//        // 상태 체크
-//        Optional<Users> loginUser = userService.getAppUser(tokenInfoDto.getAuthId());
-//        loginUser.ifPresent(l -> userService.checkAuthAppUser(loginUser.get()));
-//        LoginResponse data = LoginResponse.builder().accessToken(tokenInfoDto.getAccessToken())
-//                .refreshToken(tokenInfoDto.getRefreshToken()).build();
-//        return response.success(data);
-        return response.success();
+        // 상태 체크
+        Optional<Users> loginUser = userService.getAppUser(tokenInfoDto.getAuthId());
+        loginUser.ifPresent(l -> userService.checkAuthAppUser(loginUser.get()));
+        LoginResponse data = LoginResponse.builder().accessToken(tokenInfoDto.getAccessToken())
+                .refreshToken(tokenInfoDto.getRefreshToken()).build();
+        return response.success(data);
     }
 
     @PostMapping("/reissue")

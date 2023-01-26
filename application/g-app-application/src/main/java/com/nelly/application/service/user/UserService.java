@@ -140,17 +140,45 @@ public class UserService {
 
     @Transactional
     public TokenInfoDto login(SocialLoginRequest request) {
+        // 같은 이메일로 다른 유형으로 이미 가입한 사용자인지 검사함.
+        validateSocialUser(request.getEmail(), request.getType());
         // 해당 uid와 email로 회원 있는지 확인.
         // 없으면 회원가입 redirect exception
         Optional<SocialUsers> existUser = userDomainService.selectSocialUser(request.getUid(), request.getType());
         if (existUser.isEmpty()) throw new SocialAuthenticationException("회원 가입 후 사용해주세요.", request.getType());
 
         TokenInfoDto tokenInfoDto = authService.login(
+                existUser.get().getAuthId(),
                 request.getUid(),
                 request.getEmail(),
                 request.getType(),
-                request.getExpireTime());
-        return null;
+                request.getExpireTime(),
+                RoleType.USER.getCode());
+
+        if (request.getFcmToken() != null) {
+            Optional<Users> users = userDomainService.selectAppUsers(tokenInfoDto.getAuthId());
+            users.ifPresent(value -> createUserFcmToken(value, request.getFcmToken()));
+        }
+
+        removeUserToken(tokenInfoDto.getAuthId());
+        // 해당 authId의 토큰은 로그아웃처리.
+//        String existToken = cacheTemplate.getValue(String.valueOf(tokenInfoDto.getAuthId()), "accessToken");
+//        if (existToken != null) {
+//            try {
+//                Long expireTime = authService.getExpiration(existToken);
+//                cacheTemplate.putValue(existToken, "logout", expireTime, TimeUnit.MILLISECONDS);
+//            } catch (Exception e) {}
+//        }
+
+        // redis 저장
+        cacheTemplate.putValue(String.valueOf(tokenInfoDto.getAuthId()), tokenInfoDto.getRefreshToken(), "token",
+                tokenInfoDto.getRefreshTokenExpirationTime(), TimeUnit.MILLISECONDS);
+
+        cacheTemplate.putValue(String.valueOf(tokenInfoDto.getAuthId()), tokenInfoDto.getAccessToken(), "accessToken",
+                tokenInfoDto.getRefreshTokenExpirationTime(), TimeUnit.MILLISECONDS);
+
+        // return
+        return tokenInfoDto;
     }
 
     public void validateSocialUser(String email, String type) {

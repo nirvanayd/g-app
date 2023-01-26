@@ -73,6 +73,34 @@ public class TokenProvider {
                 .build();
     }
 
+    public TokenInfoDto generateToken(String loginId, String role, long expireTime) {
+        long now = (new Date()).getTime();
+        // Access Token 생성
+        Date accessTokenExpiresIn = new Date(now + expireTime);
+
+        String accessToken = Jwts.builder()
+                .setSubject(loginId)
+                .claim(AUTHORITIES_KEY, role)
+                .setExpiration(accessTokenExpiresIn)
+                .signWith(key, SignatureAlgorithm.HS256)
+                .compact();
+
+        // Refresh Token 생성
+        String refreshToken = Jwts.builder()
+                .claim(AUTHORITIES_KEY, role)
+                .setIssuedAt(new Date())
+                .setExpiration(new Date(now + REFRESH_TOKEN_EXPIRE_TIME))
+                .signWith(key, SignatureAlgorithm.HS256)
+                .compact();
+
+        return TokenInfoDto.builder()
+                .accessToken(accessToken)
+                .refreshToken(refreshToken)
+                .grantType(BEARER_TYPE)
+                .refreshTokenExpirationTime(REFRESH_TOKEN_EXPIRE_TIME)
+                .build();
+    }
+
     public boolean validateToken(String token) {
         try {
             Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
