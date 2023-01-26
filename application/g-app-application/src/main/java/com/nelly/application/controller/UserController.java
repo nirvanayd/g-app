@@ -77,7 +77,7 @@ public class UserController {
         return response.success();
     }
 
-    @PostMapping("/test-issue")
+    @PostMapping("/reissue")
     public ResponseEntity<?> userTest(@RequestBody ReissueRequest requestDto) {
         log.info("reissue/access token --> " + requestDto.getAccessToken());
         log.info("reissue/refresh token --> " + requestDto.getRefreshToken());
