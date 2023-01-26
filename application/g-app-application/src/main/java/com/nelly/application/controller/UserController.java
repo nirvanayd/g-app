@@ -65,9 +65,8 @@ public class UserController {
 
     @PostMapping("/social-login")
     public ResponseEntity<?> login(@RequestBody @Valid SocialLoginRequest dto) {
-
-
-
+        // 같은 이메일로 다른 유형으로 이미 가입한 사용자인지 검사함.
+        userService.validateSocialUser(dto.getEmail(), dto.getType());
         TokenInfoDto tokenInfoDto = userService.login(dto);
 //        // 상태 체크
 //        Optional<Users> loginUser = userService.getAppUser(tokenInfoDto.getAuthId());

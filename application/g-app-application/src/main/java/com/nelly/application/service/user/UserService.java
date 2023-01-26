@@ -153,6 +153,15 @@ public class UserService {
         return null;
     }
 
+    public void validateSocialUser(String email, String type) {
+        Optional<Users> existUser = userDomainService.selectAccountByEmail(email);
+        if (existUser.isEmpty()) return;
+        Users appUser = existUser.get();
+        Optional<SocialUsers> existSocialUser = userDomainService.selectSocialUser(appUser.getAuthId());
+        if (existSocialUser.isEmpty()) throw new RuntimeException("사용 중인 이메일입니다.");
+        if (!existSocialUser.get().getType().equals(type)) throw new RuntimeException("사용 중인 이메일입니다.");
+    }
+
     public void removeUserToken(long authId) {
         String existToken = cacheTemplate.getValue(String.valueOf(authId), "accessToken");
         if (existToken != null) {

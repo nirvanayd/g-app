@@ -57,6 +57,10 @@ public class UserDomainService {
         return socialUserRepository.findByUidAndType(uid, type);
     }
 
+    public Optional<SocialUsers> selectSocialUser(long authId) {
+        return socialUserRepository.findByAuthId(authId);
+    }
+
     public Users saveUser(Users user) {
         return userRepository.save(user);
     }
