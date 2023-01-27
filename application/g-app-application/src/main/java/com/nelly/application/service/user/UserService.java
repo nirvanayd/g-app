@@ -188,8 +188,8 @@ public class UserService {
         if (existUser.isEmpty()) return existUser;
         Users appUser = existUser.get();
         Optional<SocialUsers> existSocialUser = userDomainService.selectSocialUser(appUser.getAuthId());
-        if (existSocialUser.isEmpty()) throw new RuntimeException("사용 중인 이메일입니다.");
-        if (!existSocialUser.get().getType().equals(type)) throw new RuntimeException("사용 중인 이메일입니다.");
+        if (existSocialUser.isEmpty()) throw new RuntimeException("사용 중인 이메일입니다1.");
+        if (!existSocialUser.get().getType().equals(type)) throw new RuntimeException("사용 중인 이메일입니다2.");
         return existUser;
     }
 
