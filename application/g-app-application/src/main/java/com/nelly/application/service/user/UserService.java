@@ -141,15 +141,13 @@ public class UserService {
     @Transactional
     public TokenInfoDto login(SocialLoginRequest request) {
         // 같은 이메일로 다른 유형으로 이미 가입한 사용자인지 검사함.
-        validateSocialUser(request.getEmail(), request.getType());
+        Optional<Users> user = validateSocialUser(request.getEmail(), request.getType());
+        if (user.isEmpty()) throw new SocialAuthenticationException("회원 가입 후 사용해주세요.", request.getType());
+        Users appUser = user.get();
         // 해당 uid와 email로 회원 있는지 확인.
         // 없으면 회원가입 redirect exception
-        Optional<SocialUsers> existUser = userDomainService.selectSocialUser(request.getUid(), request.getType());
+        Optional<SocialUsers> existUser = userDomainService.selectSocialUser(appUser.getAuthId());
         if (existUser.isEmpty()) throw new SocialAuthenticationException("회원 가입 후 사용해주세요.", request.getType());
-
-        log.info("uid : " + existUser.get().getUid());
-        log.info("type : " + existUser.get().getType());
-        log.info("auth : " + existUser.get().getAuthId());
 
         TokenInfoDto tokenInfoDto = authService.login(
                 existUser.get().getAuthId(),
@@ -185,13 +183,14 @@ public class UserService {
         return tokenInfoDto;
     }
 
-    public void validateSocialUser(String email, String type) {
+    public Optional<Users> validateSocialUser(String email, String type) {
         Optional<Users> existUser = userDomainService.selectAccountByEmail(email);
-        if (existUser.isEmpty()) return;
+        if (existUser.isEmpty()) return existUser;
         Users appUser = existUser.get();
         Optional<SocialUsers> existSocialUser = userDomainService.selectSocialUser(appUser.getAuthId());
         if (existSocialUser.isEmpty()) throw new RuntimeException("사용 중인 이메일입니다.");
         if (!existSocialUser.get().getType().equals(type)) throw new RuntimeException("사용 중인 이메일입니다.");
+        return existUser;
     }
 
     public void removeUserToken(long authId) {
