@@ -147,6 +147,10 @@ public class UserService {
         Optional<SocialUsers> existUser = userDomainService.selectSocialUser(request.getUid(), request.getType());
         if (existUser.isEmpty()) throw new SocialAuthenticationException("회원 가입 후 사용해주세요.", request.getType());
 
+        log.info("uid : " + existUser.get().getUid());
+        log.info("type : " + existUser.get().getType());
+        log.info("auth : " + existUser.get().getAuthId());
+
         TokenInfoDto tokenInfoDto = authService.login(
                 existUser.get().getAuthId(),
                 request.getUid(),
